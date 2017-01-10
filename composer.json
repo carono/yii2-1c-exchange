@@ -1,0 +1,19 @@
+{
+  "name": "carono/yii2-1c-exchange",
+  "description": "Yii2 module for the exchange of goods and documents from 1C",
+  "type": "yii2-exchange",
+  "authors": [
+    {
+      "name": "carono",
+      "email": "info@carono.ru"
+    }
+  ],
+  "require": {
+    "yiisoft/yii2": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "carono\\exchange1c\\": ""
+    }
+  }
+}
