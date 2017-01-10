@@ -9,7 +9,8 @@
     }
   ],
   "require": {
-    "yiisoft/yii2": "^2.0"
+    "yiisoft/yii2": "^2.0",
+    "carono/commerceml": "@dev"
   },
   "autoload": {
     "psr-4": {

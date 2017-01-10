@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a9b98d4598f96910b800fd77fb3132e4",
+    "content-hash": "0949451907c95c4dc5eab7350312c793",
     "packages": [
         {
             "name": "bower-asset/jquery",
@@ -144,6 +144,50 @@
             "license": [
                 "MIT"
             ]
+        },
+        {
+            "name": "carono/commerceml",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/carono/php-commerceml.git",
+                "reference": "7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/carono/php-commerceml/zipball/7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573",
+                "reference": "7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Zenwalker\\CommerceML\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maxim Poletaev",
+                    "email": "zenwalker2@gmail.com",
+                    "homepage": "http://zenwalker.ru"
+                },
+                {
+                    "name": "Aleksandr Kasyanov",
+                    "email": "info@carono.ru",
+                    "homepage": "http://carono.ru"
+                }
+            ],
+            "description": "Library for parsing CommerceML files",
+            "homepage": "https://github.com/zenwalker/php-commerceml",
+            "keywords": [
+                "1c",
+                "commerceml"
+            ],
+            "time": "2017-01-10 05:24:40"
         },
         {
             "name": "cebe/markdown",
@@ -397,7 +441,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "carono/commerceml": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
