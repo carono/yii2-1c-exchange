@@ -4,55 +4,37 @@ namespace carono\exchange1c\helpers;
 
 class ByteHelper
 {
+
+    public static function str2bytes($value)
+    {
+        $unit_byte = preg_replace('/[^a-zA-Z]/', '', $value);
+        $num_val = preg_replace('/\D\.\D/', '', $value);
+        switch ($unit_byte) {
+            case 'M':
+                $k = 2;
+                break;
+            default:
+                $k = 1;
+        }
+        return $num_val * pow(1024, $k);
+    }
+
     /**
-     * Convert number with unit byte to bytes unit
+     * IEEE 1541/IEC 60027-2
      *
-     * @link https://en.wikipedia.org/wiki/Metric_prefix
+     *
+     * @link https://habrahabr.ru/post/193256/
      *
      * @param string $value a number of bytes with optinal SI decimal prefix (e.g. 7k, 5mb, 3GB or 1 Tb)
      *
      * @return integer|float A number representation of the size in BYTES (can be 0). otherwise FALSE
      */
-    public static function str2bytes($value)
+    public static function metrik2bytes($value)
     {
-        // only string
         $unit_byte = preg_replace('/[^a-zA-Z]/', '', $value);
-        $unit_byte = strtolower($unit_byte);
-
-        // only number (allow decimal point)
         $num_val = preg_replace('/\D\.\D/', '', $value);
-        switch ($unit_byte) {
-            case 'p':    // petabyte
-                break;
-            case 'pb':
-                $num_val *= 1024;
-                break;
-            case 't':    // terabyte
-            case 'tb':
-                $num_val *= 1024;
-                break;
-            case 'g':    // gigabyte
-            case 'gb':
-                $num_val *= 1024;
-                break;
-            case 'm':    // megabyte
-                $num_val *= 1024;
-                break;
-            case 'mb':
-                $num_val *= 1024;
-                break;
-            case 'k':    // kilobyte
-                break;
-            case 'kb':
-                $num_val *= 1024;
-                break;
-            case 'b':    // byte
-                return $num_val *= 1;
-                break; // make sure
-            default:
-                return false;
-        }
-        return $num_val;
+
+        return false;
     }
 
     /**
