@@ -7,6 +7,7 @@ use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Category;
@@ -94,7 +95,7 @@ class DefaultController extends Controller
         @unlink(self::getTmpPath() . DIRECTORY_SEPARATOR . 'import.xml');
         @unlink(self::getTmpPath() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
-            "zip"        => "no",
+            "zip"        => class_exists('ZipArchive') ? "yes" : "no",
             "file_limit" => ByteHelper::maximum_upload_size(),
         ];
     }
@@ -103,43 +104,42 @@ class DefaultController extends Controller
     {
         $body = Yii::$app->request->getRawBody();
         $filePath = self::getTmpPath() . DIRECTORY_SEPARATOR . $filename;
-        self::setData($type . '_archive', $filePath);
+        if (!self::getData('archive') && pathinfo($filePath, PATHINFO_EXTENSION) == 'zip') {
+            self::setData('archive', $filePath);
+        }
         file_put_contents($filePath, $body, FILE_APPEND);
         return true;
     }
 
     public function actionImport($type, $filename)
     {
-//        if (!self::getData($key = 'progress_' . $type . '_' . $filename)) {
-//        $filePath = self::getData($type . '_archive');
-//        @unlink($filePath);
+        if ($archive = self::getData('archive')) {
+            $zip = new \ZipArchive();
+            $zip->open($archive);
+            $zip->extractTo(dirname($archive));
+            $zip->close();
+        }
 
-        $filePath = self::getTmpPath() . DIRECTORY_SEPARATOR . $filename;
         $import = self::getTmpPath() . DIRECTORY_SEPARATOR . 'import.xml';
         $offers = self::getTmpPath() . DIRECTORY_SEPARATOR . 'offers.xml';
-        $p = new CommerceML();
+        $commerce = new CommerceML();
 
-//        if ($filename == 'offers.xml') {
-//            $p->addXmls(null, $filePath);
-//            foreach ($p->getProducts() as $product) {
-//                if (!$model = $this->findModel($product)) {
-//                    $model = $this->createModel();
-//                    $model->save(false);
-//                }
-//                $this->parseProductCost($model, $product);
-//            }
-//        } elseif ($filename == 'import.xml') {
-        $p->addXmls($import, $offers);
-        foreach ($p->getProducts() as $product) {
+        $commerce->addXmls($import, $offers);
+        foreach ($commerce->getProducts() as $product) {
             if (!$model = $this->findModel($product)) {
                 $model = $this->createModel();
                 $model->save(false);
             }
             $this->parseProduct($model, $product);
         }
-//        } else {
-//            return false;
-//        }
+        if ($archive) {
+            @unlink($archive);
+        }
+        if (is_dir($files = self::getTmpPath() . DIRECTORY_SEPARATOR . 'import_files')) {
+            FileHelper::removeDirectory($files);
+        }
+        @unlink($import);
+        @unlink($offers);
         return true;
     }
 
