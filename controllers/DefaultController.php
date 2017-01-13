@@ -92,8 +92,8 @@ class DefaultController extends Controller
 
     public function actionInit()
     {
-        @unlink(self::getTmpPath() . DIRECTORY_SEPARATOR . 'import.xml');
-        @unlink(self::getTmpPath() . DIRECTORY_SEPARATOR . 'offers.xml');
+        @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
+        @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
             "zip"        => class_exists('ZipArchive') ? "yes" : "no",
             "file_limit" => ByteHelper::maximum_upload_size(),
@@ -103,7 +103,7 @@ class DefaultController extends Controller
     public function actionFile($type, $filename)
     {
         $body = Yii::$app->request->getRawBody();
-        $filePath = self::getTmpPath() . DIRECTORY_SEPARATOR . $filename;
+        $filePath = self::getTmpDir() . DIRECTORY_SEPARATOR . $filename;
         if (!self::getData('archive') && pathinfo($filePath, PATHINFO_EXTENSION) == 'zip') {
             self::setData('archive', $filePath);
         }
@@ -120,8 +120,8 @@ class DefaultController extends Controller
             $zip->close();
         }
 
-        $import = self::getTmpPath() . DIRECTORY_SEPARATOR . 'import.xml';
-        $offers = self::getTmpPath() . DIRECTORY_SEPARATOR . 'offers.xml';
+        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
+        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
         $commerce = new CommerceML();
 
         $commerce->addXmls($import, $offers);
@@ -132,15 +132,25 @@ class DefaultController extends Controller
             }
             $this->parseProduct($model, $product);
         }
-        if ($archive) {
+//        $this->clearTmp();
+        return true;
+    }
+
+    protected function clearTmp()
+    {
+
+        if ($archive = self::getData('archive')) {
             @unlink($archive);
         }
-        if (is_dir($files = self::getTmpPath() . DIRECTORY_SEPARATOR . 'import_files')) {
+        if (is_dir($files = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import_files')) {
             FileHelper::removeDirectory($files);
         }
-        @unlink($import);
-        @unlink($offers);
-        return true;
+        if (file_exists($import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml')) {
+            @unlink($import);
+        }
+        if ($offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml') {
+            @unlink($offers);
+        }
     }
 
     public function actionQuery($type)
@@ -168,7 +178,7 @@ class DefaultController extends Controller
         return Yii::$app->session->closeSession();
     }
 
-    protected static function getTmpPath()
+    protected static function getTmpDir()
     {
         $dir = Yii::$app->runtimePath . DIRECTORY_SEPARATOR . 'exchange1c';
         mkdir($dir);
@@ -201,7 +211,7 @@ class DefaultController extends Controller
         }
 
         $this->parseCost($model, $product->price);
-
+        $this->parseImage($model, $product->images);
         $model->save();
     }
 
@@ -240,6 +250,20 @@ class DefaultController extends Controller
             $model->setPrice1c(
                 $price->cost, is_object($price->type) ? $price->type->type : $price->type, $price->currency
             );
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param array            $images
+     */
+    protected function parseImage($model, $images)
+    {
+        foreach ($images as $image => $name) {
+            $path = realpath($this->getTmpDir() . DIRECTORY_SEPARATOR . $image);
+            if (file_exists($path)) {
+                $model->addImage1c($path, $name);
+            }
         }
     }
 

@@ -2,7 +2,9 @@
 
 namespace carono\exchange1c\interfaces;
 
-interface ProductInterface
+use yii\db\ActiveRecordInterface;
+
+interface ProductInterface extends ActiveRecordInterface
 {
     public static function getFields1c();
 
@@ -19,4 +21,6 @@ interface ProductInterface
     public function getProperty1c($id);
 
     public function setPrice1c($cost, $type, $currency);
+
+    public function addImage1c($path, $caption);
 }
