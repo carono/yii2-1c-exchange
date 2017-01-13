@@ -12,6 +12,8 @@ interface ProductInterface extends ActiveRecordInterface
 
     public function getRequisite1c($name);
 
+    public function getRequisites1c();
+
     public function setCategory1c($id, $name, $parent, $owner);
 
     public function getCategory1c($id);

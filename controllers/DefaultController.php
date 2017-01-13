@@ -3,10 +3,12 @@
 namespace carono\exchange1c\controllers;
 
 use carono\exchange1c\helpers\ByteHelper;
+use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
 use Zenwalker\CommerceML\CommerceML;
@@ -19,6 +21,7 @@ use Zenwalker\CommerceML\Model\Property;
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $debug = false;
 
     public function init()
     {
@@ -32,6 +35,7 @@ class DefaultController extends Controller
         }
         parent::init();
     }
+
 
     public function auth($login, $password)
     {
@@ -49,16 +53,28 @@ class DefaultController extends Controller
 
     public function behaviors()
     {
+        $behaviors = [];
+//        $behaviors = [
+//            'bootstrap' => [
+//                'class'   => ContentNegotiator::className(),
+//                'only'    => ['query'],
+//                'rootTag'=>'asd',
+//                'formats' => [
+//                    Response::FORMAT_XML,
+//                ],
+//            ]
+//        ];
         if (Yii::$app->user->isGuest) {
-            return [
-                'basicAuth' => [
-                    'class' => \yii\filters\auth\HttpBasicAuth::className(),
-                    'auth'  => [$this, 'auth']
+            return ArrayHelper::merge(
+                $behaviors, [
+                    'basicAuth' => [
+                        'class' => \yii\filters\auth\HttpBasicAuth::className(),
+                        'auth'  => [$this, 'auth']
+                    ]
                 ]
-            ];
-        } else {
-            return [];
+            );
         }
+        return $behaviors;
     }
 
     public function afterAction($action, $result)
@@ -90,13 +106,22 @@ class DefaultController extends Controller
         }
     }
 
+    protected function getFileLimit()
+    {
+        $limit = ByteHelper::maximum_upload_size();
+        if (!($limit % 2)) {
+            $limit--;
+        }
+        return $limit;
+    }
+
     public function actionInit()
     {
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
             "zip"        => class_exists('ZipArchive') ? "yes" : "no",
-            "file_limit" => ByteHelper::maximum_upload_size(),
+            "file_limit" => $this->getFileLimit()
         ];
     }
 
@@ -108,11 +133,25 @@ class DefaultController extends Controller
             self::setData('archive', $filePath);
         }
         file_put_contents($filePath, $body, FILE_APPEND);
+        if ((int)Yii::$app->request->headers->get('Content-Length') != $this->getFileLimit()) {
+            $this->afterFinishUploadFile($filePath);
+        }
         return true;
+    }
+
+    /**
+     * @param $filePath
+     */
+    public function afterFinishUploadFile($filePath)
+    {
+        //
     }
 
     public function actionImport($type, $filename)
     {
+        if ($filename == 'offers.xml') {
+            return true;
+        }
         if ($archive = self::getData('archive')) {
             $zip = new \ZipArchive();
             $zip->open($archive);
@@ -132,13 +171,14 @@ class DefaultController extends Controller
             }
             $this->parseProduct($model, $product);
         }
-//        $this->clearTmp();
+        if (!$this->debug) {
+            $this->clearTmp();
+        }
         return true;
     }
 
     protected function clearTmp()
     {
-
         if ($archive = self::getData('archive')) {
             @unlink($archive);
         }
@@ -155,7 +195,30 @@ class DefaultController extends Controller
 
     public function actionQuery($type)
     {
-        return file_get_contents(Yii::$app->runtimePath . DIRECTORY_SEPARATOR . 'query.xml');
+        /**
+         * @var DocumentInterface $document
+         */
+        echo chr(0xEF) . chr(0xBB) . chr(0xBF);
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+
+        $xml = new \SimpleXMLElement('<root></root>');
+        $root = $xml->addChild('КоммерческаяИнформация');
+        $root->addAttribute('ВерсияСхемы', '2.04');
+        $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
+        return $root->asXML();
+/*
+        if (!$this->getDocumentClass()) {
+            return $root->asXML();
+        }
+        $class = $this->getDocumentClass();
+        $document = new $class;
+        if ($document instanceof DocumentInterface) {
+            return $root->asXML();
+        }
+        $document::findOrders1c();
+
+        return $root->asXML();
+*/
     }
 
     public function actionSuccess($type)
@@ -306,5 +369,13 @@ class DefaultController extends Controller
     protected function getProductClass()
     {
         return $this->module->productClass;
+    }
+
+    /**
+     * @return DocumentInterface
+     */
+    protected function getDocumentClass()
+    {
+        return $this->module->documentClass;
     }
 }

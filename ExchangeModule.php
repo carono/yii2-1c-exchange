@@ -12,6 +12,7 @@ class ExchangeModule extends \yii\base\Module
      */
     public $controllerNamespace = 'carono\exchange1c\controllers';
     public $productClass;
+    public $documentClass;
 
     /**
      * @inheritdoc
