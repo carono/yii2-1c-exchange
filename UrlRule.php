@@ -11,7 +11,7 @@ class UrlRule extends \yii\web\UrlRule
 
     public function parseRequest($manager, $request)
     {
-        $this->defaults = ['mode' => \Yii::$app->request->get('mode')];
+        $this->defaults = ['mode' => \Yii::$app->request->get('mode', 'index')];
         return parent::parseRequest($manager, $request);
     }
 }

@@ -36,6 +36,10 @@ class DefaultController extends Controller
         parent::init();
     }
 
+    public function actionIndex()
+    {
+        return '';
+    }
 
     public function auth($login, $password)
     {
@@ -68,8 +72,9 @@ class DefaultController extends Controller
             return ArrayHelper::merge(
                 $behaviors, [
                     'basicAuth' => [
-                        'class' => \yii\filters\auth\HttpBasicAuth::className(),
-                        'auth'  => [$this, 'auth']
+                        'class'  => \yii\filters\auth\HttpBasicAuth::className(),
+                        'auth'   => [$this, 'auth'],
+                        'except' => ['index']
                     ]
                 ]
             );
@@ -206,19 +211,19 @@ class DefaultController extends Controller
         $root->addAttribute('ВерсияСхемы', '2.04');
         $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
         return $root->asXML();
-/*
-        if (!$this->getDocumentClass()) {
-            return $root->asXML();
-        }
-        $class = $this->getDocumentClass();
-        $document = new $class;
-        if ($document instanceof DocumentInterface) {
-            return $root->asXML();
-        }
-        $document::findOrders1c();
+        /*
+                if (!$this->getDocumentClass()) {
+                    return $root->asXML();
+                }
+                $class = $this->getDocumentClass();
+                $document = new $class;
+                if ($document instanceof DocumentInterface) {
+                    return $root->asXML();
+                }
+                $document::findOrders1c();
 
-        return $root->asXML();
-*/
+                return $root->asXML();
+        */
     }
 
     public function actionSuccess($type)
