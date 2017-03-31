@@ -2,6 +2,8 @@
 
 namespace carono\exchange1c\controllers;
 
+use carono\exchange1c\behaviors\BomBehavior;
+use carono\exchange1c\ExchangeModule;
 use carono\exchange1c\helpers\ByteHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\ProductInterface;
@@ -17,11 +19,14 @@ use Zenwalker\CommerceML\Model\Property;
 
 /**
  * Default controller for the `exchange` module
+ * @property ExchangeModule $module
  */
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
     public $debug = false;
+    public $useZip = true;
+    public $tmpDir = '@runtime/1c_exchange';
 
     public function init()
     {
@@ -57,7 +62,12 @@ class DefaultController extends Controller
 
     public function behaviors()
     {
-        $behaviors = [];
+        $behaviors = [
+            'bom' => [
+                'class' => BomBehavior::className(),
+                'only'  => ['query']
+            ]
+        ];
 //        $behaviors = [
 //            'bootstrap' => [
 //                'class'   => ContentNegotiator::className(),
@@ -125,7 +135,7 @@ class DefaultController extends Controller
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
-            "zip"        => class_exists('ZipArchive') ? "yes" : "no",
+            "zip"        => class_exists('ZipArchive') && $this->useZip ? "yes" : "no",
             "file_limit" => $this->getFileLimit()
         ];
     }
@@ -157,6 +167,7 @@ class DefaultController extends Controller
         if ($filename == 'offers.xml') {
             return true;
         }
+
         if ($archive = self::getData('archive')) {
             $zip = new \ZipArchive();
             $zip->open($archive);
@@ -166,8 +177,8 @@ class DefaultController extends Controller
 
         $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
         $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
-        $commerce = new CommerceML();
 
+        $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
         foreach ($commerce->getProducts() as $product) {
             if (!$model = $this->findModel($product)) {
@@ -203,7 +214,7 @@ class DefaultController extends Controller
         /**
          * @var DocumentInterface $document
          */
-        echo chr(0xEF) . chr(0xBB) . chr(0xBF);
+
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 
         $xml = new \SimpleXMLElement('<root></root>');
@@ -246,10 +257,12 @@ class DefaultController extends Controller
         return Yii::$app->session->closeSession();
     }
 
-    protected static function getTmpDir()
+    protected function getTmpDir()
     {
-        $dir = Yii::$app->runtimePath . DIRECTORY_SEPARATOR . 'exchange1c';
-        mkdir($dir);
+        $dir = Yii::getAlias($this->tmpDir);
+        if (is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
         return $dir;
     }
 
@@ -309,7 +322,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @param ProductInterface                    $model
+     * @param ProductInterface $model
      * @param \Zenwalker\CommerceML\Model\Price[] $prices
      */
     protected function parseCost($model, $prices)
@@ -323,7 +336,7 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param array            $images
+     * @param array $images
      */
     protected function parseImage($model, $images)
     {
@@ -337,7 +350,7 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param Property[]       $properties
+     * @param Property[] $properties
      */
     protected function parseProductProperty($model, $properties)
     {
@@ -348,7 +361,7 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param Category[]       $categories
+     * @param Category[] $categories
      */
     protected function parseCategories($model, $categories)
     {
@@ -359,7 +372,7 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param array            $requisites
+     * @param array $requisites
      */
     protected function parseRequisites($model, $requisites)
     {
