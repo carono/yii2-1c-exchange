@@ -353,9 +353,9 @@ class DefaultController extends Controller
      */
     protected function parseCategories($model, $categories)
     {
-//        foreach ($categories as $category) {
-//            $model->setCategory1c($category->id, $category->name, $category->parent, $category->owner);
-//        }
+        foreach ($categories as $category) {
+            $model->setCategory1c($category->id, $category->name, $category->parent, $category->owner);
+        }
     }
 
     /**
