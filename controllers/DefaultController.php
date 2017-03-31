@@ -10,6 +10,7 @@ use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
+use yii\filters\auth\HttpBasicAuth;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
@@ -24,9 +25,6 @@ use Zenwalker\CommerceML\Model\Property;
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
-    public $debug = false;
-    public $useZip = true;
-    public $tmpDir = '@runtime/1c_exchange';
 
     public function init()
     {
@@ -68,21 +66,11 @@ class DefaultController extends Controller
                 'only'  => ['query']
             ]
         ];
-//        $behaviors = [
-//            'bootstrap' => [
-//                'class'   => ContentNegotiator::className(),
-//                'only'    => ['query'],
-//                'rootTag'=>'asd',
-//                'formats' => [
-//                    Response::FORMAT_XML,
-//                ],
-//            ]
-//        ];
         if (Yii::$app->user->isGuest) {
             return ArrayHelper::merge(
                 $behaviors, [
                     'basicAuth' => [
-                        'class'  => \yii\filters\auth\HttpBasicAuth::className(),
+                        'class'  => HttpBasicAuth::className(),
                         'auth'   => [$this, 'auth'],
                         'except' => ['index']
                     ]
@@ -135,7 +123,7 @@ class DefaultController extends Controller
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
-            "zip"        => class_exists('ZipArchive') && $this->useZip ? "yes" : "no",
+            "zip"        => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
             "file_limit" => $this->getFileLimit()
         ];
     }
@@ -187,7 +175,7 @@ class DefaultController extends Controller
             }
             $this->parseProduct($model, $product);
         }
-        if (!$this->debug) {
+        if (!$this->module->debug) {
             $this->clearTmp();
         }
         return true;
@@ -259,7 +247,7 @@ class DefaultController extends Controller
 
     protected function getTmpDir()
     {
-        $dir = Yii::getAlias($this->tmpDir);
+        $dir = Yii::getAlias($this->module->tmpDir);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
