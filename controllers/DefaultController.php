@@ -260,7 +260,7 @@ class DefaultController extends Controller
     protected function getTmpDir()
     {
         $dir = Yii::getAlias($this->tmpDir);
-        if (is_dir($dir)) {
+        if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
         return $dir;
