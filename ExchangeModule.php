@@ -16,6 +16,7 @@ class ExchangeModule extends \yii\base\Module
     public $debug = false;
     public $useZip = true;
     public $tmpDir = '@runtime/1c_exchange';
+    public $auth;
 
     /**
      * @inheritdoc

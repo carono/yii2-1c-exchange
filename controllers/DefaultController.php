@@ -51,7 +51,7 @@ class DefaultController extends Controller
          */
         $class = Yii::$app->user->identityClass;
         $user = $class::findByUsername($login);
-        if ($user->validatePassword($password)) {
+        if ($user && $user->validatePassword($password)) {
             return $user;
         } else {
             return null;
@@ -67,11 +67,16 @@ class DefaultController extends Controller
             ]
         ];
         if (Yii::$app->user->isGuest) {
+            if ($this->module->auth) {
+                $auth = $this->module->auth;
+            } else {
+                $auth = [$this, 'auth'];
+            }
             return ArrayHelper::merge(
                 $behaviors, [
                     'basicAuth' => [
                         'class'  => HttpBasicAuth::className(),
-                        'auth'   => [$this, 'auth'],
+                        'auth'   => $auth,
                         'except' => ['index']
                     ]
                 ]
