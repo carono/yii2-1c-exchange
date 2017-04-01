@@ -150,22 +150,8 @@ class DefaultController extends Controller
         //
     }
 
-    public function actionImport($type, $filename)
+    public function parsing($import, $offers)
     {
-        if ($filename == 'offers.xml') {
-            return true;
-        }
-
-        if ($archive = self::getData('archive')) {
-            $zip = new \ZipArchive();
-            $zip->open($archive);
-            $zip->extractTo(dirname($archive));
-            $zip->close();
-        }
-
-        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
-        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
-
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
         foreach ($commerce->getProducts() as $product) {
@@ -175,6 +161,29 @@ class DefaultController extends Controller
             }
             $this->parseProduct($model, $product);
         }
+    }
+
+    public function actionLoad()
+    {
+        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
+        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
+        $this->parsing($import, $offers);
+    }
+
+    public function actionImport($type, $filename)
+    {
+        if ($filename == 'offers.xml') {
+            return true;
+        }
+        if ($archive = self::getData('archive')) {
+            $zip = new \ZipArchive();
+            $zip->open($archive);
+            $zip->extractTo(dirname($archive));
+            $zip->close();
+        }
+        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
+        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
+        $this->parsing($import, $offers);
         if (!$this->module->debug) {
             $this->clearTmp();
         }
