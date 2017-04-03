@@ -29,6 +29,7 @@ class DefaultController extends Controller
     public $enableCsrfValidation = false;
     const EVENT_AFTER_UPDATE = 'afterUpdate';
     const EVENT_AFTER_SYNC = 'afterSync';
+    private $_ids;
 
     public function init()
     {
@@ -161,11 +162,14 @@ class DefaultController extends Controller
 
     public function afterSync()
     {
-        $this->module->trigger(self::EVENT_AFTER_SYNC);
+        $event = new ExchangeEvent();
+        $event->ids = $this->_ids;
+        $this->module->trigger(self::EVENT_AFTER_SYNC, $event);
     }
 
     public function parsing($import, $offers)
     {
+        $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
         foreach ($commerce->getProducts() as $product) {
@@ -174,6 +178,7 @@ class DefaultController extends Controller
                 $model->save(false);
             }
             $this->parseProduct($model, $product);
+            $this->_ids[] = $model->getPrimaryKey();
         }
         $this->afterSync();
     }
