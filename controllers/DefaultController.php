@@ -27,7 +27,9 @@ use Zenwalker\CommerceML\Model\Property;
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
+    const EVENT_BEFORE_UPDATE = 'beforeUpdate';
     const EVENT_AFTER_UPDATE = 'afterUpdate';
+    const EVENT_BEFORE_SYNC = 'beforeSync';
     const EVENT_AFTER_SYNC = 'afterSync';
     private $_ids;
 
@@ -160,6 +162,13 @@ class DefaultController extends Controller
         //
     }
 
+    public function beforeSync()
+    {
+        $event = new ExchangeEvent();
+        $this->module->trigger(self::EVENT_BEFORE_SYNC, $event);
+    }
+
+
     public function afterSync()
     {
         $event = new ExchangeEvent();
@@ -169,6 +178,7 @@ class DefaultController extends Controller
 
     public function parsing($import, $offers)
     {
+        $this->beforeSync();
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
@@ -290,6 +300,7 @@ class DefaultController extends Controller
      */
     protected function parseProduct($model, $product)
     {
+        $this->beforeUpdate($model);
         foreach ($product as $property => $value) {
             $fields = $model::getFields1c();
             switch ($property) {
@@ -322,6 +333,13 @@ class DefaultController extends Controller
         $event = new ExchangeEvent();
         $event->model = $model;
         $this->module->trigger(self::EVENT_AFTER_UPDATE, $event);
+    }
+
+    public function beforeUpdate($model)
+    {
+        $event = new ExchangeEvent();
+        $event->model = $model;
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE, $event);
     }
 
     /**
