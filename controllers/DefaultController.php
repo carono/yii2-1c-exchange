@@ -302,6 +302,9 @@ class DefaultController extends Controller
                 case "requisites":
                     $this->parseRequisites($model, $value);
                     break;
+                case "характеристикиТовара":
+                    $this->parseProductFeatures($model, $value);
+                    break;
                 default:
                     if (isset($fields[$property]) && $fields[$property]) {
                         $model->{$fields[$property]} = $value;
@@ -381,6 +384,17 @@ class DefaultController extends Controller
     {
         foreach ($properties as $property) {
             $model->setProperty1c($property->id, $property->name, $property->values);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param $properties
+     */
+    protected function parseProductFeatures($model, $properties)
+    {
+        foreach ($properties as $property => $value) {
+            $model->setFeature1c($property, $value);
         }
     }
 

@@ -20,6 +20,8 @@ interface ProductInterface extends ActiveRecordInterface
 
     public function setProperty1c($id, $name, $values);
 
+    public function setFeature1c($name, $value);
+
     public function getProperty1c($id);
 
     public function setPrice1c($cost, $type, $currency);
