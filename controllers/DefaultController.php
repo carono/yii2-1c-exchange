@@ -46,6 +46,24 @@ class DefaultController extends Controller
         parent::init();
     }
 
+    public function actionDownload($file)
+    {
+        $path = $this->getTmpDir() . '/' . $file;
+        if (file_exists($path)) {
+            return \Yii::$app->response->sendContentAsFile(file_get_contents($path), $file, []);
+        }
+        return '';
+    }
+
+
+    public function actionList()
+    {
+        foreach (glob($this->getTmpDir() . '/*') as $file) {
+            $name = basename($file);
+            echo "<a href='/exchange/default/download?file=$name'>$name</a><br>";
+        }
+    }
+
     public function actionIndex()
     {
         return '';
