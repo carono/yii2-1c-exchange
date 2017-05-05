@@ -27,4 +27,11 @@ interface ProductInterface extends ActiveRecordInterface
     public function setPrice1c($cost, $type, $currency);
 
     public function addImage1c($path, $caption);
+
+    /**
+     * @return GroupInterface
+     */
+    public function getGroup1c();
+
+    public function getExportFields1c($context = null);
 }

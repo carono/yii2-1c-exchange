@@ -2,20 +2,27 @@
 
 namespace carono\exchange1c\controllers;
 
+use app\models\Catalog;
+use app\models\Order;
 use carono\exchange1c\behaviors\BomBehavior;
 use carono\exchange1c\ExchangeEvent;
 use carono\exchange1c\ExchangeModule;
 use carono\exchange1c\helpers\ByteHelper;
+use carono\exchange1c\helpers\NodeHelper;
+use carono\exchange1c\helpers\SerializeHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
+use carono\exchange1c\interfaces\PartnerInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\filters\auth\HttpBasicAuth;
+use yii\filters\ContentNegotiator;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Controller;
+use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Category;
 use Zenwalker\CommerceML\Model\Property;
@@ -35,6 +42,7 @@ class DefaultController extends Controller
 
     public function init()
     {
+        set_time_limit(60 * 60);
         if (!$this->module->productClass) {
             throw new Exception('1');
         }
@@ -213,7 +221,6 @@ class DefaultController extends Controller
 
     public function actionLoad()
     {
-        set_time_limit(0);
         $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
         $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
         $this->parsing($import, $offers);
@@ -255,32 +262,43 @@ class DefaultController extends Controller
         }
     }
 
+
     public function actionQuery($type)
     {
         /**
          * @var DocumentInterface $document
          */
 
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-
-        $xml = new \SimpleXMLElement('<root></root>');
-        $root = $xml->addChild('КоммерческаяИнформация');
-        $root->addAttribute('ВерсияСхемы', '2.04');
-        $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
-        return $root->asXML();
         /*
-                if (!$this->getDocumentClass()) {
-                    return $root->asXML();
-                }
-                $class = $this->getDocumentClass();
-                $document = new $class;
-                if ($document instanceof DocumentInterface) {
-                    return $root->asXML();
-                }
-                $document::findOrders1c();
-
+                echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+                $xml = new \SimpleXMLElement('<root></root>');
+                $root = $xml->addChild('КоммерческаяИнформация');
+                $root->addAttribute('ВерсияСхемы', '2.04');
+                $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
                 return $root->asXML();
         */
+
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
+
+        $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
+
+        $root->addAttribute('ВерсияСхемы', '2.04');
+        $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
+
+        $document = $this->module->documentClass;
+
+        foreach ($document::findOrders1c() as $order) {
+            NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
+        }
+
+        if ($this->module->debug) {
+            $xml = $root->asXML();
+            $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
+            file_put_contents($this->getTmpDir() . '/query.xml', $xml);
+        }
+        return $root->asXML();
     }
 
     public function actionSuccess($type)
