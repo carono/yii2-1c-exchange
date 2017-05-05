@@ -27,7 +27,9 @@ use Zenwalker\CommerceML\Model\Property;
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
+    const EVENT_BEFORE_UPDATE = 'beforeUpdate';
     const EVENT_AFTER_UPDATE = 'afterUpdate';
+    const EVENT_BEFORE_SYNC = 'beforeSync';
     const EVENT_AFTER_SYNC = 'afterSync';
     private $_ids;
 
@@ -42,6 +44,24 @@ class DefaultController extends Controller
             throw new Exception('2');
         }
         parent::init();
+    }
+
+    public function actionDownload($file)
+    {
+        $path = $this->getTmpDir() . '/' . $file;
+        if (file_exists($path)) {
+            return \Yii::$app->response->sendContentAsFile(file_get_contents($path), $file, []);
+        }
+        return '';
+    }
+
+
+    public function actionList()
+    {
+        foreach (glob($this->getTmpDir() . '/*') as $file) {
+            $name = basename($file);
+            echo "<a href='/exchange/default/download?file=$name'>$name</a><br>";
+        }
     }
 
     public function actionIndex()
@@ -160,6 +180,13 @@ class DefaultController extends Controller
         //
     }
 
+    public function beforeSync()
+    {
+        $event = new ExchangeEvent();
+        $this->module->trigger(self::EVENT_BEFORE_SYNC, $event);
+    }
+
+
     public function afterSync()
     {
         $event = new ExchangeEvent();
@@ -169,6 +196,7 @@ class DefaultController extends Controller
 
     public function parsing($import, $offers)
     {
+        $this->beforeSync();
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
@@ -290,6 +318,7 @@ class DefaultController extends Controller
      */
     protected function parseProduct($model, $product)
     {
+        $this->beforeUpdate($model);
         foreach ($product as $property => $value) {
             $fields = $model::getFields1c();
             switch ($property) {
@@ -301,6 +330,9 @@ class DefaultController extends Controller
                     break;
                 case "requisites":
                     $this->parseRequisites($model, $value);
+                    break;
+                case "характеристикиТовара":
+                    $this->parseProductFeatures($model, $value);
                     break;
                 default:
                     if (isset($fields[$property]) && $fields[$property]) {
@@ -319,6 +351,13 @@ class DefaultController extends Controller
         $event = new ExchangeEvent();
         $event->model = $model;
         $this->module->trigger(self::EVENT_AFTER_UPDATE, $event);
+    }
+
+    public function beforeUpdate($model)
+    {
+        $event = new ExchangeEvent();
+        $event->model = $model;
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE, $event);
     }
 
     /**
@@ -381,6 +420,17 @@ class DefaultController extends Controller
     {
         foreach ($properties as $property) {
             $model->setProperty1c($property->id, $property->name, $property->values);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param $properties
+     */
+    protected function parseProductFeatures($model, $properties)
+    {
+        foreach ($properties as $property => $value) {
+            $model->setFeature1c($property, $value);
         }
     }
 

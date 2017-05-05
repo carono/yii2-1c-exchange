@@ -151,12 +151,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/carono/php-commerceml.git",
-                "reference": "7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573"
+                "reference": "1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carono/php-commerceml/zipball/7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573",
-                "reference": "7cc6fcc19f4bcfced0a7a706c4a8615e91fc6573",
+                "url": "https://api.github.com/repos/carono/php-commerceml/zipball/1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7",
+                "reference": "1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7",
                 "shasum": ""
             },
             "type": "library",
@@ -187,7 +187,7 @@
                 "1c",
                 "commerceml"
             ],
-            "time": "2017-01-10 05:24:40"
+            "time": "2017-05-02 08:15:15"
         },
         {
             "name": "cebe/markdown",
