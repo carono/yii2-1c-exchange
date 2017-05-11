@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0949451907c95c4dc5eab7350312c793",
+    "content-hash": "8a2b13f10fd9880850a9d63e6368c03c",
     "packages": [
         {
             "name": "bower-asset/jquery",
@@ -147,16 +147,16 @@
         },
         {
             "name": "carono/commerceml",
-            "version": "dev-master",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carono/php-commerceml.git",
-                "reference": "1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7"
+                "reference": "2afcfe1ae0eec2d0f242b44cdb198d8965c2d4da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carono/php-commerceml/zipball/1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7",
-                "reference": "1268cbcf15c6be37b8cacd3068efba7ae1f5a7a7",
+                "url": "https://api.github.com/repos/carono/php-commerceml/zipball/2afcfe1ae0eec2d0f242b44cdb198d8965c2d4da",
+                "reference": "2afcfe1ae0eec2d0f242b44cdb198d8965c2d4da",
                 "shasum": ""
             },
             "type": "library",
@@ -187,7 +187,7 @@
                 "1c",
                 "commerceml"
             ],
-            "time": "2017-05-02 08:15:15"
+            "time": "2017-05-11T13:35:52+00:00"
         },
         {
             "name": "cebe/markdown",
@@ -441,9 +441,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "carono/commerceml": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
