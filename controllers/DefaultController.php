@@ -19,6 +19,7 @@ use yii\filters\auth\HttpBasicAuth;
 use yii\filters\ContentNegotiator;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
@@ -33,6 +34,7 @@ use Zenwalker\CommerceML\Model\SpecificationCollection;
 
 /**
  * Default controller for the `exchange` module
+ *
  * @property ExchangeModule $module
  */
 class DefaultController extends Controller
@@ -71,8 +73,10 @@ class DefaultController extends Controller
     public function actionList()
     {
         foreach (glob($this->getTmpDir() . '/*') as $file) {
-            $name = basename($file);
-            echo "<a href='/exchange/default/download?file=$name'>$name</a><br>";
+            if (is_file($file)) {
+                $name = basename($file);
+                echo Html::a($name, "/exchange/default/download?file=$name") . "<br>";
+            }
         }
     }
 
@@ -272,15 +276,14 @@ class DefaultController extends Controller
         /**
          * @var DocumentInterface $document
          */
-
-        /*
-                echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-                $xml = new \SimpleXMLElement('<root></root>');
-                $root = $xml->addChild('КоммерческаяИнформация');
-                $root->addAttribute('ВерсияСхемы', '2.04');
-                $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
-                return $root->asXML();
-        */
+        if (!$this->module->exchangeDocuments) {
+            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            $xml = new \SimpleXMLElement('<root></root>');
+            $root = $xml->addChild('КоммерческаяИнформация');
+            $root->addAttribute('ВерсияСхемы', '2.04');
+            $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
+            return $root->asXML();
+        }
 
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
