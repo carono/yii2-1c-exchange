@@ -2,8 +2,6 @@
 
 namespace carono\exchange1c\controllers;
 
-use app\models\Catalog;
-use app\models\Order;
 use carono\exchange1c\behaviors\BomBehavior;
 use carono\exchange1c\ExchangeEvent;
 use carono\exchange1c\ExchangeModule;
@@ -25,7 +23,13 @@ use yii\web\Controller;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Category;
+use Zenwalker\CommerceML\Model\Group;
+use Zenwalker\CommerceML\Model\Image;
+use Zenwalker\CommerceML\Model\Properties;
 use Zenwalker\CommerceML\Model\Property;
+use Zenwalker\CommerceML\Model\Simple;
+use Zenwalker\CommerceML\Model\RequisiteCollection;
+use Zenwalker\CommerceML\Model\SpecificationCollection;
 
 /**
  * Default controller for the `exchange` module
@@ -208,7 +212,7 @@ class DefaultController extends Controller
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
-        foreach ($commerce->getProducts() as $product) {
+        foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $this->findModel($product)) {
                 $model = $this->createModel();
                 $model->save(false);
@@ -336,30 +340,22 @@ class DefaultController extends Controller
      */
     protected function parseProduct($model, $product)
     {
+        /**
+         * @var Simple $value
+         */
+        $fields = $model::getFields1c();
         $this->beforeUpdate($model);
-        foreach ($product as $property => $value) {
-            $fields = $model::getFields1c();
-            switch ($property) {
-                case "properties":
-                    $this->parseProductProperty($model, $value);
-                    break;
-                case "categories":
-                    $this->parseCategories($model, $value);
-                    break;
-                case "requisites":
-                    $this->parseRequisites($model, $value);
-                    break;
-                case "характеристикиТовара":
-                    $this->parseProductFeatures($model, $value);
-                    break;
-                default:
-                    if (isset($fields[$property]) && $fields[$property]) {
-                        $model->{$fields[$property]} = $value;
-                    }
+        $this->parseGroups($model, $product->getGroup());
+        $this->parseRequisites($model, $product->getRequisites());
+        $this->parseSpecifications($model, $product->getSpecifications());
+        $this->parseProperties($model, $product->getProperties());
+        foreach ($fields as $accountingField => $modelField) {
+            if ($modelField) {
+                $model->{$modelField} = (string)$product->{$accountingField};
             }
         }
-        $this->parseCost($model, $product->price);
-        $this->parseImage($model, $product->images);
+        $this->parsePrice($model, $product->getPrices());
+        $this->parseImage($model, $product->getImages());
         $model->save();
         $this->afterUpdate($model);
     }
@@ -407,70 +403,66 @@ class DefaultController extends Controller
      * @param ProductInterface $model
      * @param \Zenwalker\CommerceML\Model\Price[] $prices
      */
-    protected function parseCost($model, $prices)
+    protected function parsePrice($model, $prices)
     {
         foreach ($prices as $price) {
-            $model->setPrice1c(
-                $price->cost, is_object($price->type) ? $price->type->type : $price->type, $price->currency
-            );
+            $model->setPrice1c($price);
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param array $images
+     * @param Image[] $images
      */
     protected function parseImage($model, $images)
     {
-        foreach ($images as $image => $name) {
-            $path = realpath($this->getTmpDir() . DIRECTORY_SEPARATOR . $image);
+        foreach ($images as $image) {
+            $path = realpath($this->getTmpDir() . DIRECTORY_SEPARATOR . $image->path);
             if (file_exists($path)) {
-                $model->addImage1c($path, $name);
+                $model->addImage1c($path, $image->caption);
             }
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param Property[] $properties
+     * @param Group $group
      */
-    protected function parseProductProperty($model, $properties)
+    protected function parseGroups($model, $group)
     {
-        foreach ($properties as $property) {
-            $model->setProperty1c($property->id, $property->name, $property->values);
-        }
+        $model->setGroup1c($group);
     }
 
     /**
      * @param ProductInterface $model
-     * @param $properties
-     */
-    protected function parseProductFeatures($model, $properties)
-    {
-        foreach ($properties as $property => $value) {
-            $model->setFeature1c($property, $value);
-        }
-    }
-
-    /**
-     * @param ProductInterface $model
-     * @param Category[] $categories
-     */
-    protected function parseCategories($model, $categories)
-    {
-        foreach ($categories as $category) {
-            $model->setCategory1c($category->id, $category->name, $category->parent, $category->owner);
-        }
-    }
-
-    /**
-     * @param ProductInterface $model
-     * @param array $requisites
+     * @param RequisiteCollection $requisites
      */
     protected function parseRequisites($model, $requisites)
     {
-        foreach ($requisites as $name => $value) {
-            $model->setRequisite1c($name, $value);
+        foreach ($requisites as $requisite) {
+            $model->setRequisite1c($requisite->name, $requisite->value);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param SpecificationCollection $specifications
+     */
+    protected function parseSpecifications($model, $specifications)
+    {
+        foreach ($specifications as $specification) {
+            $model->setSpecification1c($specification->name, $specification->value);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param Properties $properties
+     */
+    protected function parseProperties($model, $properties)
+    {
+        foreach ($properties as $property) {
+            $model->setProperty1c($property);
         }
     }
 
