@@ -6,22 +6,35 @@ use carono\exchange1c\behaviors\BomBehavior;
 use carono\exchange1c\ExchangeEvent;
 use carono\exchange1c\ExchangeModule;
 use carono\exchange1c\helpers\ByteHelper;
+use carono\exchange1c\helpers\NodeHelper;
+use carono\exchange1c\helpers\SerializeHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
+use carono\exchange1c\interfaces\PartnerInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\filters\auth\HttpBasicAuth;
+use yii\filters\ContentNegotiator;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
+use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Category;
+use Zenwalker\CommerceML\Model\Group;
+use Zenwalker\CommerceML\Model\Image;
+use Zenwalker\CommerceML\Model\Properties;
 use Zenwalker\CommerceML\Model\Property;
+use Zenwalker\CommerceML\Model\Simple;
+use Zenwalker\CommerceML\Model\RequisiteCollection;
+use Zenwalker\CommerceML\Model\SpecificationCollection;
 
 /**
  * Default controller for the `exchange` module
+ *
  * @property ExchangeModule $module
  */
 class DefaultController extends Controller
@@ -35,6 +48,7 @@ class DefaultController extends Controller
 
     public function init()
     {
+        set_time_limit(60 * 60);
         if (!$this->module->productClass) {
             throw new Exception('1');
         }
@@ -59,8 +73,10 @@ class DefaultController extends Controller
     public function actionList()
     {
         foreach (glob($this->getTmpDir() . '/*') as $file) {
-            $name = basename($file);
-            echo "<a href='/exchange/default/download?file=$name'>$name</a><br>";
+            if (is_file($file)) {
+                $name = basename($file);
+                echo Html::a($name, "/exchange/default/download?file=$name") . "<br>";
+            }
         }
     }
 
@@ -200,7 +216,7 @@ class DefaultController extends Controller
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->addXmls($import, $offers);
-        foreach ($commerce->getProducts() as $product) {
+        foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $this->findModel($product)) {
                 $model = $this->createModel();
                 $model->save(false);
@@ -213,7 +229,6 @@ class DefaultController extends Controller
 
     public function actionLoad()
     {
-        set_time_limit(0);
         $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
         $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
         $this->parsing($import, $offers);
@@ -255,32 +270,42 @@ class DefaultController extends Controller
         }
     }
 
+
     public function actionQuery($type)
     {
         /**
          * @var DocumentInterface $document
          */
+        if (!$this->module->exchangeDocuments) {
+            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            $xml = new \SimpleXMLElement('<root></root>');
+            $root = $xml->addChild('КоммерческаяИнформация');
+            $root->addAttribute('ВерсияСхемы', '2.04');
+            $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
+            return $root->asXML();
+        }
 
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_RAW;
+        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
 
-        $xml = new \SimpleXMLElement('<root></root>');
-        $root = $xml->addChild('КоммерческаяИнформация');
+        $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
+
         $root->addAttribute('ВерсияСхемы', '2.04');
         $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
-        return $root->asXML();
-        /*
-                if (!$this->getDocumentClass()) {
-                    return $root->asXML();
-                }
-                $class = $this->getDocumentClass();
-                $document = new $class;
-                if ($document instanceof DocumentInterface) {
-                    return $root->asXML();
-                }
-                $document::findOrders1c();
 
-                return $root->asXML();
-        */
+        $document = $this->module->documentClass;
+
+        foreach ($document::findOrders1c() as $order) {
+            NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
+        }
+
+        if ($this->module->debug) {
+            $xml = $root->asXML();
+            $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
+            file_put_contents($this->getTmpDir() . '/query.xml', $xml);
+        }
+        return $root->asXML();
     }
 
     public function actionSuccess($type)
@@ -318,30 +343,22 @@ class DefaultController extends Controller
      */
     protected function parseProduct($model, $product)
     {
+        /**
+         * @var Simple $value
+         */
+        $fields = $model::getFields1c();
         $this->beforeUpdate($model);
-        foreach ($product as $property => $value) {
-            $fields = $model::getFields1c();
-            switch ($property) {
-                case "properties":
-                    $this->parseProductProperty($model, $value);
-                    break;
-                case "categories":
-                    $this->parseCategories($model, $value);
-                    break;
-                case "requisites":
-                    $this->parseRequisites($model, $value);
-                    break;
-                case "характеристикиТовара":
-                    $this->parseProductFeatures($model, $value);
-                    break;
-                default:
-                    if (isset($fields[$property]) && $fields[$property]) {
-                        $model->{$fields[$property]} = $value;
-                    }
+        $this->parseGroups($model, $product->getGroup());
+        $this->parseRequisites($model, $product->getRequisites());
+        $this->parseSpecifications($model, $product->getSpecifications());
+        $this->parseProperties($model, $product->getProperties());
+        foreach ($fields as $accountingField => $modelField) {
+            if ($modelField) {
+                $model->{$modelField} = (string)$product->{$accountingField};
             }
         }
-        $this->parseCost($model, $product->price);
-        $this->parseImage($model, $product->images);
+        $this->parsePrice($model, $product->getPrices());
+        $this->parseImage($model, $product->getImages());
         $model->save();
         $this->afterUpdate($model);
     }
@@ -389,70 +406,66 @@ class DefaultController extends Controller
      * @param ProductInterface $model
      * @param \Zenwalker\CommerceML\Model\Price[] $prices
      */
-    protected function parseCost($model, $prices)
+    protected function parsePrice($model, $prices)
     {
         foreach ($prices as $price) {
-            $model->setPrice1c(
-                $price->cost, is_object($price->type) ? $price->type->type : $price->type, $price->currency
-            );
+            $model->setPrice1c($price);
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param array $images
+     * @param Image[] $images
      */
     protected function parseImage($model, $images)
     {
-        foreach ($images as $image => $name) {
-            $path = realpath($this->getTmpDir() . DIRECTORY_SEPARATOR . $image);
+        foreach ($images as $image) {
+            $path = realpath($this->getTmpDir() . DIRECTORY_SEPARATOR . $image->path);
             if (file_exists($path)) {
-                $model->addImage1c($path, $name);
+                $model->addImage1c($path, $image->caption);
             }
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param Property[] $properties
+     * @param Group $group
      */
-    protected function parseProductProperty($model, $properties)
+    protected function parseGroups($model, $group)
     {
-        foreach ($properties as $property) {
-            $model->setProperty1c($property->id, $property->name, $property->values);
-        }
+        $model->setGroup1c($group);
     }
 
     /**
      * @param ProductInterface $model
-     * @param $properties
-     */
-    protected function parseProductFeatures($model, $properties)
-    {
-        foreach ($properties as $property => $value) {
-            $model->setFeature1c($property, $value);
-        }
-    }
-
-    /**
-     * @param ProductInterface $model
-     * @param Category[] $categories
-     */
-    protected function parseCategories($model, $categories)
-    {
-        foreach ($categories as $category) {
-            $model->setCategory1c($category->id, $category->name, $category->parent, $category->owner);
-        }
-    }
-
-    /**
-     * @param ProductInterface $model
-     * @param array $requisites
+     * @param RequisiteCollection $requisites
      */
     protected function parseRequisites($model, $requisites)
     {
-        foreach ($requisites as $name => $value) {
-            $model->setRequisite1c($name, $value);
+        foreach ($requisites as $requisite) {
+            $model->setRequisite1c($requisite->name, $requisite->value);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param SpecificationCollection $specifications
+     */
+    protected function parseSpecifications($model, $specifications)
+    {
+        foreach ($specifications as $specification) {
+            $model->setSpecification1c($specification->name, $specification->value);
+        }
+    }
+
+    /**
+     * @param ProductInterface $model
+     * @param Properties $properties
+     */
+    protected function parseProperties($model, $properties)
+    {
+        foreach ($properties as $property) {
+            $model->setProperty1c($property);
         }
     }
 
