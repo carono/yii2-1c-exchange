@@ -5,9 +5,11 @@ namespace carono\exchange1c\interfaces;
 use yii\db\ActiveRecordInterface;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Group;
+use Zenwalker\CommerceML\Model\Offer;
 use Zenwalker\CommerceML\Model\Price;
 use Zenwalker\CommerceML\Model\Product;
 use Zenwalker\CommerceML\Model\Property;
+use Zenwalker\CommerceML\Model\Simple;
 
 interface ProductInterface extends ActiveRecordInterface
 {
@@ -33,6 +35,7 @@ interface ProductInterface extends ActiveRecordInterface
      *      'Количество'   => 'remnant',
      *      'Штрихкод'     => 'barcode'
      * ]
+     *
      * @return array
      */
     public static function getFields1c();
@@ -59,11 +62,11 @@ interface ProductInterface extends ActiveRecordInterface
      * $name - Наименование
      * $value - Значение
      *
-     * @param $name
-     * @param $value
+     * @param Offer $offer
+     * @param Simple $specification
      * @return void
      */
-    public function setSpecification1c($name, $value);
+    public function setSpecification1c($offer, $specification);
 
     /**
      * $property - Свойство товара (import.xml > Классификатор > Свойства > Свойство)
@@ -71,7 +74,7 @@ interface ProductInterface extends ActiveRecordInterface
      * $property->getValueModel() - Данные по значению, Ид значения, и т.д (import.xml > Классификатор > Свойства > Свойство > ВариантыЗначений > Справочник)
      *
      * @param Property $property
-     * @return mixed
+     * @return void
      */
     public function setProperty1c($property);
 
@@ -81,10 +84,11 @@ interface ProductInterface extends ActiveRecordInterface
      * К $price можно обратиться как к массиву, чтобы получить список цен (Цены > Цена)
      * $price->type - тип цены (offers.xml > ПакетПредложений > ТипыЦен > ТипЦены)
      *
+     * @param Offer $offer
      * @param Price $price
-     * @return mixed
+     * @return void
      */
-    public function setPrice1c($price);
+    public function setPrice1c($offer, $price);
 
     /**
      * @param string $path

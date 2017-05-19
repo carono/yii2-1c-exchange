@@ -9,28 +9,24 @@ use carono\exchange1c\helpers\ByteHelper;
 use carono\exchange1c\helpers\NodeHelper;
 use carono\exchange1c\helpers\SerializeHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
-use carono\exchange1c\interfaces\PartnerInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
-use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\filters\auth\HttpBasicAuth;
-use yii\filters\ContentNegotiator;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
-use Zenwalker\CommerceML\Model\Category;
 use Zenwalker\CommerceML\Model\Group;
 use Zenwalker\CommerceML\Model\Image;
-use Zenwalker\CommerceML\Model\Properties;
-use Zenwalker\CommerceML\Model\Property;
+use Zenwalker\CommerceML\Model\Offer;
+use Zenwalker\CommerceML\Model\Product;
+use Zenwalker\CommerceML\Model\PropertyCollection;
 use Zenwalker\CommerceML\Model\Simple;
 use Zenwalker\CommerceML\Model\RequisiteCollection;
-use Zenwalker\CommerceML\Model\SpecificationCollection;
 
 /**
  * Default controller for the `exchange` module
@@ -40,10 +36,12 @@ use Zenwalker\CommerceML\Model\SpecificationCollection;
 class DefaultController extends Controller
 {
     public $enableCsrfValidation = false;
-    const EVENT_BEFORE_UPDATE = 'beforeUpdate';
-    const EVENT_AFTER_UPDATE = 'afterUpdate';
-    const EVENT_BEFORE_SYNC = 'beforeSync';
-    const EVENT_AFTER_SYNC = 'afterSync';
+    const EVENT_BEFORE_UPDATE_PRODUCT = 'beforeUpdateProduct';
+    const EVENT_AFTER_UPDATE_PRODUCT = 'afterUpdateProduct';
+    const EVENT_BEFORE_UPDATE_OFFER = 'beforeUpdateOffer';
+    const EVENT_AFTER_UPDATE_OFFER = 'afterUpdateOffer';
+    const EVENT_BEFORE_PRODUCT_SYNC = 'beforeProductSync';
+    const EVENT_AFTER_PRODUCT_SYNC = 'afterProductSync';
     private $_ids;
 
     public function init()
@@ -196,35 +194,41 @@ class DefaultController extends Controller
         //
     }
 
-    public function beforeSync()
+    public function beforeProductSync()
     {
-        $event = new ExchangeEvent();
-        $this->module->trigger(self::EVENT_BEFORE_SYNC, $event);
+        $this->module->trigger(self::EVENT_BEFORE_PRODUCT_SYNC, new ExchangeEvent());
     }
 
 
-    public function afterSync()
+    public function afterProductSync()
     {
-        $event = new ExchangeEvent();
-        $event->ids = $this->_ids;
-        $this->module->trigger(self::EVENT_AFTER_SYNC, $event);
+        $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
     }
 
     public function parsing($import, $offers)
     {
-        $this->beforeSync();
         $this->_ids = [];
         $commerce = new CommerceML();
-        $commerce->addXmls($import, $offers);
-        foreach ($commerce->catalog->getProducts() as $product) {
-            if (!$model = $this->findModel($product)) {
-                $model = $this->createModel();
-                $model->save(false);
+        $commerce->addXmls(file_exists($import) ? $import : false, file_exists($offers) ? $offers : false);
+        if ($import) {
+            $this->beforeProductSync();
+            foreach ($commerce->catalog->getProducts() as $product) {
+                if (!$model = $this->findModel($product)) {
+                    $model = $this->createModel();
+                    $model->save($this->module->validateModelOnSave);
+                }
+                $this->parseProduct($model, $product);
+                $this->_ids[] = $model->getPrimaryKey();
             }
-            $this->parseProduct($model, $product);
-            $this->_ids[] = $model->getPrimaryKey();
+            $this->afterProductSync();
         }
-        $this->afterSync();
+        if ($offers) {
+            foreach ($commerce->offerPackage->getOffers() as $offer) {
+                if ($model = $this->findModel($offer)) {
+                    $this->parseProductOffer($model, $offer);
+                }
+            }
+        }
     }
 
     public function actionLoad()
@@ -234,20 +238,37 @@ class DefaultController extends Controller
         $this->parsing($import, $offers);
     }
 
+    public function parsingImport($file)
+    {
+        $this->parsing($file, false);
+    }
+
+    public function parsingOffer($file)
+    {
+        $this->parsing(false, $file);
+    }
+
     public function actionImport($type, $filename)
     {
-        if ($filename == 'offers.xml') {
-            return true;
+        if ($type != 'catalog') {
+            return false;
         }
+
         if ($archive = self::getData('archive')) {
             $zip = new \ZipArchive();
             $zip->open($archive);
             $zip->extractTo(dirname($archive));
             $zip->close();
         }
-        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
-        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
-        $this->parsing($import, $offers);
+
+        $file = self::getTmpDir() . DIRECTORY_SEPARATOR . $filename;
+
+        if (strpos($file, 'offer') !== false) {
+            $this->parsingOffer($file);
+        } else {
+            $this->parsingImport($file);
+        }
+
         if (!$this->module->debug) {
             $this->clearTmp();
         }
@@ -269,7 +290,6 @@ class DefaultController extends Controller
             @unlink($offers);
         }
     }
-
 
     public function actionQuery($type)
     {
@@ -347,51 +367,81 @@ class DefaultController extends Controller
          * @var Simple $value
          */
         $fields = $model::getFields1c();
-        $this->beforeUpdate($model);
+        $this->beforeUpdateProduct($model);
+        $model->setRaw1cData($product->owner, $product);
         $this->parseGroups($model, $product->getGroup());
-        $this->parseRequisites($model, $product->getRequisites());
-        $this->parseSpecifications($model, $product->getSpecifications());
         $this->parseProperties($model, $product->getProperties());
+        $this->parseRequisites($model, $product->getRequisites());
+        $this->parseImage($model, $product->getImages());
         foreach ($fields as $accountingField => $modelField) {
             if ($modelField) {
                 $model->{$modelField} = (string)$product->{$accountingField};
             }
         }
-        $this->parsePrice($model, $product->getPrices());
-        $this->parseImage($model, $product->getImages());
         $model->save();
-        $this->afterUpdate($model);
-    }
-
-    public function afterUpdate($model)
-    {
-        $event = new ExchangeEvent();
-        $event->model = $model;
-        $this->module->trigger(self::EVENT_AFTER_UPDATE, $event);
-    }
-
-    public function beforeUpdate($model)
-    {
-        $event = new ExchangeEvent();
-        $event->model = $model;
-        $this->module->trigger(self::EVENT_BEFORE_UPDATE, $event);
+        $this->afterUpdateProduct($model);
     }
 
     /**
-     * @param \Zenwalker\CommerceML\Model\Product $product
-     *
-     * @return ActiveRecord|null
+     * @param ProductInterface $model
+     * @param Offer $offer
      */
-    protected function findModel($product)
+    protected function parseProductOffer($model, $offer)
+    {
+        /**
+         * @var Simple $value
+         */
+        $fields = $model::getFields1c();
+        $this->beforeUpdateOffer($model);
+        $this->parseSpecifications($model, $offer);
+        $this->parsePrice($model, $offer);
+        foreach ($fields as $accountingField => $modelField) {
+            if ($modelField) {
+                $model->{$modelField} = (string)$offer->{$accountingField};
+            }
+        }
+        $model->save();
+        $this->afterUpdateOffer($model);
+    }
+
+    public function afterUpdateProduct($model)
+    {
+        $this->module->trigger(self::EVENT_AFTER_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
+    }
+
+    public function beforeUpdateProduct($model)
+    {
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
+    }
+
+    public function beforeUpdateOffer($model)
+    {
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent(['model' => $model]));
+    }
+
+    public function afterUpdateOffer($model)
+    {
+        $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model]));
+    }
+
+    /**
+     * @param Product|Offer $object
+     *
+     * @return ProductInterface|null
+     */
+    protected function findModel($object)
     {
         /**
          * @var $class ProductInterface
          */
         $class = $this->getProductClass();
         $id = $class::getFields1c()['id'];
-        return $class::find()->andWhere([$id => $product->id])->one();
+        return $class::find()->andWhere([$id => $object->getClearId()])->one();
     }
 
+    /**
+     * @return mixed
+     */
     protected function createModel()
     {
         /**
@@ -404,18 +454,18 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param \Zenwalker\CommerceML\Model\Price[] $prices
+     * @param Offer $offer
      */
-    protected function parsePrice($model, $prices)
+    protected function parsePrice($model, $offer)
     {
-        foreach ($prices as $price) {
-            $model->setPrice1c($price);
+        foreach ($offer->getPrices() as $price) {
+            $model->setPrice1c($offer, $price);
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param Image[] $images
+     * @param Image $images
      */
     protected function parseImage($model, $images)
     {
@@ -449,18 +499,18 @@ class DefaultController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param SpecificationCollection $specifications
+     * @param Offer $offer
      */
-    protected function parseSpecifications($model, $specifications)
+    protected function parseSpecifications($model, $offer)
     {
-        foreach ($specifications as $specification) {
-            $model->setSpecification1c($specification->name, $specification->value);
+        foreach ($offer->getSpecifications() as $specification) {
+            $model->setSpecification1c($offer, $specification);
         }
     }
 
     /**
      * @param ProductInterface $model
-     * @param Properties $properties
+     * @param PropertyCollection $properties
      */
     protected function parseProperties($model, $properties)
     {
