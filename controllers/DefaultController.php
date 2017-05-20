@@ -42,11 +42,13 @@ class DefaultController extends Controller
     const EVENT_AFTER_UPDATE_OFFER = 'afterUpdateOffer';
     const EVENT_BEFORE_PRODUCT_SYNC = 'beforeProductSync';
     const EVENT_AFTER_PRODUCT_SYNC = 'afterProductSync';
+    const EVENT_AFTER_FINISH_UPLOAD_FILE = 'afterFinishUploadFile';
+
     private $_ids;
 
     public function init()
     {
-        set_time_limit(60 * 60);
+        set_time_limit($this->module->timeLimit);
         if (!$this->module->productClass) {
             throw new Exception('1');
         }
@@ -191,7 +193,7 @@ class DefaultController extends Controller
      */
     public function afterFinishUploadFile($filePath)
     {
-        //
+        $this->module->trigger(self::EVENT_AFTER_FINISH_UPLOAD_FILE, new ExchangeEvent());
     }
 
     public function beforeProductSync()
