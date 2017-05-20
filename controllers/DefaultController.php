@@ -227,6 +227,8 @@ class DefaultController extends Controller
         if ($offers) {
             foreach ($commerce->offerPackage->getOffers() as $offer) {
                 if ($model = $this->findModel($offer)) {
+//                    var_dump($model);
+//                    exit;
                     $this->parseProductOffer($model, $offer);
                 }
             }
@@ -235,9 +237,8 @@ class DefaultController extends Controller
 
     public function actionLoad()
     {
-        $import = self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml';
-        $offers = self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml';
-        $this->parsing($import, $offers);
+        $this->actionImport('catalog', 'import.xml');
+        $this->actionImport('catalog', 'offers.xml');
     }
 
     public function parsingImport($file)
@@ -395,6 +396,7 @@ class DefaultController extends Controller
          */
         $fields = $model::getFields1c();
         $this->beforeUpdateOffer($model);
+
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
         foreach ($fields as $accountingField => $modelField) {
