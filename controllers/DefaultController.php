@@ -401,6 +401,9 @@ class DefaultController extends Controller
         $this->parsePrice($model, $offer);
         foreach ($fields as $accountingField => $modelField) {
             if ($modelField) {
+                if ($accountingField == 'id') {
+                    continue;
+                }
                 $model->{$modelField} = (string)$offer->{$accountingField};
             }
         }
