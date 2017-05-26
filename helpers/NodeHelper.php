@@ -11,13 +11,16 @@ class NodeHelper
     /**
      * @param \SimpleXMLElement $parent
      * @param \SimpleXMLElement $child
+     *
+     * @return \SimpleXMLElement
      */
     public static function appendNode(\SimpleXMLElement $parent, \SimpleXMLElement $child)
     {
-        $partnersDom = dom_import_simplexml($parent);
-        $partnerDom = dom_import_simplexml($child);
-        $partnerDom = $partnersDom->ownerDocument->importNode($partnerDom, TRUE);
-        $partnersDom->appendChild($partnerDom);
+        $parentDom = dom_import_simplexml($parent);
+        $childDom = dom_import_simplexml($child);
+        $childDom = $parentDom->ownerDocument->importNode($childDom, TRUE);
+        $parentDom->appendChild($childDom);
+        return $child;
     }
 
     /**
@@ -25,29 +28,36 @@ class NodeHelper
      * @param $model
      * @param $field1c
      * @param $attribute
+     * @return int|\SimpleXMLElement|string
      */
     public static function addChild($xml, $model, $field1c, $attribute)
     {
         if ($attribute instanceof \Closure) {
-            self::addChild($xml, $model, $field1c, call_user_func($attribute, $model));
+            return self::addChild($xml, $model, $field1c, call_user_func($attribute, $model));
         } elseif (is_string($attribute) && isset($model->{$attribute})) {
-            self::addChild($xml, $model, $field1c, $model->{$attribute});
+            return self::addChild($xml, $model, $field1c, $model->{$attribute});
         } elseif (is_array($attribute)) {
             $array = $attribute;
             $content = ArrayHelper::remove($array, '@content', '');
+            $field1c = ArrayHelper::remove($array, '@name', $field1c);
             $attributes = ArrayHelper::remove($array, '@attributes', []);
-            $item = new \SimpleXMLElement("<{$field1c}>{$content}</{$field1c}>");
-            foreach ($attributes as $attribute => $value) {
-                $item->addAttribute($attribute, $value);
+            if (is_array($content)) {
+                $item = self::addChild($xml, $model, $field1c, $content);
+                return $item;
+            } else {
+                $item = new \SimpleXMLElement("<{$field1c}>$content</{$field1c}>");
+                foreach ($attributes as $attribute => $value) {
+                    $item->addAttribute($attribute, $value);
+                }
+                foreach ($array as $field => $value) {
+                    self::addChild($item, $model, $field, $value);
+                }
+                return self::appendNode($xml, $item);
             }
-            foreach ($array as $field => $value) {
-                self::addChild($item, $model, $field, $value);
-            }
-            self::appendNode($xml, $item);
         } elseif ($attribute instanceof \SimpleXMLElement) {
-            self::appendNode($xml, $attribute);
+            return self::appendNode($xml, $attribute);
         } else {
-            $xml->addChild($field1c, $attribute);
+            return $xml->addChild($field1c, $attribute);
         }
     }
 }
