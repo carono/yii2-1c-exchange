@@ -404,6 +404,9 @@ class DefaultController extends Controller
                 if ($accountingField == 'id') {
                     continue;
                 }
+                if (is_null($offer->{$accountingField})) {
+                    continue;
+                }
                 $model->{$modelField} = (string)$offer->{$accountingField};
             }
         }
