@@ -104,8 +104,8 @@ class DefaultController extends Controller
         $behaviors = [
             'bom' => [
                 'class' => BomBehavior::className(),
-                'only'  => ['query']
-            ]
+                'only' => ['query'],
+            ],
         ];
         if (Yii::$app->user->isGuest) {
             if ($this->module->auth) {
@@ -116,10 +116,10 @@ class DefaultController extends Controller
             return ArrayHelper::merge(
                 $behaviors, [
                     'basicAuth' => [
-                        'class'  => HttpBasicAuth::className(),
-                        'auth'   => $auth,
-                        'except' => ['index']
-                    ]
+                        'class' => HttpBasicAuth::className(),
+                        'auth' => $auth,
+                        'except' => ['index'],
+                    ],
                 ]
             );
         }
@@ -150,7 +150,7 @@ class DefaultController extends Controller
             return [
                 "success",
                 "PHPSESSID",
-                Yii::$app->session->getId()
+                Yii::$app->session->getId(),
             ];
         }
     }
@@ -169,8 +169,8 @@ class DefaultController extends Controller
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
         @unlink(self::getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
-            "zip"        => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
-            "file_limit" => $this->getFileLimit()
+            "zip" => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
+            "file_limit" => $this->getFileLimit(),
         ];
     }
 
@@ -221,15 +221,19 @@ class DefaultController extends Controller
                 }
                 $this->parseProduct($model, $product);
                 $this->_ids[] = $model->getPrimaryKey();
+                $model = null;
+                unset($model);
+                unset($product);
+                gc_collect_cycles();
             }
             $this->afterProductSync();
+
         }
         if ($offers) {
             foreach ($commerce->offerPackage->getOffers() as $offer) {
                 if ($model = $this->findModel($offer)) {
-//                    var_dump($model);
-//                    exit;
                     $this->parseProductOffer($model, $offer);
+                    unset($model);
                 }
             }
         }
@@ -372,7 +376,8 @@ class DefaultController extends Controller
         $fields = $model::getFields1c();
         $this->beforeUpdateProduct($model);
         $model->setRaw1cData($product->owner, $product);
-        $this->parseGroups($model, $product->getGroup());
+        $group = $product->getGroup();
+        $this->parseGroups($model, $group);
         $this->parseProperties($model, $product->getProperties());
         $this->parseRequisites($model, $product->getRequisites());
         $this->parseImage($model, $product->getImages());
@@ -382,6 +387,7 @@ class DefaultController extends Controller
             }
         }
         $model->save();
+        unset($group);
         $this->afterUpdateProduct($model);
     }
 
@@ -395,8 +401,7 @@ class DefaultController extends Controller
          * @var Simple $value
          */
         $fields = $model::getFields1c();
-        $this->beforeUpdateOffer($model);
-
+        $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
         foreach ($fields as $accountingField => $modelField) {
@@ -424,9 +429,12 @@ class DefaultController extends Controller
         $this->module->trigger(self::EVENT_BEFORE_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
     }
 
-    public function beforeUpdateOffer($model)
+    public function beforeUpdateOffer($model, $offer)
     {
-        $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent(['model' => $model]));
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent([
+            'model' => $model,
+            'ml' => $offer,
+        ]));
     }
 
     public function afterUpdateOffer($model)
