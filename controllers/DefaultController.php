@@ -10,6 +10,7 @@ use carono\exchange1c\helpers\NodeHelper;
 use carono\exchange1c\helpers\SerializeHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\ProductInterface;
+use function GuzzleHttp\Promise\promise_for;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
@@ -250,6 +251,21 @@ class DefaultController extends Controller
         $this->parsing($file, false);
     }
 
+    public function parsingOrder($file)
+    {
+        /**
+         * @var DocumentInterface $documentModel
+         */
+        $commerce = new CommerceML();
+        $commerce->addXmls(false, false, $file);
+        $documentClass = $this->module->documentClass;
+        foreach ($commerce->order->documents as $document) {
+            if ($documentModel = $documentClass::findOne((string)$document->Номер)) {
+                $documentModel->setRaw1cData($commerce, $document);
+            }
+        }
+    }
+
     public function parsingOffer($file)
     {
         $this->parsing(false, $file);
@@ -257,25 +273,22 @@ class DefaultController extends Controller
 
     public function actionImport($type, $filename)
     {
-        if ($type != 'catalog') {
-            return false;
-        }
-
         if ($archive = self::getData('archive')) {
             $zip = new \ZipArchive();
             $zip->open($archive);
             $zip->extractTo(dirname($archive));
             $zip->close();
         }
-
         $file = self::getTmpDir() . DIRECTORY_SEPARATOR . $filename;
-
-        if (strpos($file, 'offer') !== false) {
-            $this->parsingOffer($file);
-        } else {
-            $this->parsingImport($file);
+        if ($type == 'catalog') {
+            if (strpos($file, 'offer') !== false) {
+                $this->parsingOffer($file);
+            } elseif (strpos($file, 'import') !== false) {
+                $this->parsingImport($file);
+            }
+        } elseif ($type == 'sale' && strpos($file, 'order') !== false) {
+            $this->parsingOrder($file);
         }
-
         if (!$this->module->debug) {
             $this->clearTmp();
         }
