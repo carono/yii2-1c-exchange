@@ -43,7 +43,7 @@ class SerializeHelper
         $partnerNode = self::serializePartner($partner);
         NodeHelper::appendNode($partnersNode, $partnerNode);
         $products = $documentNode->addChild('Товары');
-        foreach ($document->getProducts1c() as $product) {
+        foreach ($document->getOffers1c() as $product) {
             $productNode = self::serializeProduct($product, $document);
             NodeHelper::appendNode($products, $productNode);
         }
