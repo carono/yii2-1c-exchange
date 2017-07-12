@@ -13,6 +13,8 @@ echo DetailView::widget([
         'debug:boolean',
         'productClass',
         'documentClass',
+        'groupClass',
+        'partnerClass',
         'useZip:boolean',
         'tmpDir',
         'validateModelOnSave:boolean',

@@ -63,7 +63,7 @@ $this->beginPage();
             ],
             ['options' => ['class' => 'divider']],
             [
-                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Спецификация CommerceML',
+                'label' => '<i class="glyph glyphicon glyphicon-book"></i>CommerceML (PDF)',
                 'url' => ['default/documentation'],
                 'encode' => false
             ],
@@ -75,7 +75,7 @@ $this->beginPage();
                 'encode' => false
             ],
             [
-                'label' => '<i class="glyph glyphicon glyphicon-wrench"></i>Интерфейсы',
+                'label' => '<i class="glyph glyphicon glyphicon-cog"></i>Интерфейсы',
                 'url' => ['default/interfaces'],
                 'active' => in_array($controller, ['interface']) || $actionId == 'default/interfaces',
                 'encode' => false
