@@ -289,7 +289,7 @@ class ApiController extends Controller
 
         $document = $this->module->documentClass;
 
-        foreach ($document::findOrders1c() as $order) {
+        foreach ($document::findDocuments1c() as $order) {
             NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
         }
 

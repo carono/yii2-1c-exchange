@@ -9,8 +9,6 @@ use yii\helpers\FileHelper;
 
 class DefaultController extends Controller
 {
-    public $layout = '@vendor/carono/yii2-1c-exchange/views/layouts/main';
-
     public function actionIndex()
     {
         return $this->render('index');
@@ -51,5 +49,10 @@ class DefaultController extends Controller
     {
         $content = file_get_contents($this->module->getTmpDir($file));
         return \Yii::$app->response->sendContentAsFile($content, basename($file));
+    }
+
+    public function actionSettings()
+    {
+        return $this->render('settings');
     }
 }

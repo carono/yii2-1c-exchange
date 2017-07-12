@@ -6,6 +6,10 @@ use yii\widgets\Menu;
  * @var \yii\web\View $this
  * @var string $content
  */
+
+$actionId = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
+$controller = Yii::$app->controller->id;
+
 $bundle = AppAsset::register($this);
 
 $this->beginPage();
@@ -42,6 +46,12 @@ $this->beginPage();
         'options' => ['class' => 'nav menu'],
         'items' => [
             [
+                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Start Yii2 1C Exchange',
+                'url' => ['default/documentation'],
+                'encode' => false
+            ],
+            ['options' => ['class' => 'divider']],
+            [
                 'label' => '<i class="glyph glyphicon glyphicon-import"></i>Импорт',
                 'url' => ['default/import'],
                 'encode' => false
@@ -53,15 +63,11 @@ $this->beginPage();
             ],
             ['options' => ['class' => 'divider']],
             [
-                'label' => '<i class="glyph glyphicon glyphicon-book"></i>CommerceML',
+                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Спецификация CommerceML',
                 'url' => ['default/documentation'],
                 'encode' => false
             ],
-            [
-                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Yii2 1C Exchange',
-                'url' => ['default/documentation'],
-                'encode' => false
-            ],
+
             ['options' => ['class' => 'divider']],
             [
                 'label' => '<i class="glyph glyphicon glyphicon-folder-open"></i>Файлы',
@@ -71,6 +77,12 @@ $this->beginPage();
             [
                 'label' => '<i class="glyph glyphicon glyphicon-wrench"></i>Интерфейсы',
                 'url' => ['default/interfaces'],
+                'active' => in_array($controller, ['interface']) || $actionId == 'default/interfaces',
+                'encode' => false
+            ],
+            [
+                'label' => '<i class="glyph glyphicon glyphicon-wrench"></i>Настройки модуля',
+                'url' => ['default/settings'],
                 'encode' => false
             ]
         ]
