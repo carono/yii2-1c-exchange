@@ -6,7 +6,7 @@ namespace carono\exchange1c;
 
 class UrlRule extends \yii\web\UrlRule
 {
-    public $route = 'exchange/default/<mode>';
+    public $route = 'exchange/api/<mode>';
     public $pattern = '1c_exchange.php';
 
     public function parseRequest($manager, $request)

@@ -2,6 +2,8 @@
 
 namespace carono\exchange1c;
 
+use yii\helpers\FileHelper;
+
 /**
  * exchange module definition class
  */
@@ -49,5 +51,14 @@ class ExchangeModule extends \yii\base\Module
         parent::init();
 
         // custom initialization code goes here
+    }
+
+    public function getTmpDir($part = null)
+    {
+        $dir = \Yii::getAlias($this->tmpDir);
+        if (!is_dir($dir)) {
+            FileHelper::createDirectory($dir, 0777, true);
+        }
+        return $dir . ($part ? DIRECTORY_SEPARATOR . trim($part, '/\\') : '');
     }
 }
