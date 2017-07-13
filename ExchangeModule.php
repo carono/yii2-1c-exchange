@@ -63,4 +63,18 @@ class ExchangeModule extends \yii\base\Module
         }
         return $dir . ($part ? DIRECTORY_SEPARATOR . trim($part, '/\\') : '');
     }
+
+    public function auth($login, $password)
+    {
+        /**
+         * @var $class \yii\web\IdentityInterface
+         */
+        $class = \Yii::$app->user->identityClass;
+        $user = $class::findByUsername($login);
+        if ($user && $user->validatePassword($password)) {
+            return $user;
+        } else {
+            return null;
+        }
+    }
 }

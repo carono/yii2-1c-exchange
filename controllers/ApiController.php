@@ -56,20 +56,6 @@ class ApiController extends Controller
         parent::init();
     }
 
-    public function auth($login, $password)
-    {
-        /**
-         * @var $class \yii\web\IdentityInterface
-         */
-        $class = Yii::$app->user->identityClass;
-        $user = $class::findByUsername($login);
-        if ($user && $user->validatePassword($password)) {
-            return $user;
-        } else {
-            return null;
-        }
-    }
-
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [

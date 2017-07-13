@@ -11,7 +11,22 @@ class UrlRule extends \yii\web\UrlRule
 
     public function init()
     {
-        //
+        $this->route = 'exchange/api/<mode>';
+        if (!isset(\Yii::$app->modules['exchange'])) {
+            foreach (\Yii::$app->modules as $name => $module) {
+                $class = '';
+                if ((is_array($module))) {
+                    $class = ltrim($module['class'], '\\');
+                } elseif (is_object($module)) {
+                    $class = get_class($module);
+                }
+                if ($class == 'carono\exchange1c\ExchangeModule') {
+                    $this->route = "$name/api/<mode>";
+                    break;
+                }
+            }
+        }
+        parent::init();
     }
 
     public function parseRequest($manager, $request)

@@ -3,7 +3,11 @@
 namespace carono\exchange1c\models;
 
 use yii\base\Model;
+use yii\db\ActiveRecord;
 
+/**
+ * @property ActiveRecord model
+ */
 class InterfaceTest extends Model
 {
     public $class;

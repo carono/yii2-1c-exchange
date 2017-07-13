@@ -37,7 +37,18 @@ class DefaultController extends Controller
 
     public function actionDocumentation()
     {
-        return $this->render('documentation');
+        $dir = \Yii::getAlias('@vendor/carono/yii2-1c-exchange/doc');
+        $data = [];
+        foreach (FileHelper::findFiles($dir) as $file) {
+            $data[] = ['filename' => substr($file, strlen($dir) + 1), 'size' => filesize($file)];
+        }
+        $dataProvider = new ArrayDataProvider(['allModels' => $data]);
+        return $this->render('documentation', ['dataProvider' => $dataProvider]);
+    }
+
+    public function actionStart()
+    {
+        return $this->render('start');
     }
 
     public function actionInterfaces()
@@ -51,8 +62,27 @@ class DefaultController extends Controller
         return \Yii::$app->response->sendContentAsFile($content, basename($file));
     }
 
+    public function actionViewDoc($file)
+    {
+        $filePath = \Yii::getAlias("@vendor/carono/yii2-1c-exchange/doc/$file");
+        $content = file_get_contents($filePath);
+        $options = [
+            'inline' => true,
+            'mimeType' => FileHelper::getMimeType($filePath)
+        ];
+        return \Yii::$app->response->sendContentAsFile($content, basename($file), $options);
+    }
+
     public function actionSettings()
     {
         return $this->render('settings');
+    }
+
+    public function actionClearTmp()
+    {
+        foreach (FileHelper::findFiles($this->module->getTmpDir()) as $file) {
+            @unlink($file);
+        }
+        return $this->redirect(\Yii::$app->request->referrer);
     }
 }

@@ -1,6 +1,9 @@
 <?php
 use carono\exchange1c\assets\AppAsset;
 use yii\widgets\Menu;
+use yii\widgets\Breadcrumbs;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * @var \yii\web\View $this
@@ -19,7 +22,7 @@ $this->beginPage();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lumino - Dashboard</title>
+    <title>1С Exchange - <?= $this->title ?></title>
     <?php $this->head() ?>
 </head>
 
@@ -35,7 +38,14 @@ $this->beginPage();
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#"><span>YII2</span>Модуль обмена с 1С</a>
+            <a class="navbar-brand" href="<?= Url::to(['default/index']) ?>">
+                <span>YII2</span>Модуль обмена с 1С
+            </a>
+            <ul class="user-menu">
+                <li class="pull-right">
+                    <a href="/">Application</a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>
@@ -46,8 +56,8 @@ $this->beginPage();
         'options' => ['class' => 'nav menu'],
         'items' => [
             [
-                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Start Yii2 1C Exchange',
-                'url' => ['default/documentation'],
+                'label' => '<i class="glyph glyphicon glyphicon-book"></i>Старт Yii2 1C Exchange',
+                'url' => ['default/start'],
                 'encode' => false
             ],
             ['options' => ['class' => 'divider']],
@@ -70,7 +80,7 @@ $this->beginPage();
 
             ['options' => ['class' => 'divider']],
             [
-                'label' => '<i class="glyph glyphicon glyphicon-folder-open"></i>Файлы',
+                'label' => '<i class="glyph glyphicon glyphicon-folder-open"></i>Временные файлы',
                 'url' => ['default/files'],
                 'encode' => false
             ],
@@ -84,7 +94,13 @@ $this->beginPage();
                 'label' => '<i class="glyph glyphicon glyphicon-wrench"></i>Настройки модуля',
                 'url' => ['default/settings'],
                 'encode' => false
-            ]
+            ],
+            ['options' => ['class' => 'divider']],
+            [
+                'label' => '<i class="glyph glyphicon glyphicon-asterisk"></i>Тестирование',
+                'url' => ['testing/index'],
+                'encode' => false
+            ],
         ]
     ]);
     ?>
@@ -96,15 +112,14 @@ $this->beginPage();
 
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
     <div class="row">
-        <ol class="breadcrumb">
-            <li>
-                <a href="#">
-                    <svg class="glyph stroked home">
-                        <use xlink:href="#stroked-home"></use>
-                    </svg>
-                </a></li>
-            <li class="active">Icons</li>
-        </ol>
+        <?= Breadcrumbs::widget([
+            'links' => ArrayHelper::getValue($this->params, 'breadcrumbs', []),
+            'homeLink' => [
+                'label' => '<svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg>',
+                'encode' => false,
+                'url' => ['default/index']
+            ]
+        ]); ?>
     </div>
 
     <div class="row">

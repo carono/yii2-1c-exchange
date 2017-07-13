@@ -4,6 +4,11 @@ namespace carono\exchange1c\interfaces;
 
 use yii\db\ActiveRecordInterface;
 
+/**
+ * Interface ProductInterface
+ *
+ * @package carono\exchange1c\interfaces
+ */
 interface ProductInterface extends ActiveRecordInterface, FieldsInterface
 {
     /**
@@ -51,7 +56,9 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
     public function setGroup1c($group);
 
     /**
-     * Характеристики товара, (offers.xml > ПакетПредложений > Предложения > Предложение > ХарактеристикиТовара > ХарактеристикаТовара)
+     * offers.xml > ПакетПредложений > Предложения > Предложение > ХарактеристикиТовара > ХарактеристикаТовара
+     *
+     * Характеристики товара
      * $name - Наименование
      * $value - Значение
      *
@@ -62,9 +69,14 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
     public function setSpecification1c($offer, $specification);
 
     /**
-     * $property - Свойство товара (import.xml > Классификатор > Свойства > Свойство)
-     * $property->value - Разыменованное значение (string) (import.xml > Классификатор > Свойства > Свойство > Значение)
-     * $property->getValueModel() - Данные по значению, Ид значения, и т.д (import.xml > Классификатор > Свойства > Свойство > ВариантыЗначений > Справочник)
+     * import.xml > Классификатор > Свойства > Свойство
+     * $property - Свойство товара
+     *
+     * import.xml > Классификатор > Свойства > Свойство > Значение
+     * $property->value - Разыменованное значение (string)
+     *
+     * import.xml > Классификатор > Свойства > Свойство > ВариантыЗначений > Справочник
+     * $property->getValueModel() - Данные по значению, Ид значения, и т.д
      *
      * @param \Zenwalker\CommerceML\Model\Property $property
      * @return void
@@ -73,7 +85,9 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
 
 
     /**
-     * Цена товара, (offers.xml > ПакетПредложений > Предложения > Предложение > Цены)
+     * offers.xml > ПакетПредложений > Предложения > Предложение > Цены
+     *
+     * Цена товара,
      * К $price можно обратиться как к массиву, чтобы получить список цен (Цены > Цена)
      * $price->type - тип цены (offers.xml > ПакетПредложений > ТипыЦен > ТипЦены)
      *

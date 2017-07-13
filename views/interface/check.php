@@ -20,10 +20,14 @@ use carono\exchange1c\helpers\ClassHelper;
     <div class="row">
         <div class="col-lg-12">
             <?php
+            if ($interfaceTest->model) {
+                echo Html::tag('div', "Модель найдена, PK = " . $interfaceTest->model->primaryKey, ['class' => 'alert alert-success']);
+            }
             $form = ActiveForm::begin(['layout' => 'horizontal']);
             echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()']);
             echo Html::submitButton('Протестировать', ['class' => 'btn btn-primary pull-right']);
             ActiveForm::end();
+
             ?>
         </div>
     </div>

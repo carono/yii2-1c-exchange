@@ -9,6 +9,13 @@ use yii\helpers\Html;
  */
 $this->title = 'Список файлов';
 
+echo Html::a('Очистить всё', ['default/clear-tmp'], [
+    'class' => ['btn btn-warning'],
+    'data-confirm' => 'Очистить все временные файлы?'
+]);
+
+echo "<hr>";
+
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
