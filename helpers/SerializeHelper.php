@@ -5,6 +5,7 @@ namespace carono\exchange1c\helpers;
 
 
 use carono\exchange1c\interfaces\DocumentInterface;
+use carono\exchange1c\interfaces\OfferInterface;
 use carono\exchange1c\interfaces\PartnerInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 
@@ -22,11 +23,11 @@ class SerializeHelper
         return $xml;
     }
 
-    public static function serializeProduct(ProductInterface $product, DocumentInterface $document)
+    public static function serializeOffer(OfferInterface $offer, DocumentInterface $document)
     {
         $productNode = new \SimpleXMLElement('<Товар></Товар>');
-        self::addFields($productNode, $product, $product->getExportFields1c($document));
-        $productNode->addChild('ИдКаталога', $product->getGroup1c()->getId1c());
+        self::addFields($productNode, $offer, $offer->getExportFields1c($document));
+        $productNode->addChild('ИдКаталога', $offer->getGroup1c()->getId1c());
         return $productNode;
     }
 
@@ -43,8 +44,8 @@ class SerializeHelper
         $partnerNode = self::serializePartner($partner);
         NodeHelper::appendNode($partnersNode, $partnerNode);
         $products = $documentNode->addChild('Товары');
-        foreach ($document->getOffers1c() as $product) {
-            $productNode = self::serializeProduct($product, $document);
+        foreach ($document->getOffers1c() as $offer) {
+            $productNode = self::serializeOffer($offer, $document);
             NodeHelper::appendNode($products, $productNode);
         }
         return $documentNode;
