@@ -44,6 +44,7 @@ class DefaultController extends Controller
     const EVENT_BEFORE_PRODUCT_SYNC = 'beforeProductSync';
     const EVENT_AFTER_PRODUCT_SYNC = 'afterProductSync';
     const EVENT_AFTER_FINISH_UPLOAD_FILE = 'afterFinishUploadFile';
+    const EVENT_AFTER_EXPORT_ORDERS = 'afterExportOrders';
 
     private $_ids;
 
@@ -345,6 +346,7 @@ class DefaultController extends Controller
             $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
             file_put_contents($this->getTmpDir() . '/query.xml', $xml);
         }
+        $this->afterExportOrders(null);
         return $root->asXML();
     }
 
@@ -448,6 +450,11 @@ class DefaultController extends Controller
             'model' => $model,
             'ml' => $offer,
         ]));
+    }
+
+    public function afterExportOrders($model)
+    {
+        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent(['model' => $model]));
     }
 
     public function afterUpdateOffer($model)
