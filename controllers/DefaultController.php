@@ -4,6 +4,7 @@
 namespace carono\exchange1c\controllers;
 
 
+use carono\exchange1c\models\Article;
 use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
 
@@ -37,7 +38,7 @@ class DefaultController extends Controller
 
     public function actionDocumentation()
     {
-        $dir = \Yii::getAlias('@vendor/carono/yii2-1c-exchange/doc');
+        $dir = \Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/doc');
         $data = [];
         foreach (FileHelper::findFiles($dir) as $file) {
             $data[] = ['filename' => substr($file, strlen($dir) + 1), 'size' => filesize($file)];
@@ -48,7 +49,21 @@ class DefaultController extends Controller
 
     public function actionStart()
     {
-        return $this->render('start');
+        $dataProvider = Article::find()->search();
+        return $this->render('start', ['dataProvider' => $dataProvider]);
+    }
+
+    public function actionUpdateArticle($id)
+    {
+        $article = Article::findOne($id, true);
+        if ($article->load(\Yii::$app->request->post())) {
+            if ($article->save()) {
+                return $this->refresh();
+            } else {
+
+            }
+        }
+        return $this->render('update-article', ['article' => $article]);
     }
 
     public function actionInterfaces()
@@ -60,17 +75,6 @@ class DefaultController extends Controller
     {
         $content = file_get_contents($this->module->getTmpDir($file));
         return \Yii::$app->response->sendContentAsFile($content, basename($file));
-    }
-
-    public function actionViewDoc($file)
-    {
-        $filePath = \Yii::getAlias("@vendor/carono/yii2-1c-exchange/doc/$file");
-        $content = file_get_contents($filePath);
-        $options = [
-            'inline' => true,
-            'mimeType' => FileHelper::getMimeType($filePath)
-        ];
-        return \Yii::$app->response->sendContentAsFile($content, basename($file), $options);
     }
 
     public function actionSettings()

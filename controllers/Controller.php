@@ -34,6 +34,9 @@ abstract class Controller extends \yii\web\Controller
 
     public function render($view, $params = [])
     {
+        if (!\Yii::$app->getView()->title) {
+            \Yii::$app->getView()->title = $this->action->id;
+        }
         Breadcrumbs::formCrumbs($this->action, $params);
         return parent::render($view, $params);
     }

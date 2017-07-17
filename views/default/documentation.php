@@ -19,7 +19,7 @@ echo GridView::widget([
             'buttons' => [
                 'view' => function ($url, $data) {
                     $span = Html::tag('i', '', ['class' => 'glyphicon glyphicon-eye-open']);
-                    return Html::a($span, ['default/view-doc', 'file' => $data['filename']], ['target' => '_blank']);
+                    return Html::a($span, ['file/doc', 'file' => $data['filename']], ['target' => '_blank']);
                 }
             ]
         ]

@@ -14,7 +14,7 @@ $actionId = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
 $controller = Yii::$app->controller->id;
 
 $bundle = AppAsset::register($this);
-
+$ico = $this->assetManager->publish('@vendor/carono/yii2-1c-exchange/assets/other/favicon.ico');
 $this->beginPage();
 ?>
 <!DOCTYPE html>
@@ -22,6 +22,7 @@ $this->beginPage();
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= $ico[1] ?>"/>
     <title>1С Exchange - <?= $this->title ?></title>
     <?php $this->head() ?>
 </head>

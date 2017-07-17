@@ -19,4 +19,7 @@ class LuminoAsset extends AssetBundle
         'js/html5shiv.min',
         'js/respond.min.js'
     ];
+    public $publishOptions = [
+        'forceCopy' => true
+    ];
 }

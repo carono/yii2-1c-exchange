@@ -16,5 +16,8 @@
     "psr-4": {
       "carono\\exchange1c\\": ""
     }
+  },
+  "require-dev": {
+    "yiidoc/yii2-redactor": "^2.0"
   }
 }
