@@ -3,14 +3,15 @@
 use yii\data\ArrayDataProvider;
 use Zenwalker\CommerceML\CommerceML;
 use yii\grid\GridView;
+use yii\helpers\Html;
 
-$import = Yii::getAlias('@vendor/carono/yii2-1c-exchange/xml/import.xml');
-$offers = Yii::getAlias('@vendor/carono/yii2-1c-exchange/xml/offers.xml');
+$import = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/xml/import.xml');
+$offers = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/xml/offers.xml');
 $cml = new CommerceML($import, $offers);
 $cml->addXmls($import, $offers);
 $dataProvider = new ArrayDataProvider(['allModels' => $cml->catalog->getProducts()]);
 ?>
-    <h2>Товары (import.xml)</h2>
+    <h2>Товары (<?= Html::a('import.xml', ['file/xml', 'file' => 'import.xml'], ['target' => '_blank']) ?>)</h2>
 <?php
 
 echo GridView::widget([
@@ -24,7 +25,7 @@ echo GridView::widget([
 ]);
 
 ?>
-    <h2>Предложения (offers.xml)</h2>
+    <h2>Предложения (<?= Html::a('offers.xml', ['file/xml', 'file' => 'offers.xml'], ['target' => '_blank']) ?>)</h2>
 <?php
 $dataProvider = new ArrayDataProvider(['allModels' => $cml->offerPackage->offers]);
 echo GridView::widget([

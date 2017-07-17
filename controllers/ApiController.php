@@ -257,8 +257,7 @@ class ApiController extends Controller
          */
         if (!$this->module->exchangeDocuments) {
             echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml = new \SimpleXMLElement('<root></root>');
-            $root = $xml->addChild('КоммерческаяИнформация');
+            $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
             $root->addAttribute('ВерсияСхемы', '2.04');
             $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
             return $root->asXML();

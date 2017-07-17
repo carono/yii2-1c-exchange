@@ -7,7 +7,7 @@ use yii\helpers\Html;
  * @var \yii\data\ActiveDataProvider $dataProvider
  * @var \yii\web\View $this
  */
-$this->title = 'Список файлов';
+$this->title = "Список временных файлов ({$this->context->module->tmpDir})";
 
 echo Html::a('Очистить всё', ['default/clear-tmp'], [
     'class' => ['btn btn-warning'],

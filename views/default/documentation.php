@@ -5,9 +5,10 @@ use yii\helpers\Html;
 
 /**
  * @var \yii\data\ArrayDataProvider $dataProvider
+ * @var \yii\web\View $this
  */
 
-
+$this->title = 'Спецификация по стандарту CommerceML';
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [

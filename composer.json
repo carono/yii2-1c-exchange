@@ -17,6 +17,9 @@
       "carono\\exchange1c\\": ""
     }
   },
+  "extra": {
+    "bootstrap": "carono\\exchange1c\\Bootstrap"
+  },
   "require-dev": {
     "yiidoc/yii2-redactor": "^2.0"
   }
