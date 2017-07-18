@@ -20,16 +20,16 @@ abstract class Controller extends \yii\web\Controller
 
     public function init()
     {
-        $db = [
-            'class' => 'yii\db\Connection',
-            'dsn' => 'sqlite:' . realpath(__DIR__ . '/../exchange.db'),
-            'username' => '',
-            'password' => '',
-            'charset' => 'utf8',
-        ];
-        $components = \Yii::$app->getComponents();
-        $components['exchangeDb'] = $db;
-        \Yii::$app->setComponents($components);
+        if ($dbPath = realpath(__DIR__ . '/../exchange.db')) {
+            $config = [
+                'class' => 'yii\db\Connection',
+                'dsn' => 'sqlite:' . $dbPath,
+                'username' => '',
+                'password' => '',
+                'charset' => 'utf8',
+            ];
+            \Yii::$app->set('exchangeDb', $config);
+        }
     }
 
     public function render($view, $params = [])
@@ -53,7 +53,7 @@ abstract class Controller extends \yii\web\Controller
             $behaviors = [
                 'basicAuth' => [
                     'class' => HttpBasicAuth::className(),
-                    'auth' => $auth,
+                    'auth' => $auth
                 ],
             ];
         }
