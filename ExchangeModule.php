@@ -2,10 +2,6 @@
 
 namespace carono\exchange1c;
 
-use carono\exchange1c\interfaces\DocumentInterface;
-use carono\exchange1c\interfaces\GroupInterface;
-use carono\exchange1c\interfaces\PartnerInterface;
-use carono\exchange1c\interfaces\ProductInterface;
 use yii\helpers\FileHelper;
 
 /**
@@ -18,19 +14,19 @@ class ExchangeModule extends \yii\base\Module
      */
     public $controllerNamespace = 'carono\exchange1c\controllers';
     /**
-     * @var ProductInterface
+     * @var \carono\exchange1c\interfaces\ProductInterface
      */
     public $productClass;
     /**
-     * @var DocumentInterface
+     * @var \carono\exchange1c\interfaces\DocumentInterface
      */
     public $documentClass;
     /**
-     * @var GroupInterface
+     * @var \carono\exchange1c\interfaces\GroupInterface
      */
     public $groupClass;
     /**
-     * @var PartnerInterface
+     * @var \carono\exchange1c\interfaces\PartnerInterface
      */
     public $partnerClass;
     /**

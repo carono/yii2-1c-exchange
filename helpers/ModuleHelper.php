@@ -6,7 +6,12 @@ namespace carono\exchange1c\helpers;
 
 class ModuleHelper
 {
-    public static function getModuleNameByClass($class, $default = null)
+    /**
+     * @param string $class
+     * @param null $default
+     * @return int|null|string
+     */
+    public static function getModuleNameByClass($class = 'carono\exchange1c\ExchangeModule', $default = null)
     {
         foreach (\Yii::$app->modules as $name => $module) {
             $result = '';
@@ -20,5 +25,21 @@ class ModuleHelper
             }
         }
         return $default;
+    }
+
+    /**
+     * @param $variable
+     * @param string $class
+     * @return string|null
+     */
+    public static function getPhpDocInterfaceProperty($variable, $class = 'carono\exchange1c\ExchangeModule')
+    {
+        $reflection = new \ReflectionClass($class);
+        $property = $reflection->getProperty($variable);
+        if (preg_match('#@var\s+([\w\\\]+)#iu', $property->getDocComment(), $match)) {
+            return $match[1];
+        } else {
+            return null;
+        }
     }
 }

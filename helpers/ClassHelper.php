@@ -11,7 +11,7 @@ class ClassHelper
 {
     /**
      * @param $class
-     * @return mixed
+     * @return string[]
      */
     public static function getMethods($class)
     {
@@ -23,7 +23,7 @@ class ClassHelper
 
     /**
      * @param $interface
-     * @return \ReflectionMethod[] array
+     * @return string[]
      */
     public static function getInterfaceMethods($interface)
     {
@@ -33,6 +33,22 @@ class ClassHelper
             if (StringHelper::startsWith($method->class, 'carono\exchange1c\interfaces')) {
                 $result[] = $method;
             }
+        }
+        return array_values(ArrayHelper::map($result, 'name', 'name'));
+    }
+
+    /**
+     * @param $class
+     * @param $interface
+     * @return boolean[]
+     */
+    public static function getImplementedMethods($class, $interface)
+    {
+        $methods = ClassHelper::getMethods($class);
+        $interfaceMethods = self::getInterfaceMethods($interface);
+        $result = [];
+        foreach ($interfaceMethods as $interfaceMethod) {
+            $result[$interfaceMethod] = array_search($interfaceMethod, $methods) !== false;
         }
         return $result;
     }

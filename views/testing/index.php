@@ -1,10 +1,46 @@
 <?php
 
-use yii\data\ArrayDataProvider;
-use Zenwalker\CommerceML\CommerceML;
 use yii\grid\GridView;
-use yii\helpers\Html;
+use carono\exchange1c\models\TestingProductClass;
+use carono\exchange1c\models\TestingDocumentClass;
 
+/**
+ * @var \yii\web\View $this
+ */
+$this->title = 'Тестирование модуля';
+
+echo GridView::widget([
+    'dataProvider' => TestingProductClass::findAll(),
+    'rowOptions' => function ($data) {
+        if (!$data->result) {
+            return ['class' => 'danger'];
+        } else {
+            return ['class' => 'success'];
+        }
+    },
+    'columns' => [
+        'name',
+        'comment:raw'
+    ]
+]);
+
+echo GridView::widget([
+    'dataProvider' => TestingDocumentClass::findAll(),
+    'rowOptions' => function ($data) {
+        if (!$data->result) {
+            return ['class' => 'danger'];
+        } else {
+            return ['class' => 'success'];
+        }
+    },
+    'columns' => [
+        'name',
+        'comment:raw'
+    ]
+]);
+
+return;
+/*
 $import = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/xml/import.xml');
 $offers = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/xml/offers.xml');
 $cml = new CommerceML($import, $offers);
@@ -48,5 +84,6 @@ echo GridView::widget([
         ]
     ]
 ]);
+*/
 
 
