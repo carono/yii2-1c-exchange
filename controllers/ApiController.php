@@ -494,4 +494,9 @@ class ApiController extends Controller
     {
         return $this->module->documentClass;
     }
+
+    public function actionError()
+    {
+        return false;
+    }
 }

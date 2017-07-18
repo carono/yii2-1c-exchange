@@ -18,8 +18,10 @@ class Bootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        if (ModuleHelper::getModuleNameByClass('carono\exchange1c\ExchangeModule')) {
-            \Yii::$app->urlManager->addRules(['class' => 'carono\exchange1c\UrlRule']);
+        if ($id = ModuleHelper::getModuleNameByClass()) {
+            if (\Yii::$app->getModule($id)->bootstrapUrlRule) {
+                \Yii::$app->urlManager->addRules([new UrlRule]);
+            }
         }
     }
 }
