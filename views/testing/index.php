@@ -3,19 +3,49 @@
 use yii\grid\GridView;
 use carono\exchange1c\models\TestingProductClass;
 use carono\exchange1c\models\TestingDocumentClass;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+use carono\exchange1c\models\InterfaceTest;
+use yii\data\ArrayDataProvider;
 
 /**
  * @var \yii\web\View $this
+ * @var \carono\exchange1c\models\InterfaceTest $interfaceTest
  */
 $this->title = 'Тестирование модуля';
 
+?>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <?php
+            $class = Yii::$app->controller->module->productClass;
+            $interfaceTest = InterfaceTest::findByClass($class);
+            $hint = '';
+            if ($interfaceTest->model) {
+                $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;
+            }
+            $form = ActiveForm::begin(['layout' => 'horizontal']);
+            echo $form->field($interfaceTest, 'class')->hiddenInput(['value' => $class])->label(false);
+            echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()'])->hint($hint);
+            echo Html::submitButton('Найти', ['class' => 'btn btn-primary pull-right']);
+            ActiveForm::end();
+            ?>
+        </div>
+    </div>
+
+
+<?php
+
 echo GridView::widget([
-    'dataProvider' => TestingProductClass::findAll(),
+    'dataProvider' => new ArrayDataProvider(['allModels' => TestingProductClass::findAll()]),
     'rowOptions' => function ($data) {
-        if (!$data->result) {
+        if ($data->result === true) {
+            return ['class' => 'success'];
+        } elseif ($data->result === false) {
             return ['class' => 'danger'];
         } else {
-            return ['class' => 'success'];
+            return ['class' => 'warning'];
         }
     },
     'columns' => [
@@ -24,8 +54,30 @@ echo GridView::widget([
     ]
 ]);
 
+?>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <?php
+            $class = Yii::$app->controller->module->documentClass;
+            $interfaceTest = InterfaceTest::findByClass($class);
+            $hint = '';
+            if ($interfaceTest->model) {
+                $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;
+            }
+            $form = ActiveForm::begin(['layout' => 'horizontal']);
+            echo $form->field($interfaceTest, 'class')->hiddenInput(['value' => $class])->label(false);
+            echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()'])->hint($hint);
+            echo Html::submitButton('Найти', ['class' => 'btn btn-primary pull-right']);
+            ActiveForm::end();
+            ?>
+        </div>
+    </div>
+
+<?php
+
 echo GridView::widget([
-    'dataProvider' => TestingDocumentClass::findAll(),
+    'dataProvider' => new ArrayDataProvider(['allModels' => TestingDocumentClass::findAll()]),
     'rowOptions' => function ($data) {
         if (!$data->result) {
             return ['class' => 'danger'];

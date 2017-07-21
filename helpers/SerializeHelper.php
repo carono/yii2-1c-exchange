@@ -27,7 +27,9 @@ class SerializeHelper
     {
         $productNode = new \SimpleXMLElement('<Товар></Товар>');
         self::addFields($productNode, $offer, $offer->getExportFields1c($document));
-        $productNode->addChild('ИдКаталога', $offer->getGroup1c()->getId1c());
+        if ($group = $offer->getGroup1c()) {
+            $productNode->addChild('ИдКаталога', $group->getId1c());
+        }
         return $productNode;
     }
 
@@ -35,12 +37,9 @@ class SerializeHelper
     public static function serializeDocument(DocumentInterface $document)
     {
         $documentNode = new \SimpleXMLElement('<Документ></Документ>');
-
         self::addFields($documentNode, $document, $document->getExportFields1c());
-
         $partnersNode = $documentNode->addChild('Контрагенты');
         $partner = $document->getPartner1c();
-
         $partnerNode = self::serializePartner($partner);
         NodeHelper::appendNode($partnersNode, $partnerNode);
         $products = $documentNode->addChild('Товары');

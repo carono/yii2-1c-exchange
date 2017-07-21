@@ -13,6 +13,7 @@ use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
@@ -45,14 +46,6 @@ class ApiController extends Controller
     public function init()
     {
         set_time_limit($this->module->timeLimit);
-        if (!$this->module->productClass) {
-            throw new Exception('1');
-        }
-        $c = new $this->module->productClass;
-
-        if (!$c instanceof ProductInterface) {
-            throw new Exception('2');
-        }
         parent::init();
     }
 
@@ -141,7 +134,6 @@ class ApiController extends Controller
         $this->module->trigger(self::EVENT_BEFORE_PRODUCT_SYNC, new ExchangeEvent());
     }
 
-
     public function afterProductSync()
     {
         $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
@@ -217,6 +209,7 @@ class ApiController extends Controller
             $zip->open($archive);
             $zip->extractTo(dirname($archive));
             $zip->close();
+            @unlink($archive);
         }
         $file = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
         if ($type == 'catalog') {
@@ -236,18 +229,7 @@ class ApiController extends Controller
 
     protected function clearTmp()
     {
-        if ($archive = self::getData('archive')) {
-            @unlink($archive);
-        }
-        if (is_dir($files = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'import_files')) {
-            FileHelper::removeDirectory($files);
-        }
-        if (file_exists($import = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml')) {
-            @unlink($import);
-        }
-        if ($offers = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml') {
-            @unlink($offers);
-        }
+        FileHelper::removeDirectory($this->module->getTmpDir());
     }
 
     public function actionQuery($type)
@@ -395,7 +377,7 @@ class ApiController extends Controller
          * @var $class ProductInterface
          */
         $class = $this->getProductClass();
-        $id = $class::getFields1c()['id'];
+        $id = ArrayHelper::getValue($class::getFields1c(), 'Ид', ArrayHelper::getValue($class::getFields1c(), 'id'));
         return $class::find()->andWhere([$id => $object->getClearId()])->one();
     }
 

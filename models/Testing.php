@@ -13,7 +13,7 @@ class Testing extends Model
 {
     public $name;
     public $result = true;
-    public $comment;
+    public $comment = 'OK';
 
     /**
      * @return \carono\exchange1c\ExchangeModule
@@ -23,6 +23,9 @@ class Testing extends Model
         return \Yii::$app->controller->module;
     }
 
+    /**
+     * @return array
+     */
     public static function findAll()
     {
         $reflection = new \ReflectionClass(self::className());
@@ -33,8 +36,10 @@ class Testing extends Model
 
         $data = [];
         foreach ($methods as $method) {
-            $data[] = call_user_func(static::className() . "::$method");
+            if ($test = call_user_func(static::className() . "::$method")) {
+                $data[] = $test;
+            }
         }
-        return new ArrayDataProvider(['allModels' => $data]);
+        return $data;
     }
 }

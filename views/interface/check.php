@@ -46,9 +46,8 @@ $data = [];
 
 foreach (ClassHelper::getInterfaceMethods($interfaceClass) as $method) {
     $data[] = new InterfaceModel([
-        'function' => $method->name,
+        'function' => $method,
         'interface' => $interfaceClass,
-        'description' => $method->getDocComment(),
         'class' => $class
     ]);
 }
@@ -63,14 +62,7 @@ echo GridView::widget([
     },
     'columns' => [
         'function',
-        [
-            'attribute' => 'description',
-            'format' => 'raw',
-            'value' => function ($data) {
-                $description = trim($data['description'], '/*');
-                return $data['description'] ? Html::tag('pre', $description) : '';
-            }
-        ],
+        'description:raw',
         'status_name',
     ]
 ]);

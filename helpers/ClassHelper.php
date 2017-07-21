@@ -44,7 +44,7 @@ class ClassHelper
      */
     public static function getImplementedMethods($class, $interface)
     {
-        $methods = ClassHelper::getMethods($class);
+        $methods = $class ? ClassHelper::getMethods($class) : [];
         $interfaceMethods = self::getInterfaceMethods($interface);
         $result = [];
         foreach ($interfaceMethods as $interfaceMethod) {

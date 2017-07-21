@@ -7,6 +7,7 @@ namespace carono\exchange1c\models;
 use carono\exchange1c\helpers\ClassHelper;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @property integer status_id
@@ -22,7 +23,6 @@ class InterfaceModel extends Model
     public $function;
     public $interface;
     public $class;
-    public $description;
 
     public function getStatus_id()
     {
@@ -40,5 +40,11 @@ class InterfaceModel extends Model
     public function functionExists()
     {
         return array_search($this->function, ClassHelper::getMethods($this->class)) !== false;
+    }
+
+    public function getDescription()
+    {
+        $method = new \ReflectionMethod($this->class, $this->function);
+        return nl2br(preg_replace('#\*/|/\*|\*#', '', $method->getDocComment()));
     }
 }
