@@ -1,7 +1,9 @@
 <?php
+
 use yii\grid\GridView;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
+use carono\exchange1c\widgets\Panel;
 
 /**
  * @var \yii\web\View $this
@@ -16,7 +18,7 @@ $data = [
     ['name' => 'groupClass', 'value' => $module->groupClass],
     ['name' => 'partnerClass', 'value' => $module->partnerClass],
 ];
-
+Panel::begin();
 echo GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider(['allModels' => $data]),
     'columns' => [
@@ -34,3 +36,4 @@ echo GridView::widget([
         ]
     ]
 ]);
+Panel::end();

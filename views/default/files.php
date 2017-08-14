@@ -1,7 +1,9 @@
 <?php
+
 use yii\grid\GridView;
 use \yii\grid\ActionColumn;
 use yii\helpers\Html;
+use carono\exchange1c\widgets\Panel;
 
 /**
  * @var \yii\data\ActiveDataProvider $dataProvider
@@ -9,6 +11,7 @@ use yii\helpers\Html;
  */
 $this->title = "Список временных файлов ({$this->context->module->tmpDir})";
 
+Panel::begin();
 echo Html::a('Очистить всё', ['default/clear-tmp'], [
     'class' => ['btn btn-warning'],
     'data-confirm' => 'Очистить все временные файлы?'
@@ -33,3 +36,4 @@ echo GridView::widget([
         ]
     ]
 ]);
+Panel::end();

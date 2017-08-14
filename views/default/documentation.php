@@ -1,7 +1,10 @@
 <?php
+
 use yii\grid\GridView;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
+use carono\exchange1c\widgets\Panel;
+use carono\xmldoc\Json;
 
 /**
  * @var \yii\data\ArrayDataProvider $dataProvider
@@ -9,6 +12,7 @@ use yii\helpers\Html;
  */
 
 $this->title = 'Спецификация по стандарту CommerceML';
+Panel::begin();
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
@@ -26,3 +30,8 @@ echo GridView::widget([
         ]
     ]
 ]);
+$file = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/json/2.09.json');
+$json = Json::loadFromFile($file);
+
+
+Panel::end();

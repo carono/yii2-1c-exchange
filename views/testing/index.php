@@ -7,6 +7,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use carono\exchange1c\models\InterfaceTest;
 use yii\data\ArrayDataProvider;
+use carono\exchange1c\widgets\Panel;
 
 /**
  * @var \yii\web\View $this
@@ -14,29 +15,8 @@ use yii\data\ArrayDataProvider;
  */
 $this->title = 'Тестирование модуля';
 
-?>
-
-    <div class="row">
-        <div class="col-lg-12">
-            <?php
-            $class = Yii::$app->controller->module->productClass;
-            $interfaceTest = InterfaceTest::findByClass($class);
-            $hint = '';
-            if ($interfaceTest->model) {
-                $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;
-            }
-            $form = ActiveForm::begin(['layout' => 'horizontal']);
-            echo $form->field($interfaceTest, 'class')->hiddenInput(['value' => $class])->label(false);
-            echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()'])->hint($hint);
-            echo Html::submitButton('Найти', ['class' => 'btn btn-primary pull-right']);
-            ActiveForm::end();
-            ?>
-        </div>
-    </div>
-
-
-<?php
-
+Panel::begin();
+echo $this->render('../partial/find-model', ['variable' => 'productClass']);
 echo GridView::widget([
     'dataProvider' => new ArrayDataProvider(['allModels' => TestingProductClass::findAll()]),
     'rowOptions' => function ($data) {
@@ -53,29 +33,10 @@ echo GridView::widget([
         'comment:raw'
     ]
 ]);
+Panel::end();
 
-?>
-
-    <div class="row">
-        <div class="col-lg-12">
-            <?php
-            $class = Yii::$app->controller->module->documentClass;
-            $interfaceTest = InterfaceTest::findByClass($class);
-            $hint = '';
-            if ($interfaceTest->model) {
-                $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;
-            }
-            $form = ActiveForm::begin(['layout' => 'horizontal']);
-            echo $form->field($interfaceTest, 'class')->hiddenInput(['value' => $class])->label(false);
-            echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()'])->hint($hint);
-            echo Html::submitButton('Найти', ['class' => 'btn btn-primary pull-right']);
-            ActiveForm::end();
-            ?>
-        </div>
-    </div>
-
-<?php
-
+Panel::begin();
+echo $this->render('../partial/find-model', ['variable' => 'documentClass']);
 echo GridView::widget([
     'dataProvider' => new ArrayDataProvider(['allModels' => TestingDocumentClass::findAll()]),
     'rowOptions' => function ($data) {
@@ -91,6 +52,7 @@ echo GridView::widget([
     ]
 ]);
 
+Panel::end();
 return;
 /*
 $import = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/xml/import.xml');
