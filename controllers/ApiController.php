@@ -99,8 +99,8 @@ class ApiController extends Controller
 
     public function actionInit()
     {
-        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
-        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
+//        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
+//        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
             "zip" => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
             "file_limit" => $this->getFileLimit(),
@@ -204,7 +204,7 @@ class ApiController extends Controller
 
     public function actionImport($type, $filename)
     {
-        if ($archive = self::getData('archive')) {
+        if (($archive = self::getData('archive')) && file_exists($archive)) {
             $zip = new \ZipArchive();
             $zip->open($archive);
             $zip->extractTo(dirname($archive));
