@@ -146,6 +146,12 @@ class ApiController extends Controller
         $commerce->addXmls(file_exists($import) ? $import : false, file_exists($offers) ? $offers : false);
         if ($import) {
             $this->beforeProductSync();
+            $groupClass = $this->getGroupClass();
+            $groupClass::createTree1c($commerce->classifier->getGroups());
+
+            $productClass = $this->getProductClass();
+            $productClass::createProperties1c($commerce->classifier->getProperties());
+
             foreach ($commerce->catalog->getProducts() as $product) {
                 if (!$model = $this->findModel($product)) {
                     $model = $this->createModel();
@@ -462,7 +468,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @return ActiveRecord
+     * @return ProductInterface
      */
     protected function getProductClass()
     {
@@ -475,6 +481,14 @@ class ApiController extends Controller
     protected function getDocumentClass()
     {
         return $this->module->documentClass;
+    }
+
+    /**
+     * @return \carono\exchange1c\interfaces\GroupInterface
+     */
+    protected function getGroupClass()
+    {
+        return $this->module->groupClass;
     }
 
     public function actionError()

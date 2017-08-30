@@ -3,6 +3,7 @@
 namespace carono\exchange1c\interfaces;
 
 use yii\db\ActiveRecordInterface;
+use Zenwalker\CommerceML\Model\PropertyCollection;
 
 /**
  * Interface ProductInterface
@@ -108,4 +109,10 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
      * @return GroupInterface
      */
     public function getGroup1c();
+
+    /**
+     * @param PropertyCollection $properties
+     * @return mixed
+     */
+    public static function createProperties1c($properties);
 }
