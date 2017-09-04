@@ -253,10 +253,9 @@ class ApiController extends Controller
             return $root->asXML();
         }
 
-exit;
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
-//        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
+        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
 
         $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
 
@@ -264,8 +263,6 @@ exit;
         $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
         $document = $this->module->documentClass;
         foreach ($document::findDocuments1c() as $order) {
-            var_dump($order);
-            exit;
             NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
         }
 
