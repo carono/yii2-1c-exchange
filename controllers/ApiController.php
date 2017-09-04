@@ -146,8 +146,10 @@ class ApiController extends Controller
         $commerce->addXmls(file_exists($import) ? $import : false, file_exists($offers) ? $offers : false);
         if ($import) {
             $this->beforeProductSync();
-            $groupClass = $this->getGroupClass();
-            $groupClass::createTree1c($commerce->classifier->getGroups());
+
+            if ($groupClass = $this->getGroupClass()) {
+                $groupClass::createTree1c($commerce->classifier->getGroups());
+            }
 
             $productClass = $this->getProductClass();
             $productClass::createProperties1c($commerce->classifier->getProperties());
@@ -346,7 +348,7 @@ class ApiController extends Controller
             }
         }
         $model->save();
-        $this->afterUpdateOffer($model);
+        $this->afterUpdateOffer($model, $offer);
     }
 
     public function afterUpdateProduct($model)
@@ -367,9 +369,9 @@ class ApiController extends Controller
         ]));
     }
 
-    public function afterUpdateOffer($model)
+    public function afterUpdateOffer($model, $offer)
     {
-        $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model]));
+        $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
     }
 
     /**
