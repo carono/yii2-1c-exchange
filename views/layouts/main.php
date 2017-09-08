@@ -59,7 +59,8 @@ $this->beginPage();
         'items' => [
             [
                 'label' => '<i class="glyph glyphicon glyphicon-book"></i>Старт Yii2 1C Exchange',
-                'url' => ['default/start'],
+                'url' => ['article/index'],
+                'active' => in_array(Yii::$app->controller->id, ['article']),
                 'encode' => false
             ],
             ['options' => ['class' => 'divider']],

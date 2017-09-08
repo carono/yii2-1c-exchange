@@ -49,6 +49,7 @@ class ArticleController extends Controller
 
     public function actionIndex()
     {
-
+        $dataProvider = Article::find()->search();
+        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 }

@@ -45,7 +45,7 @@ class Breadcrumbs
         }
     }
 
-    public static function buttonDefaultStart()
+    public static function buttonArticleIndex()
     {
         return [
             [
@@ -85,7 +85,7 @@ class Breadcrumbs
     public static function crumbArticleView($article)
     {
         return [
-            ['label' => 'Старт', 'url' => ['default/start']],
+            ['label' => 'Старт', 'url' => ['article/index']],
             $article->name,
         ];
     }
@@ -141,7 +141,7 @@ class Breadcrumbs
         ];
     }
 
-    public static function crumbDefaultStart()
+    public static function crumbArticleIndex()
     {
         return [
             'Старт',

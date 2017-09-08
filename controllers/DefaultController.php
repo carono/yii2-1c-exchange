@@ -51,23 +51,6 @@ class DefaultController extends Controller
         return $this->render('documentation', ['dataProvider' => $dataProvider]);
     }
 
-    public function actionStart()
-    {
-        $dataProvider = Article::find()->search();
-        return $this->render('start', ['dataProvider' => $dataProvider]);
-    }
-
-    public function actionUpdateArticle($id)
-    {
-
-    }
-
-
-    public function actionCreateArticle()
-    {
-
-    }
-
     public function actionInterfaces()
     {
         return $this->render('interfaces');
