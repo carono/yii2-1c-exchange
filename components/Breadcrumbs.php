@@ -65,7 +65,7 @@ class Breadcrumbs
         return [
             [
                 'label' => 'Редактировать',
-                'url' => ['article/create'],
+                'url' => ['article/update', 'id' => $article->id],
                 'options' => ['class' => 'btn btn-primary']
             ],
             [

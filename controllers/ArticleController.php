@@ -14,7 +14,7 @@ class ArticleController extends Controller
         $article = new Article();
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {
-                return $this->redirect(['default/start']);
+                return $this->redirect(['article/index']);
             } else {
                 \Yii::$app->session->setFlash('error', Html::errorSummary($article));
             }
@@ -27,7 +27,7 @@ class ArticleController extends Controller
         $article = Article::findOne($id, true);
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {
-                return $this->redirect(['default/start']);
+                return $this->redirect(['article/view', 'id' => $article->id]);
             } else {
                 \Yii::$app->session->setFlash('error', Html::errorSummary($article));
             }
@@ -44,7 +44,7 @@ class ArticleController extends Controller
     public function actionDelete($id)
     {
         Article::findOne($id, true)->delete();
-        return $this->redirect(['default/start']);
+        return $this->redirect(['article/index']);
     }
 
     public function actionIndex()
