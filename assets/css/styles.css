@@ -929,7 +929,9 @@ h1.page-header {
 	overflow: scroll;
 }
 
-
+.redactor-editor{
+	height: 1000px;
+}
 
 
 

@@ -77,7 +77,7 @@ class Article extends BaseArticle
     public function afterSave($insert, $changedAttributes)
     {
         if ($content = ArrayHelper::getValue($changedAttributes, 'content')) {
-            preg_match_all('#src=".+\?file=(.+)"#', $content, $m);
+            preg_match_all('#/file/article\?file=(.+)"#', $content, $m);
             foreach (ArrayHelper::getValue($m, 1) as $file) {
                 @unlink(Yii::getAlias(Yii::$app->getModule('redactor')->uploadDir . '/' . $file));
             }

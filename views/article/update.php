@@ -15,8 +15,8 @@ echo $form->field($article, 'parent_id')->dropDownList($articles, ['prompt' => '
 echo $form->field($article, 'content')->widget(Redactor::className(), [
     'clientOptions' => [
         'lang' => 'ru',
-        'plugins' => ['clips', 'fontcolor', 'imagemanager']
-    ]
+        'plugins' => ['clips', 'fontcolor', 'imagemanager'],
+    ],
 ]);
 echo \yii\helpers\Html::submitButton();
 ActiveForm::end();
