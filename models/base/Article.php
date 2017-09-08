@@ -9,6 +9,7 @@ use Yii;
  *
  * @property integer $id
  * @property string $name
+ * @property integer $parent_id
  * @property string $content
  * @property string $created_at
  * @property string $updated_at
@@ -37,7 +38,7 @@ protected $_relationClasses = [];
      */
     public static function tableName()
     {
-        return 'article';
+        return '{{%article}}';
     }
 
     /**
@@ -46,7 +47,9 @@ protected $_relationClasses = [];
     public function rules()
     {
         return [
-            [['name', 'content'], 'string', 'max' => 255]
+            [['parent_id'], 'integer'],
+            [['content'], 'string'],
+            [['name'], 'string', 'max' => 255]
         ];
     }
 
@@ -58,6 +61,7 @@ protected $_relationClasses = [];
         return [
             'id' => Yii::t('models', 'ID'),
             'name' => Yii::t('models', 'Name'),
+            'parent_id' => Yii::t('models', 'Parent ID'),
             'content' => Yii::t('models', 'Content'),
             'created_at' => Yii::t('models', 'Created At'),
             'updated_at' => Yii::t('models', 'Updated At'),

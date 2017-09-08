@@ -1,6 +1,7 @@
 <?php
 namespace carono\exchange1c\models\query\base;
 
+use carono\yii2helpers\QueryHelper;
 use yii\data\ActiveDataProvider;
 use yii\data\Sort;
 
@@ -10,12 +11,11 @@ use yii\data\Sort;
  */
 class ArticleQuery extends \yii\db\ActiveQuery
 {
-
 	/**
 	 * @inheritdoc
 	 * @return \carono\exchange1c\models\Article[]
 	 */
-	public function all($db = NULL)
+	public function all($db = null)
 	{
 		return parent::all($db);
 	}
@@ -25,7 +25,7 @@ class ArticleQuery extends \yii\db\ActiveQuery
 	 * @inheritdoc
 	 * @return \carono\exchange1c\models\Article
 	 */
-	public function one($db = NULL)
+	public function one($db = null)
 	{
 		return parent::one($db);
 	}
@@ -36,13 +36,14 @@ class ArticleQuery extends \yii\db\ActiveQuery
 	 * @var array $options Options for ActiveDataProvider
 	 * @return ActiveDataProvider
 	 */
-	public function search($filter = NULL, $options = [])
+	public function search($filter = null, $options = [])
 	{
-		$this->filter($filter);
+		$query = clone $this;
+		$query->filter($filter);
 		$sort = new Sort();
 		    return new ActiveDataProvider(
 		    array_merge([
-		        'query' => $this,
+		        'query' => $query,
 		        'sort'  => $sort
 		    ], $options)
 		);
@@ -53,12 +54,11 @@ class ArticleQuery extends \yii\db\ActiveQuery
 	 * @var mixed $model
 	 * @return $this
 	 */
-	public function filter($model = NULL)
+	public function filter($model = null)
 	{
 		if ($model){
-		//
+		    QueryHelper::regular($model, $this);
 		}
 		return $this;
 	}
-
 }

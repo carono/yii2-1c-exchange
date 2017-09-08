@@ -1,4 +1,5 @@
 <?php
+
 use carono\exchange1c\assets\AppAsset;
 use yii\widgets\Menu;
 use yii\widgets\Breadcrumbs;
@@ -44,7 +45,7 @@ $this->beginPage();
             </a>
             <ul class="user-menu">
                 <li class="pull-right">
-                    <a href="/">Application</a>
+                    <a href="/"><?= Yii::$app->name ?></a>
                 </li>
             </ul>
         </div>
@@ -113,14 +114,30 @@ $this->beginPage();
 
 <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
     <div class="row">
-        <?= Breadcrumbs::widget([
+        <?php
+        echo Breadcrumbs::widget([
             'links' => ArrayHelper::getValue($this->params, 'breadcrumbs', []),
+            'options' => [
+                'class' => 'breadcrumb col-lg-8'
+            ],
             'homeLink' => [
                 'label' => '<svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg>',
                 'encode' => false,
                 'url' => ['default/index']
             ]
-        ]); ?>
+        ]);
+        ?>
+        <div class="col-lg-4" style="background: #e9ecf2; padding: 10px 15px;">
+            <?php
+            echo Menu::widget([
+                'items' => ArrayHelper::getValue($this->params, 'buttons', []),
+                'options' => [
+                    'tag' => 'div',
+                    'class' => ['btn-group pull-right'],
+                ],
+            ]);
+            ?>
+        </div>
     </div>
 
     <div class="row">

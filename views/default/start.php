@@ -1,15 +1,12 @@
 <?php
 
-use yii\widgets\ListView;
-use carono\exchange1c\widgets\Panel;
+use carono\exchange1c\models\Article;
+use yii\widgets\Menu;
 
 /**
  * @var \yii\data\ActiveDataProvider $dataProvider
+ * @var \yii\web\View $this
  */
-
-Panel::begin();
-echo ListView::widget([
-    'dataProvider' => $dataProvider,
-    'itemView' => '@vendor/carono/yii2-1c-exchange/views/widgets/article-item'
-]);
-Panel::end();
+$this->title = 'Документация по работе модуля';
+$items = Article::formMenuItems();
+echo Menu::widget(['items' => $items]);

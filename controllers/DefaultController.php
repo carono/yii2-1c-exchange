@@ -7,6 +7,7 @@ namespace carono\exchange1c\controllers;
 use carono\exchange1c\models\Article;
 use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 
 class DefaultController extends Controller
 {
@@ -28,7 +29,7 @@ class DefaultController extends Controller
 
     public function actionImport()
     {
-        if (\Yii::$app->request->isPost){
+        if (\Yii::$app->request->isPost) {
 
         }
         return $this->render('import');
@@ -58,15 +59,13 @@ class DefaultController extends Controller
 
     public function actionUpdateArticle($id)
     {
-        $article = Article::findOne($id, true);
-        if ($article->load(\Yii::$app->request->post())) {
-            if ($article->save()) {
-                return $this->refresh();
-            } else {
 
-            }
-        }
-        return $this->render('update-article', ['article' => $article]);
+    }
+
+
+    public function actionCreateArticle()
+    {
+
     }
 
     public function actionInterfaces()
