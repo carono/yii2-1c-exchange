@@ -5,7 +5,7 @@ namespace carono\exchange1c\interfaces;
 
 
 
-interface OfferInterface extends FieldsInterface, ExportFieldsInterface
+interface OfferInterface extends ExportFieldsInterface
 {
     /**
      * @return GroupInterface
