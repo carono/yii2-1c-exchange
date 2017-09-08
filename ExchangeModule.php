@@ -18,6 +18,10 @@ class ExchangeModule extends \yii\base\Module
      */
     public $productClass;
     /**
+     * @var \carono\exchange1c\interfaces\OfferInterface
+     */
+    public $offerClass;
+    /**
      * @var \carono\exchange1c\interfaces\DocumentInterface
      */
     public $documentClass;

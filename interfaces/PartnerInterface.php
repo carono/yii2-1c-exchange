@@ -4,6 +4,6 @@
 namespace carono\exchange1c\interfaces;
 
 
-interface PartnerInterface extends FieldsInterface
+interface PartnerInterface extends FieldsInterface, ExportFieldsInterface
 {
 }

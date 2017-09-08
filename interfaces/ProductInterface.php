@@ -51,23 +51,12 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
     public function setRequisite1c($name, $value);
 
     /**
+     * Предпологается, что дерево групп у Вас уже создано (\carono\exchange1c\interfaces\GroupInterface::createTree1c)
+     *
      * @param \Zenwalker\CommerceML\Model\Group $group
      * @return mixed
      */
     public function setGroup1c($group);
-
-    /**
-     * offers.xml > ПакетПредложений > Предложения > Предложение > ХарактеристикиТовара > ХарактеристикаТовара
-     *
-     * Характеристики товара
-     * $name - Наименование
-     * $value - Значение
-     *
-     * @param \Zenwalker\CommerceML\Model\Offer $offer
-     * @param \Zenwalker\CommerceML\Model\Simple $specification
-     * @return void
-     */
-    public function setSpecification1c($offer, $specification);
 
     /**
      * import.xml > Классификатор > Свойства > Свойство
@@ -83,20 +72,6 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
      * @return void
      */
     public function setProperty1c($property);
-
-
-    /**
-     * offers.xml > ПакетПредложений > Предложения > Предложение > Цены
-     *
-     * Цена товара,
-     * К $price можно обратиться как к массиву, чтобы получить список цен (Цены > Цена)
-     * $price->type - тип цены (offers.xml > ПакетПредложений > ТипыЦен > ТипЦены)
-     *
-     * @param \Zenwalker\CommerceML\Model\Offer $offer
-     * @param \Zenwalker\CommerceML\Model\Price $price
-     * @return void
-     */
-    public function setPrice1c($offer, $price);
 
     /**
      * @param string $path
@@ -115,4 +90,10 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface
      * @return mixed
      */
     public static function createProperties1c($properties);
+
+    /**
+     * @param \Zenwalker\CommerceML\Model\Offer $offer
+     * @return OfferInterface
+     */
+    public function getOffer1c($offer);
 }

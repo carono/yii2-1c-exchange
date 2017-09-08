@@ -9,6 +9,7 @@ use carono\exchange1c\helpers\ByteHelper;
 use carono\exchange1c\helpers\NodeHelper;
 use carono\exchange1c\helpers\SerializeHelper;
 use carono\exchange1c\interfaces\DocumentInterface;
+use carono\exchange1c\interfaces\OfferInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
 use yii\base\Exception;
@@ -170,6 +171,9 @@ class ApiController extends Controller
 
         }
         if ($offers) {
+            if ($offerClass = $this->getOfferClass()) {
+                $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
+            }
             foreach ($commerce->offerPackage->getOffers() as $offer) {
                 if ($model = $this->findModel($offer)) {
                     $this->parseProductOffer($model, $offer);
@@ -406,8 +410,9 @@ class ApiController extends Controller
      */
     protected function parsePrice($model, $offer)
     {
+        $offerModel = $model->getOffer1c($offer);
         foreach ($offer->getPrices() as $price) {
-            $model->setPrice1c($offer, $price);
+            $offerModel->setPrice1c($price);
         }
     }
 
@@ -451,8 +456,9 @@ class ApiController extends Controller
      */
     protected function parseSpecifications($model, $offer)
     {
+        $offerModel = $model->getOffer1c($offer);
         foreach ($offer->getSpecifications() as $specification) {
-            $model->setSpecification1c($offer, $specification);
+            $offerModel->setSpecification1c($specification);
         }
     }
 
@@ -465,6 +471,14 @@ class ApiController extends Controller
         foreach ($properties as $property) {
             $model->setProperty1c($property);
         }
+    }
+
+    /**
+     * @return OfferInterface
+     */
+    protected function getOfferClass()
+    {
+        return $this->module->offerClass;
     }
 
     /**
