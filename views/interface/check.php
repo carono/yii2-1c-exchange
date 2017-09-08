@@ -1,10 +1,10 @@
 <?php
+
 use yii\grid\GridView;
 use yii\data\ArrayDataProvider;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use carono\exchange1c\models\InterfaceTest;
-use yii\helpers\StringHelper;
 use carono\exchange1c\models\InterfaceModel;
 use carono\exchange1c\helpers\ClassHelper;
 
@@ -13,6 +13,8 @@ use carono\exchange1c\helpers\ClassHelper;
  * @var string $variable
  * @var string $class
  * @var InterfaceTest $interfaceTest
+ * @var ReflectionProperty $property
+ * @var string $interfaceClass
  */
 
 ?>
@@ -27,21 +29,13 @@ use carono\exchange1c\helpers\ClassHelper;
             echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => 'Найти модель через findOne()']);
             echo Html::submitButton('Протестировать', ['class' => 'btn btn-primary pull-right']);
             ActiveForm::end();
-
             ?>
         </div>
     </div>
 
 <?php
-$classes = [
-    'productClass' => ['interface' => 'carono\exchange1c\interfaces\ProductInterface'],
-    'documentClass' => ['interface' => 'carono\exchange1c\interfaces\DocumentInterface'],
-];
-$interfaceClass = $classes[$variable]['interface'];
 
 $this->title = "Класс $class";
-
-
 $data = [];
 
 foreach (ClassHelper::getInterfaceMethods($interfaceClass) as $method) {

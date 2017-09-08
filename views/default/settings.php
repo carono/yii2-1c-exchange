@@ -17,6 +17,7 @@ echo DetailView::widget([
         'documentClass',
         'groupClass',
         'partnerClass',
+        'offerClass',
         'useZip:boolean',
         'tmpDir',
         'validateModelOnSave:boolean',

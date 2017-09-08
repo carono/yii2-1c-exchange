@@ -39,7 +39,7 @@ class TestingClass extends Testing
                 case "array":
                     if (!is_array($methodResult)) {
                         $test->result = false;
-                        $test->comment = 'значение должно быть массивом';
+                        $test->comment = 'Значение должно быть массивом';
                     }
                     break;
                 case "interface":
@@ -47,7 +47,7 @@ class TestingClass extends Testing
                         $reflection = new \ReflectionClass(get_class($methodResult));
                         if (!$reflection->implementsInterface(ltrim($rule['value'], '\\'))) {
                             $test->result = false;
-                            $test->comment = "результат должен имплементировать {$rule['value']}";
+                            $test->comment = "Результат должен имплементировать {$rule['value']}";
                         }
                     } else {
                         $test->result = null;

@@ -18,6 +18,7 @@ $this->title = 'Тестирование модуля';
 Panel::begin();
 echo $this->render('../partial/find-model', ['variable' => 'productClass']);
 echo GridView::widget([
+    'caption' => 'Тестирование интерфейса продукта',
     'dataProvider' => new ArrayDataProvider(['allModels' => TestingProductClass::findAll()]),
     'rowOptions' => function ($data) {
         if ($data->result === true) {
@@ -38,6 +39,7 @@ Panel::end();
 Panel::begin();
 echo $this->render('../partial/find-model', ['variable' => 'documentClass']);
 echo GridView::widget([
+    'caption' => 'Тестирование интерфейса документа',
     'dataProvider' => new ArrayDataProvider(['allModels' => TestingDocumentClass::findAll()]),
     'rowOptions' => function ($data) {
         if (!$data->result) {
