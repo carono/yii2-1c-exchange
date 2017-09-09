@@ -69,6 +69,11 @@ class Breadcrumbs
                 'options' => ['class' => 'btn btn-primary']
             ],
             [
+                'label' => 'Добавить подстатью',
+                'url' => ['article/create', 'parent' => $article->id],
+                'options' => ['class' => 'btn btn-primary']
+            ],
+            [
                 'label' => 'Удалить',
                 'url' => ['article/delete', 'id' => $article->id],
                 'options' => ['class' => 'btn btn-danger', 'data-confirm' => 'Удалить статью?']
@@ -84,11 +89,31 @@ class Breadcrumbs
      */
     public static function crumbArticleView($article)
     {
-        return [
-            ['label' => 'Старт', 'url' => ['article/index']],
-            $article->name,
+        $items = [
+            ['label' => 'Старт', 'url' => ['article/index']]
         ];
+        $parent = $article;
+        while ($parent = $parent->parent) {
+            $items[] = ['label' => $parent->name, 'url' => ['article/view', 'id' => $parent->id]];
+        }
+        $items[] = $article->name;
+        return $items;
     }
+
+    public static function crumbArticleUpdate($article)
+    {
+        $items = [
+            ['label' => 'Старт', 'url' => ['article/index']]
+        ];
+        $parent = $article;
+        while ($parent = $parent->parent) {
+            $items[] = ['label' => $parent->name, 'url' => ['article/view', 'id' => $parent->id]];
+        }
+        $items[] = ['label' => $article->name, 'url' => ['article/view', 'id' => $article->id]];
+        $items [] = 'Редактирование';
+        return $items;
+    }
+
 
     public static function crumbInterfaceCheck($variable, $class, $interfaceTest)
     {

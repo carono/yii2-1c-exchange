@@ -9,4 +9,4 @@ use yii\widgets\Menu;
  */
 $this->title = 'Документация по работе модуля';
 $items = Article::formMenuItems();
-echo Menu::widget(['items' => $items]);
+echo Menu::widget(['items' => $items, 'options' => ['class' => 'article-menu']]);

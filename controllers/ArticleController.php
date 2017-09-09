@@ -9,9 +9,11 @@ use yii\helpers\Html;
 
 class ArticleController extends Controller
 {
-    public function actionCreate()
+    public function actionCreate($parent = null)
     {
         $article = new Article();
+        $article->pos = 10;
+        $article->parent_id = $parent;
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {
                 return $this->redirect(['article/index']);
@@ -49,7 +51,7 @@ class ArticleController extends Controller
 
     public function actionIndex()
     {
-        $dataProvider = Article::find()->search();
+        $dataProvider = Article::find()->orderBy(['{{%article}}.[[pos]]' => SORT_ASC])->search();
         return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 }

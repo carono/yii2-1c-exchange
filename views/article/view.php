@@ -1,6 +1,7 @@
 <?php
 
-use yii\helpers\Html;
+use carono\exchange1c\models\Article;
+use yii\widgets\Menu;
 use carono\exchange1c\widgets\Panel;
 
 /**
@@ -9,9 +10,10 @@ use carono\exchange1c\widgets\Panel;
  */
 
 $this->title = $article->name;
-Html::a('редактировать', ['default/update-article', 'id' => $article->id], ['class' => 'btn btn-success']);
+
+$items = Article::formMenuItems($article->id);
+echo Menu::widget(['items' => $items, 'options' => ['class' => 'article-menu']]);
 
 Panel::begin();
 echo $article->content;
 Panel::end();
-
