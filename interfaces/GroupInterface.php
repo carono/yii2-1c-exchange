@@ -4,13 +4,8 @@
 namespace carono\exchange1c\interfaces;
 
 
-interface GroupInterface
+interface GroupInterface extends IdentifierInterface
 {
-    /**
-     * @return string
-     */
-    public function getId1c();
-
     /**
      * @param \Zenwalker\CommerceML\Model\Group[] $groups
      * @return void

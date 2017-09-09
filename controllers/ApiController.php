@@ -12,9 +12,6 @@ use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\OfferInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
-use yii\base\Exception;
-use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
@@ -100,8 +97,6 @@ class ApiController extends Controller
 
     public function actionInit()
     {
-//        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'import.xml');
-//        @unlink($this->module->getTmpDir() . DIRECTORY_SEPARATOR . 'offers.xml');
         return [
             "zip" => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
             "file_limit" => $this->getFileLimit(),
@@ -156,8 +151,8 @@ class ApiController extends Controller
             $productClass::createProperties1c($commerce->classifier->getProperties());
 
             foreach ($commerce->catalog->getProducts() as $product) {
-                if (!$model = $this->findModel($product)) {
-                    $model = $this->createModel();
+                if (!$model = $this->findProductModelById($product->id)) {
+                    $model = $this->createProductModel();
                     $model->save($this->module->validateModelOnSave);
                 }
                 $this->parseProduct($model, $product);
@@ -175,10 +170,12 @@ class ApiController extends Controller
                 $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
             }
             foreach ($commerce->offerPackage->getOffers() as $offer) {
-                if ($model = $this->findModel($offer)) {
-                    $this->parseProductOffer($model, $offer);
-                    unset($model);
+                if (!$model = $this->findOfferModel($offer)) {
+                    $product = $this->findProductModelById($offer->getClearId());
+                    $model = $product->getOffer1c($offer);
                 }
+                $this->parseProductOffer($model, $offer);
+                unset($model);
             }
         }
     }
@@ -315,6 +312,7 @@ class ApiController extends Controller
         $this->parseProperties($model, $product->getProperties());
         $this->parseRequisites($model, $product->getRequisites());
         $this->parseImage($model, $product->getImages());
+        $model->{$model::getIdFieldName1c()} = $product->id;
         foreach ($fields as $accountingField => $modelField) {
             if ($modelField) {
                 $model->{$modelField} = (string)$product->{$accountingField};
@@ -326,7 +324,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @param ProductInterface $model
+     * @param OfferInterface $model
      * @param Offer $offer
      */
     protected function parseProductOffer($model, $offer)
@@ -338,11 +336,9 @@ class ApiController extends Controller
         $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
+        $model->{$model::getIdFieldName1c()} = $offer->id;
         foreach ($fields as $accountingField => $modelField) {
             if ($modelField) {
-                if ($accountingField == 'id') {
-                    continue;
-                }
                 if (is_null($offer->{$accountingField})) {
                     continue;
                 }
@@ -377,42 +373,49 @@ class ApiController extends Controller
     }
 
     /**
-     * @param Product|Offer $object
+     * @param string $id
      *
      * @return ProductInterface|null
      */
-    protected function findModel($object)
+    protected function findProductModelById($id)
     {
         /**
          * @var $class ProductInterface
          */
         $class = $this->getProductClass();
-        $id = ArrayHelper::getValue($class::getFields1c(), 'Ид', ArrayHelper::getValue($class::getFields1c(), 'id'));
-        return $class::find()->andWhere([$id => $object->getClearId()])->one();
+        return $class::find()->andWhere([$class::getIdFieldName1c() => $id])->one();
+    }
+
+    /**
+     * @param Offer $offer
+     *
+     * @return OfferInterface|null
+     */
+    protected function findOfferModel($offer)
+    {
+        /**
+         * @var $class ProductInterface
+         */
+        $class = $this->getOfferClass();
+        return $class::find()->andWhere([$class::getIdFieldName1c() => $offer->id])->one();
     }
 
     /**
      * @return mixed
      */
-    protected function createModel()
+    protected function createProductModel()
     {
-        /**
-         * @var $class ProductInterface
-         */
-        $class = $this->getProductClass();
-        $model = new $class;
-        return $model;
+        return Yii::createObject(['class' => $this->getProductClass()]);
     }
 
     /**
-     * @param ProductInterface $model
+     * @param OfferInterface $model
      * @param Offer $offer
      */
     protected function parsePrice($model, $offer)
     {
-        $offerModel = $model->getOffer1c($offer);
         foreach ($offer->getPrices() as $price) {
-            $offerModel->setPrice1c($price);
+            $model->setPrice1c($price);
         }
     }
 
@@ -451,14 +454,13 @@ class ApiController extends Controller
     }
 
     /**
-     * @param ProductInterface $model
+     * @param OfferInterface $model
      * @param Offer $offer
      */
     protected function parseSpecifications($model, $offer)
     {
-        $offerModel = $model->getOffer1c($offer);
         foreach ($offer->getSpecifications() as $specification) {
-            $offerModel->setSpecification1c($specification);
+            $model->setSpecification1c($specification);
         }
     }
 

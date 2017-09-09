@@ -6,7 +6,7 @@ namespace carono\exchange1c\interfaces;
 
 use yii\db\ActiveRecordInterface;
 
-interface DocumentInterface extends ActiveRecordInterface, FieldsInterface, RawInterface, ExportFieldsInterface
+interface DocumentInterface extends ActiveRecordInterface, FieldsInterface, RawInterface, ExportFieldsInterface, IdentifierInterface
 {
     /**
      * Список заказов с сайта

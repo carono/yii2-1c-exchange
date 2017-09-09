@@ -7,7 +7,7 @@ use yii\bootstrap\ActiveForm;
 use carono\exchange1c\models\InterfaceTest;
 use carono\exchange1c\models\InterfaceModel;
 use carono\exchange1c\helpers\ClassHelper;
-
+use carono\exchange1c\widgets\Panel;
 /**
  * @var \yii\web\View $this
  * @var string $variable
@@ -17,6 +17,7 @@ use carono\exchange1c\helpers\ClassHelper;
  * @var string $interfaceClass
  */
 
+Panel::begin();
 ?>
 
     <div class="row">
@@ -60,3 +61,4 @@ echo GridView::widget([
         'status_name',
     ]
 ]);
+Panel::end();
