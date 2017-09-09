@@ -30,8 +30,4 @@ echo GridView::widget([
         ]
     ]
 ]);
-$file = Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/json/2.09.json');
-$json = Json::loadFromFile($file);
-
-
 Panel::end();
