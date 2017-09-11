@@ -12,6 +12,7 @@ use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\OfferInterface;
 use carono\exchange1c\interfaces\ProductInterface;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
@@ -142,18 +143,17 @@ class ApiController extends Controller
         $commerce->addXmls(file_exists($import) ? $import : false, file_exists($offers) ? $offers : false);
         if ($import) {
             $this->beforeProductSync();
-
             if ($groupClass = $this->getGroupClass()) {
                 $groupClass::createTree1c($commerce->classifier->getGroups());
             }
-
             $productClass = $this->getProductClass();
             $productClass::createProperties1c($commerce->classifier->getProperties());
-
             foreach ($commerce->catalog->getProducts() as $product) {
                 if (!$model = $this->findProductModelById($product->id)) {
-                    $model = $this->createProductModel();
-                    $model->save($this->module->validateModelOnSave);
+                    if (!$model = $productClass::createModel1c($product)) {
+                        Yii::error('1', 'exchange1c');
+                        continue;
+                    }
                 }
                 $this->parseProduct($model, $product);
                 $this->_ids[] = $model->getPrimaryKey();
@@ -163,17 +163,14 @@ class ApiController extends Controller
                 gc_collect_cycles();
             }
             $this->afterProductSync();
-
         }
         if ($offers) {
             if ($offerClass = $this->getOfferClass()) {
                 $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
             }
             foreach ($commerce->offerPackage->getOffers() as $offer) {
-                if (!$model = $this->findOfferModel($offer)) {
-                    $product = $this->findProductModelById($offer->getClearId());
-                    $model = $product->getOffer1c($offer);
-                }
+                $product = $this->findProductModelById($offer->getClearId());
+                $model = $product->getOffer1c($offer);
                 $this->parseProductOffer($model, $offer);
                 unset($model);
             }
@@ -304,7 +301,6 @@ class ApiController extends Controller
         /**
          * @var Simple $value
          */
-        $fields = $model::getFields1c();
         $this->beforeUpdateProduct($model);
         $model->setRaw1cData($product->owner, $product);
         $group = $product->getGroup();
@@ -312,15 +308,8 @@ class ApiController extends Controller
         $this->parseProperties($model, $product->getProperties());
         $this->parseRequisites($model, $product->getRequisites());
         $this->parseImage($model, $product->getImages());
-        $model->{$model::getIdFieldName1c()} = $product->id;
-        foreach ($fields as $accountingField => $modelField) {
-            if ($modelField) {
-                $model->{$modelField} = (string)$product->{$accountingField};
-            }
-        }
-        $model->save();
-        unset($group);
         $this->afterUpdateProduct($model);
+        unset($group);
     }
 
     /**
@@ -332,21 +321,13 @@ class ApiController extends Controller
         /**
          * @var Simple $value
          */
-        $fields = $model::getFields1c();
         $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
         $model->{$model::getIdFieldName1c()} = $offer->id;
-        foreach ($fields as $accountingField => $modelField) {
-            if ($modelField) {
-                if (is_null($offer->{$accountingField})) {
-                    continue;
-                }
-                $model->{$modelField} = (string)$offer->{$accountingField};
-            }
-        }
         $model->save();
         $this->afterUpdateOffer($model, $offer);
+        unset($model);
     }
 
     public function afterUpdateProduct($model)
@@ -401,11 +382,16 @@ class ApiController extends Controller
     }
 
     /**
-     * @return mixed
+     * @return ActiveRecord
      */
-    protected function createProductModel()
+    protected function createProductModel($data)
     {
-        return Yii::createObject(['class' => $this->getProductClass()]);
+        $class = $this->getProductClass();
+        if ($model = $class::createModel1c($data)) {
+            return $model;
+        } else {
+            return Yii::createObject(['class' => $class]);
+        }
     }
 
     /**

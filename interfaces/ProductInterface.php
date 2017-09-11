@@ -10,7 +10,7 @@ use Zenwalker\CommerceML\Model\PropertyCollection;
  *
  * @package carono\exchange1c\interfaces
  */
-interface ProductInterface extends ActiveRecordInterface, FieldsInterface, IdentifierInterface
+interface ProductInterface extends ActiveRecordInterface, IdentifierInterface
 {
     /**
      * Если по каким то причинам файлы import.xml или offers.xml были модифицированы и какие то данные
@@ -22,22 +22,6 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface, Ident
      * @return void
      */
     public function setRaw1cData($cml, $product);
-
-    /**
-     * Ассоциативный массив, где
-     * Ключ - имя xml тега (import.xml > Каталог > Товары > Товар)
-     * Значение из XML  => Атрибут модели
-     * Например:
-     *
-     * [
-     *      'id'           => 'accounting_id',
-     *      'Наименование' => 'title',
-     *      'Штрихкод'     => 'barcode'
-     * ]
-     *
-     * @return array
-     */
-    public static function getFields1c();
 
     /**
      * Установка реквизитов, (import.xml > Каталог > Товары > Товар > ЗначенияРеквизитов > ЗначениеРеквизита)
@@ -96,4 +80,10 @@ interface ProductInterface extends ActiveRecordInterface, FieldsInterface, Ident
      * @return OfferInterface
      */
     public function getOffer1c($offer);
+
+    /**
+     * @param \Zenwalker\CommerceML\Model\Product $product
+     * @return mixed
+     */
+    public static function createModel1c($product);
 }
