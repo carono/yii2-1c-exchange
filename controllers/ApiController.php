@@ -298,9 +298,6 @@ class ApiController extends Controller
      */
     protected function parseProduct($model, $product)
     {
-        /**
-         * @var Simple $value
-         */
         $this->beforeUpdateProduct($model);
         $model->setRaw1cData($product->owner, $product);
         $group = $product->getGroup();
@@ -318,9 +315,6 @@ class ApiController extends Controller
      */
     protected function parseProductOffer($model, $offer)
     {
-        /**
-         * @var Simple $value
-         */
         $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
