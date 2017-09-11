@@ -12,7 +12,11 @@ use carono\exchange1c\widgets\Panel;
 $this->title = $article->name;
 
 $items = Article::formMenuItems($article->id);
-echo Menu::widget(['items' => $items, 'options' => ['class' => 'article-menu']]);
+if ($items) {
+    Panel::begin();
+    echo Menu::widget(['items' => $items, 'options' => ['class' => 'article-menu']]);
+    Panel::end();
+}
 
 Panel::begin();
 echo $article->content;
