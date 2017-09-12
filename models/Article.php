@@ -68,18 +68,28 @@ class Article extends BaseArticle
 
     public function delete()
     {
+        $files = self::extractFilesFromString($this->content);
+        foreach ($files as $file) {
+            @unlink(Yii::getAlias(Yii::$app->getModule('redactor')->uploadDir . '/' . $file));
+        }
         foreach ($this->articles as $article) {
             $article->delete();
         }
         return parent::delete();
     }
 
+    public static function extractFilesFromString($content)
+    {
+        preg_match_all('#/file/article\?file=([\w\d\-\/\.]+)"#ui', $content, $m);
+        return $m[1];
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         if ($content = ArrayHelper::getValue($changedAttributes, 'content')) {
-            preg_match_all('#/file/article\?file=([\w\d\-\/\.]+)"#ui', $content, $old);
-            preg_match_all('#/file/article\?file=([\w\d\-\/\.]+)"#ui', $this->content, $new);
-            foreach (array_diff($old[1], $new[1]) as $file) {
+            $old = self::extractFilesFromString($content);
+            $new = self::extractFilesFromString($this->content);
+            foreach (array_diff($old, $new) as $file) {
                 @unlink(Yii::getAlias(Yii::$app->getModule('redactor')->uploadDir . '/' . $file));
             }
         }

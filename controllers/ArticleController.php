@@ -5,8 +5,15 @@ namespace carono\exchange1c\controllers;
 
 
 use carono\exchange1c\models\Article;
+use yii\helpers\FileHelper;
 use yii\helpers\Html;
+use Yii;
 
+/**
+ * Class ArticleController
+ *
+ * @package carono\exchange1c\controllers
+ */
 class ArticleController extends Controller
 {
     public function actionCreate($parent = null)
@@ -53,5 +60,23 @@ class ArticleController extends Controller
     {
         $dataProvider = Article::find()->orderBy(['{{%article}}.[[pos]]' => SORT_ASC])->search();
         return $this->render('index', ['dataProvider' => $dataProvider]);
+    }
+
+    /**
+     * Удаляем все реальные файлы, которые не используются в статьях
+     */
+    public function actionDeleteUnusedImages()
+    {
+        $content = Article::find()->select(['content' => 'group_concat([[content]])'])->scalar();
+        $dir = Yii::getAlias(Yii::$app->getModule('redactor')->uploadDir);
+        $files = Article::extractFilesFromString($content);
+        $realFiles = FileHelper::findFiles($dir);
+        array_walk($realFiles, function (&$item) use ($dir) {
+            $item = str_replace('\\', '/', substr($item, strlen($dir)));
+        });
+        foreach (array_diff($realFiles, $files) as $file) {
+            @unlink($dir . '/' . $file);
+        };
+        return $this->redirect(['article/index']);
     }
 }

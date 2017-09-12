@@ -70,6 +70,12 @@ interface ProductInterface extends ActiveRecordInterface, IdentifierInterface
     public function getGroup1c();
 
     /**
+     * Создание все свойств продутка
+     * import.xml > Классификатор > Свойства
+     *
+     * $properties[]->availableValues - список доступных значений, для этого свойства
+     * import.xml > Классификатор > Свойства > Свойство > ВариантыЗначений > Справочник
+     *
      * @param PropertyCollection $properties
      * @return mixed
      */

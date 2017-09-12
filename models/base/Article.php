@@ -48,6 +48,7 @@ protected $_relationClasses = [];
     public function rules()
     {
         return [
+            [['name'], 'required'],
             [['parent_id', 'pos'], 'integer'],
             [['content'], 'string'],
             [['name'], 'string', 'max' => 255]
