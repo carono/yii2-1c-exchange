@@ -4,7 +4,10 @@ namespace carono\exchange1c\helpers;
 
 class ByteHelper
 {
-
+    /**
+     * @param $value
+     * @return mixed
+     */
     public static function str2bytes($value)
     {
         $unit_byte = preg_replace('/[^a-zA-Z]/', '', $value);
@@ -20,27 +23,9 @@ class ByteHelper
     }
 
     /**
-     * IEEE 1541/IEC 60027-2
-     *
-     *
-     * @link https://habrahabr.ru/post/193256/
-     *
-     * @param string $value a number of bytes with optinal SI decimal prefix (e.g. 7k, 5mb, 3GB or 1 Tb)
-     *
-     * @return integer|float A number representation of the size in BYTES (can be 0). otherwise FALSE
-     */
-    public static function metrik2bytes($value)
-    {
-        $unit_byte = preg_replace('/[^a-zA-Z]/', '', $value);
-        $num_val = preg_replace('/\D\.\D/', '', $value);
-
-        return false;
-    }
-
-    /**
      * The maximum file upload size by getting PHP settings
      *
-     * @return integer|float file size limit in BYTES based
+     * @return integer|float|false file size limit in BYTES based
      */
     public static function maximum_upload_size()
     {
