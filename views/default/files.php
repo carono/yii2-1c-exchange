@@ -6,7 +6,7 @@ use yii\helpers\Html;
 use carono\exchange1c\widgets\Panel;
 
 /**
- * @var \yii\data\ActiveDataProvider $dataProvider
+ * @var \yii\data\ArrayDataProvider $dataProvider
  * @var \yii\web\View $this
  */
 $this->title = "Список временных файлов ({$this->context->module->tmpDir})";
