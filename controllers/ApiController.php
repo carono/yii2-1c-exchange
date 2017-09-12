@@ -48,6 +48,9 @@ class ApiController extends Controller
         parent::init();
     }
 
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
@@ -58,6 +61,11 @@ class ApiController extends Controller
         ]);
     }
 
+    /**
+     * @param \yii\base\Action $action
+     * @param mixed $result
+     * @return mixed|string
+     */
     public function afterAction($action, $result)
     {
         Yii::$app->response->headers->set('uid', Yii::$app->user->getId());
@@ -74,6 +82,10 @@ class ApiController extends Controller
         }
     }
 
+    /**
+     * @param $type
+     * @return array|bool
+     */
     public function actionCheckauth($type)
     {
         if (Yii::$app->user->isGuest) {
@@ -87,6 +99,9 @@ class ApiController extends Controller
         }
     }
 
+    /**
+     * @return float|int
+     */
     protected function getFileLimit()
     {
         $limit = ByteHelper::maximum_upload_size();
@@ -96,6 +111,9 @@ class ApiController extends Controller
         return $limit;
     }
 
+    /**
+     * @return array
+     */
     public function actionInit()
     {
         return [
@@ -104,6 +122,11 @@ class ApiController extends Controller
         ];
     }
 
+    /**
+     * @param $type
+     * @param $filename
+     * @return bool
+     */
     public function actionFile($type, $filename)
     {
         $body = Yii::$app->request->getRawBody();
@@ -136,58 +159,58 @@ class ApiController extends Controller
         $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
     }
 
-    public function parsing($import, $offers)
+    /**
+     * @param $file
+     */
+    public function parsingImport($file)
     {
         $this->_ids = [];
         $commerce = new CommerceML();
-        $commerce->addXmls(file_exists($import) ? $import : false, file_exists($offers) ? $offers : false);
-        if ($import) {
-            $this->beforeProductSync();
-            if ($groupClass = $this->getGroupClass()) {
-                $groupClass::createTree1c($commerce->classifier->getGroups());
-            }
-            $productClass = $this->getProductClass();
-            $productClass::createProperties1c($commerce->classifier->getProperties());
-            foreach ($commerce->catalog->getProducts() as $product) {
-                if (!$model = $this->findProductModelById($product->id)) {
-                    if (!$model = $productClass::createModel1c($product)) {
-                        Yii::error('1', 'exchange1c');
-                        continue;
-                    }
+        $commerce->loadImportXml($file);
+        $this->beforeProductSync();
+        if ($groupClass = $this->getGroupClass()) {
+            $groupClass::createTree1c($commerce->classifier->getGroups());
+        }
+        $productClass = $this->getProductClass();
+        $productClass::createProperties1c($commerce->classifier->getProperties());
+        foreach ($commerce->catalog->getProducts() as $product) {
+            if (!$model = $this->findProductModelById($product->id)) {
+                if (!$model = $productClass::createModel1c($product)) {
+                    Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c", 'exchange1c');
+                    continue;
                 }
-                $this->parseProduct($model, $product);
-                $this->_ids[] = $model->getPrimaryKey();
-                $model = null;
-                unset($model);
-                unset($product);
-                gc_collect_cycles();
             }
-            $this->afterProductSync();
+            $this->parseProduct($model, $product);
+            $this->_ids[] = $model->getPrimaryKey();
+            $model = null;
+            unset($model);
+            unset($product);
+            gc_collect_cycles();
         }
-        if ($offers) {
-            if ($offerClass = $this->getOfferClass()) {
-                $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
-            }
-            foreach ($commerce->offerPackage->getOffers() as $offer) {
-                $product = $this->findProductModelById($offer->getClearId());
-                $model = $product->getOffer1c($offer);
-                $this->parseProductOffer($model, $offer);
-                unset($model);
-            }
+        $this->afterProductSync();
+    }
+
+    /**
+     * @param $file
+     */
+    public function parsingOffer($file)
+    {
+        $commerce = new CommerceML();
+        $commerce->loadOffersXml($file);
+        if ($offerClass = $this->getOfferClass()) {
+            $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
+        }
+        foreach ($commerce->offerPackage->getOffers() as $offer) {
+            $product = $this->findProductModelById($offer->getClearId());
+            $model = $product->getOffer1c($offer);
+            $this->parseProductOffer($model, $offer);
+            unset($model);
         }
     }
 
-    public function actionLoad()
-    {
-        $this->actionImport('catalog', 'import.xml');
-        $this->actionImport('catalog', 'offers.xml');
-    }
-
-    public function parsingImport($file)
-    {
-        $this->parsing($file, false);
-    }
-
+    /**
+     * @param $file
+     */
     public function parsingOrder($file)
     {
         /**
@@ -203,11 +226,11 @@ class ApiController extends Controller
         }
     }
 
-    public function parsingOffer($file)
-    {
-        $this->parsing(false, $file);
-    }
-
+    /**
+     * @param $type
+     * @param $filename
+     * @return bool
+     */
     public function actionImport($type, $filename)
     {
         if (($archive = self::getData('archive')) && file_exists($archive)) {
@@ -238,6 +261,10 @@ class ApiController extends Controller
         FileHelper::removeDirectory($this->module->getTmpDir());
     }
 
+    /**
+     * @param $type
+     * @return mixed
+     */
     public function actionQuery($type)
     {
         /**
@@ -272,39 +299,54 @@ class ApiController extends Controller
         return $root->asXML();
     }
 
+    /**
+     * @param $type
+     * @return bool
+     */
     public function actionSuccess($type)
     {
         return true;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     */
     protected static function setData($name, $value)
     {
         Yii::$app->session->set($name, $value);
     }
 
+    /**
+     * @param $name
+     * @param null $default
+     * @return mixed
+     */
     protected static function getData($name, $default = null)
     {
         return Yii::$app->session->get($name, $default);
     }
 
+    /**
+     * @return bool
+     */
     protected static function clearData()
     {
         return Yii::$app->session->closeSession();
     }
 
     /**
-     * @param                                     $model ProductInterface
+     * @param ProductInterface $model
      * @param \Zenwalker\CommerceML\Model\Product $product
      */
     protected function parseProduct($model, $product)
     {
         $this->beforeUpdateProduct($model);
         $model->setRaw1cData($product->owner, $product);
-        $group = $product->getGroup();
-        $this->parseGroups($model, $group);
-        $this->parseProperties($model, $product->getProperties());
-        $this->parseRequisites($model, $product->getRequisites());
-        $this->parseImage($model, $product->getImages());
+        $this->parseGroups($model, $product);
+        $this->parseProperties($model, $product);
+        $this->parseRequisites($model, $product);
+        $this->parseImage($model, $product);
         $this->afterUpdateProduct($model);
         unset($group);
     }
@@ -324,16 +366,26 @@ class ApiController extends Controller
         unset($model);
     }
 
+    /**
+     * @param $model
+     */
     public function afterUpdateProduct($model)
     {
         $this->module->trigger(self::EVENT_AFTER_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
     }
 
+    /**
+     * @param $model
+     */
     public function beforeUpdateProduct($model)
     {
         $this->module->trigger(self::EVENT_BEFORE_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
     }
 
+    /**
+     * @param $model
+     * @param $offer
+     */
     public function beforeUpdateOffer($model, $offer)
     {
         $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent([
@@ -342,6 +394,10 @@ class ApiController extends Controller
         ]));
     }
 
+    /**
+     * @param $model
+     * @param $offer
+     */
     public function afterUpdateOffer($model, $offer)
     {
         $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
@@ -401,10 +457,11 @@ class ApiController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param Image $images
+     * @param Product $product
      */
-    protected function parseImage($model, $images)
+    protected function parseImage($model, $product)
     {
+        $images = $product->getImages();
         foreach ($images as $image) {
             $path = realpath($this->module->getTmpDir() . DIRECTORY_SEPARATOR . $image->path);
             if (file_exists($path)) {
@@ -415,19 +472,21 @@ class ApiController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param Group $group
+     * @param Product $product
      */
-    protected function parseGroups($model, $group)
+    protected function parseGroups($model, $product)
     {
+        $group = $product->getGroup();
         $model->setGroup1c($group);
     }
 
     /**
      * @param ProductInterface $model
-     * @param RequisiteCollection $requisites
+     * @param Product $product
      */
-    protected function parseRequisites($model, $requisites)
+    protected function parseRequisites($model, $product)
     {
+        $requisites = $product->getRequisites();
         foreach ($requisites as $requisite) {
             $model->setRequisite1c($requisite->name, $requisite->value);
         }
@@ -446,10 +505,11 @@ class ApiController extends Controller
 
     /**
      * @param ProductInterface $model
-     * @param PropertyCollection $properties
+     * @param Product $product
      */
-    protected function parseProperties($model, $properties)
+    protected function parseProperties($model, $product)
     {
+        $properties = $product->getProperties();
         foreach ($properties as $property) {
             $model->setProperty1c($property);
         }
@@ -487,6 +547,9 @@ class ApiController extends Controller
         return $this->module->groupClass;
     }
 
+    /**
+     * @return bool
+     */
     public function actionError()
     {
         return false;

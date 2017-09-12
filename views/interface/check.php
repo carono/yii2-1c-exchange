@@ -13,11 +13,11 @@ use carono\exchange1c\widgets\Panel;
  * @var string $variable
  * @var string $class
  * @var InterfaceTest $interfaceTest
- * @var ReflectionProperty $property
  * @var string $interfaceClass
  */
 
 Panel::begin();
+/*
 ?>
 
     <div class="row">
@@ -35,10 +35,9 @@ Panel::begin();
     </div>
 
 <?php
-
+*/
 $this->title = "Класс $class";
 $data = [];
-
 foreach (ClassHelper::getInterfaceMethods($interfaceClass) as $method) {
     $data[] = new InterfaceModel([
         'function' => $method,
@@ -46,7 +45,6 @@ foreach (ClassHelper::getInterfaceMethods($interfaceClass) as $method) {
         'class' => $class
     ]);
 }
-
 echo GridView::widget([
     'dataProvider' => new ArrayDataProvider(['allModels' => $data]),
     'rowOptions' => function (InterfaceModel $model) {

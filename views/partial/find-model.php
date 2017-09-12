@@ -11,6 +11,7 @@ use yii\helpers\Html;
         <?php
         $class = Yii::$app->controller->module->{$variable};
         $interfaceTest = InterfaceTest::findByClass($class);
+
         $hint = '';
         if ($interfaceTest->model) {
             $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;

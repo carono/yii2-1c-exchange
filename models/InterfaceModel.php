@@ -44,7 +44,7 @@ class InterfaceModel extends Model
 
     public function getDescription()
     {
-        $method = new \ReflectionMethod($this->class, $this->function);
+        $method = new \ReflectionMethod($this->interface, $this->function);
         return nl2br(preg_replace('#\*/|/\*|\*#', '', $method->getDocComment()));
     }
 }
