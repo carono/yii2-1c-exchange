@@ -38,6 +38,8 @@ class ApiController extends Controller
     const EVENT_AFTER_UPDATE_OFFER = 'afterUpdateOffer';
     const EVENT_BEFORE_PRODUCT_SYNC = 'beforeProductSync';
     const EVENT_AFTER_PRODUCT_SYNC = 'afterProductSync';
+    const EVENT_BEFORE_OFFER_SYNC = 'beforeOfferSync';
+    const EVENT_AFTER_OFFER_SYNC = 'afterOfferSync';
     const EVENT_AFTER_FINISH_UPLOAD_FILE = 'afterFinishUploadFile';
     const EVENT_AFTER_EXPORT_ORDERS = 'afterExportOrders';
 
@@ -160,6 +162,15 @@ class ApiController extends Controller
         $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
     }
 
+    public function beforeOfferSync()
+    {
+        $this->module->trigger(self::EVENT_BEFORE_OFFER_SYNC, new ExchangeEvent());
+    }
+
+    public function afterOfferSync()
+    {
+        $this->module->trigger(self::EVENT_AFTER_OFFER_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
+    }
     /**
      * @param $file
      */
@@ -196,17 +207,21 @@ class ApiController extends Controller
      */
     public function parsingOffer($file)
     {
+        $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->loadOffersXml($file);
         if ($offerClass = $this->getOfferClass()) {
             $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
         }
+        $this->beforeOfferSync();
         foreach ($commerce->offerPackage->getOffers() as $offer) {
             $product = $this->findProductModelById($offer->getClearId());
             $model = $product->getOffer1c($offer);
             $this->parseProductOffer($model, $offer);
+            $this->_ids[] = $model->getPrimaryKey();
             unset($model);
         }
+        $this->afterOfferSync();
     }
 
     /**
