@@ -39,6 +39,7 @@ class ApiController extends Controller
     const EVENT_BEFORE_PRODUCT_SYNC = 'beforeProductSync';
     const EVENT_AFTER_PRODUCT_SYNC = 'afterProductSync';
     const EVENT_AFTER_FINISH_UPLOAD_FILE = 'afterFinishUploadFile';
+    const EVENT_AFTER_EXPORT_ORDERS = 'afterExportOrders';
 
     private $_ids;
 
@@ -296,6 +297,7 @@ class ApiController extends Controller
             $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
             file_put_contents($this->module->getTmpDir() . '/query.xml', $xml);
         }
+        $this->afterExportOrders();
         return $root->asXML();
     }
 
@@ -401,6 +403,11 @@ class ApiController extends Controller
     public function afterUpdateOffer($model, $offer)
     {
         $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
+    }
+    
+    public function afterExportOrders()
+    {
+        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent());
     }
 
     /**
