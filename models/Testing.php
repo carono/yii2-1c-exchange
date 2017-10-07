@@ -5,18 +5,19 @@ namespace carono\exchange1c\models;
 
 
 use yii\base\Model;
-use yii\data\ArrayDataProvider;
+use yii\base\Module;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 
-class Testing extends Model
+abstract class Testing extends Model
 {
     public $name;
-    public $result = true;
-    public $comment = 'OK';
+    public $method;
+    public $comment;
+    protected $_result;
 
     /**
-     * @return \carono\exchange1c\ExchangeModule
+     * @return \carono\exchange1c\ExchangeModule|Module
      */
     public static function module()
     {
@@ -28,12 +29,11 @@ class Testing extends Model
      */
     public static function findAll()
     {
-        $reflection = new \ReflectionClass(self::className());
+        $reflection = new \ReflectionClass(static::className());
         $methods = $reflection->getMethods(\ReflectionMethod::IS_STATIC);
         $methods = ArrayHelper::map(array_filter($methods, function ($data) {
             return StringHelper::startsWith($data->name, 'test');
         }), 'name', 'name');
-
         $data = [];
         foreach ($methods as $method) {
             if ($test = call_user_func(static::className() . "::$method")) {
@@ -41,5 +41,10 @@ class Testing extends Model
             }
         }
         return $data;
+    }
+
+    public function testing()
+    {
+        return !$this->hasErrors();
     }
 }

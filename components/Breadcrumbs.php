@@ -83,6 +83,13 @@ class Breadcrumbs
 
     #############################################################################
 
+    public static function crumbTestingIndex()
+    {
+        return [
+            'Тестирование модуля',
+        ];
+    }
+
     /**
      * @param Article $article
      * @return array

@@ -24,26 +24,22 @@ class TestingProductClass extends TestingClass
     public static function methodRules()
     {
         return [
-            [['getIdFieldName1c'], 'return' => 'string'],
-            [
-                ['createModel1c'],
+            'getIdFieldName1c' => ['return' => 'string', 'auto' => true],
+            'createModel1c' => [
                 'return' => 'interface',
                 'value' => '\carono\exchange1c\interfaces\ProductInterface',
                 'params' => ['cml.catalog.products.0']
             ],
-            [
-                ['getOffer1c'],
+            'getOffer1c' => [
                 'return' => 'interface',
                 'value' => '\carono\exchange1c\interfaces\OfferInterface',
                 'params' => ['cml.offerPackage.offers.0']
             ],
-            [
-                ['setGroup1c'],
+            'setGroup1c' => [
                 'return' => '',
                 'params' => ['cml.catalog.products.0.group']
             ],
-            [
-                ['getGroup1c'],
+            'getGroup1c' => [
                 'return' => 'interface',
                 'value' => '\carono\exchange1c\interfaces\GroupInterface'
             ]

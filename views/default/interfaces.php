@@ -32,11 +32,15 @@ echo GridView::widget([
         ],
         [
             'class' => ActionColumn::className(),
-            'template' => '{download}',
+            'template' => '{testing}',
             'buttons' => [
-                'download' => function ($url, $data) {
-                    $span = Html::tag('i', '', ['class' => 'glyphicon glyphicon-cog']);
-                    return Html::a($span, ['interface/check', 'variable' => $data->name]);
+                'testing' => function ($url, $data) use ($module) {
+                    if ($module->{$data->name}) {
+                        $span = Html::tag('i', '', ['class' => 'glyphicon glyphicon-cog']);
+                        return Html::a($span, ['interface/check', 'variable' => $data->name]);
+                    } else {
+                        return null;
+                    }
                 }
             ]
         ]

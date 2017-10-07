@@ -4,21 +4,29 @@
 namespace carono\exchange1c\controllers;
 
 
-use carono\exchange1c\models\InterfaceTest;
-use yii\helpers\Html;
+use carono\exchange1c\models\TestingClass;
 
 class TestingController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex($class = null, $result = null)
     {
-        $interfaceTest = new InterfaceTest();
-        if ($interfaceTest->load(\Yii::$app->request->post())) {
-            if ($interfaceTest->save()) {
-                $this->refresh();
+        /**
+         * @var TestingClass $testingClass
+         * @var TestingClass $resultClass
+         */
+        $testingClass = null;
+        $resultClass = null;
+        if ($class) {
+            $className = 'carono\exchange1c\models\\' . $class;
+            if (class_exists($className)) {
+                $testingClass = new $className();
             } else {
-                \Yii::$app->session->setFlash('error', Html::errorSummary($interfaceTest));
+                throw new \Exception("Class $className not found");
+            }
+            if ($result) {
+                $resultClass = new $className(['method' => $result]);
             }
         }
-        return $this->render('index');
+        return $this->render('index', ['testingClass' => $testingClass, 'resultClass' => $resultClass]);
     }
 }
