@@ -13,18 +13,18 @@ use carono\exchange1c\widgets\Panel;
  */
 $this->title = 'Тестирование модуля';
 
-
+$links = [
+    'groupClass' => ['testing/index', 'class' => 'TestingGroupClass'],
+    'productClass' => ['testing/index', 'class' => 'TestingProductClass'],
+];
 ?>
     <div class="panel">
         <div class="btn-group panel-body">
-            <?= Html::a('groupClass', [
-                'testing/index',
-                'class' => 'TestingGroupClass'
-            ], ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('productClass', [
-                'testing/index',
-                'class' => 'TestingProductClass'
-            ], ['class' => 'btn btn-primary']) ?>
+            <?php
+            foreach ($links as $name => $link) {
+                echo Html::a($name, $link, ['class' => 'btn btn-primary']);
+            }
+            ?>
         </div>
     </div>
 
@@ -61,6 +61,8 @@ if ($resultClass) {
         echo GridView::widget(['dataProvider' => new ArrayDataProvider(['allModels' => $result])]);
     } elseif (is_string($result)) {
         echo $result;
+    } elseif (is_object($result)) {
+        echo \yii\widgets\DetailView::widget(['model' => $result]);
     } else {
         var_dump($result);
     }

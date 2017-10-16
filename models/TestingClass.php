@@ -36,6 +36,33 @@ abstract class TestingClass extends Testing
         return [];
     }
 
+    /**
+     * @param $result
+     * @return mixed
+     */
+    protected function saveResult($result)
+    {
+        if (\Yii::$app->cache) {
+            \Yii::$app->cache->set([$this->method, self::getPropertyClass()], $result);
+        }
+        return $result;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    protected function getSavedResult()
+    {
+        if (\Yii::$app->cache) {
+            return \Yii::$app->cache->get([$this->method, self::getPropertyClass()]);
+        }
+        return null;
+    }
+
+    /**
+     * @param $params
+     * @return array
+     */
     protected static function getParams($params)
     {
         $values = [];
@@ -109,7 +136,6 @@ abstract class TestingClass extends Testing
             $test->name = "Результат '$method'";
             $test->method = $method;
             $test->expect = ArrayHelper::getValue($rule, 'return', false) ?: 'VOID';
-//            self::validateMethodRule($test, $method, $rule);
             $result[] = $test;
         }
         return $result;
@@ -138,10 +164,13 @@ abstract class TestingClass extends Testing
         return $this->_result;
     }
 
-    public function getResult()
+    public function getResult($force = false)
     {
+        if (!$force && ($cache = self::getSavedResult())) {
+            return $cache;
+        }
         try {
-            return $this->prepareResult();
+            return $this->saveResult($this->prepareResult());
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -195,8 +224,7 @@ abstract class TestingClass extends Testing
 
     public function validateMethod()
     {
-        $class = self::getPropertyClass();
-        $this->addError('asdf', 'asfd');
+//        $class = self::getPropertyClass();
 //        if (method_exists($class, $method)) {
 //            $reflectionMethod = new \ReflectionMethod($class, $method);
 //            if ($params = ArrayHelper::getValue($rule, 'params', [])) {

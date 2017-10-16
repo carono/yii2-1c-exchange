@@ -17,9 +17,9 @@ class TestingGridView extends GridView
              * @var TestingClass $data
              */
             $result = $data->testing();
-            if ($result === true || $data->hasResult()) {
+            if (($result === true || $data->hasResult()) && !$data->hasErrors()) {
                 return ['class' => 'success'];
-            } elseif ($result === false) {
+            } elseif ($result === false || $data->hasErrors()) {
                 return ['class' => 'danger'];
             } else {
                 return ['class' => 'warning'];
@@ -29,7 +29,18 @@ class TestingGridView extends GridView
         $this->columns = [
             'name',
             'expect',
-            'comment:raw',
+            [
+                'attribute' => 'comment',
+                'value' => function ($data) {
+                    /**
+                     * @var TestingClass $data
+                     */
+                    if ($data->hasErrors()) {
+                        return Html::errorSummary($data);
+                    }
+                    return $data->comment;
+                }
+            ],
             [
                 'class' => ActionColumn::className(),
                 'header' => 'Result',

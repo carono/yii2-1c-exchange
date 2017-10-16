@@ -21,10 +21,21 @@ class TestingProductClass extends TestingClass
         return call_user_func_array("$class::createModel1c", self::getParams(['cml.catalog.products.0']));
     }
 
+    public function getResultCreateModel1c()
+    {
+        $params = self::getParams(['cml.catalog.products.0']);
+        self::getMethodResult('createModel1c', ['cml.catalog.products.0']);
+        $class = self::getPropertyClass();
+        return $class::findOne([$class::getIdFieldName1c() => $params[0]->id]);
+    }
+
     public static function methodRules()
     {
         return [
-            'getIdFieldName1c' => ['return' => 'string', 'auto' => true],
+            'getIdFieldName1c' => [
+                'return' => 'string',
+                'auto' => true
+            ],
             'createModel1c' => [
                 'return' => 'interface',
                 'value' => '\carono\exchange1c\interfaces\ProductInterface',
