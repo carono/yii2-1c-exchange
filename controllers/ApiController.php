@@ -171,6 +171,7 @@ class ApiController extends Controller
     {
         $this->module->trigger(self::EVENT_AFTER_OFFER_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
     }
+
     /**
      * @param $file
      */
@@ -186,11 +187,9 @@ class ApiController extends Controller
         $productClass = $this->getProductClass();
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
-            if (!$model = $this->findProductModelById($product->id)) {
-                if (!$model = $productClass::createModel1c($product)) {
-                    Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c", 'exchange1c');
-                    continue;
-                }
+            if (!$model = $productClass::createModel1c($product)) {
+                Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c", 'exchange1c');
+                continue;
             }
             $this->parseProduct($model, $product);
             $this->_ids[] = $model->getPrimaryKey();
@@ -419,7 +418,7 @@ class ApiController extends Controller
     {
         $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
     }
-    
+
     public function afterExportOrders()
     {
         $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent());
