@@ -52,6 +52,7 @@ class ApiController extends Controller
         parent::init();
     }
 
+
     /**
      * @return array
      */
@@ -73,6 +74,7 @@ class ApiController extends Controller
     public function afterAction($action, $result)
     {
         Yii::$app->response->headers->set('uid', Yii::$app->user->getId());
+        parent::afterAction($action, $result);
         if (is_bool($result)) {
             return $result ? "success" : "failure";
         } elseif (is_array($result)) {

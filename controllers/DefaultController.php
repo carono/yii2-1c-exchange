@@ -43,6 +43,11 @@ class DefaultController extends Controller
         return $this->render('export');
     }
 
+    public function actionMonitor()
+    {
+        return $this->render('monitor');
+    }
+
     public function actionDocumentation()
     {
         $dir = \Yii::getAlias('@vendor/carono/yii2-1c-exchange/files/doc');

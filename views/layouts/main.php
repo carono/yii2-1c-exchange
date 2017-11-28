@@ -74,6 +74,11 @@ $this->beginPage();
                 'url' => ['default/export'],
                 'encode' => false
             ],
+            [
+                'label' => '<i class="glyph glyphicon glyphicon-blackboard"></i>Монитор',
+                'url' => ['default/monitor'],
+                'encode' => false
+            ],
             ['options' => ['class' => 'divider']],
             [
                 'label' => '<i class="glyph glyphicon glyphicon-book"></i>CommerceML (PDF)',
