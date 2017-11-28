@@ -16,6 +16,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
+use Zenwalker\CommerceML\Model\Classifier;
 use Zenwalker\CommerceML\Model\Group;
 use Zenwalker\CommerceML\Model\Image;
 use Zenwalker\CommerceML\Model\Offer;
@@ -180,6 +181,12 @@ class ApiController extends Controller
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->loadImportXml($file);
+        $classifierFile = Yii::getAlias($this->module->tmpDir . '/classifier.xml');
+        if ($commerce->classifier->xml) {
+            $commerce->classifier->xml->saveXML($classifierFile);
+        } else {
+            $commerce->classifier->xml = simplexml_load_file($classifierFile);
+        }
         $this->beforeProductSync();
         if ($groupClass = $this->getGroupClass()) {
             $groupClass::createTree1c($commerce->classifier->getGroups());
