@@ -11,7 +11,7 @@ class ByteHelper
     public static function str2bytes($value)
     {
         $unit_byte = preg_replace('/[^a-zA-Z]/', '', $value);
-        $num_val = preg_replace('/\D\.\D/', '', $value);
+        $num_val = preg_replace('/[^\d]/', '', $value);
         switch ($unit_byte) {
             case 'M':
                 $k = 2;
