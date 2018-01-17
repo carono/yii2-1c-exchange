@@ -294,33 +294,28 @@ class ApiController extends Controller
         /**
          * @var DocumentInterface $document
          */
-        if (!$this->module->exchangeDocuments) {
-            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
-            $root->addAttribute('ВерсияСхемы', '2.04');
-            $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
-            return $root->asXML();
-        }
-
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
         $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
 
         $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
-
-        $root->addAttribute('ВерсияСхемы', '2.04');
+        $root->addAttribute('ВерсияСхемы', '2.10');
         $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
-        $document = $this->module->documentClass;
-        foreach ($document::findDocuments1c() as $order) {
-            NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
-        }
 
-        if ($this->module->debug) {
-            $xml = $root->asXML();
-            $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
-            file_put_contents($this->module->getTmpDir() . '/query.xml', $xml);
+        $ids = [];
+        if ($this->module->exchangeDocuments) {
+            $document = $this->module->documentClass;
+            foreach ($document::findDocuments1c() as $order) {
+                $ids[] = $order->getPrimaryKey();
+                NodeHelper::appendNode($root, SerializeHelper::serializeDocument($order));
+            }
+            if ($this->module->debug) {
+                $xml = $root->asXML();
+                $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
+                file_put_contents($this->module->getTmpDir() . '/query.xml', $xml);
+            }
         }
-        $this->afterExportOrders();
+        $this->afterExportOrders($ids);
         return $root->asXML();
     }
 
@@ -428,9 +423,12 @@ class ApiController extends Controller
         $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
     }
 
-    public function afterExportOrders()
+    /**
+     * @param $ids
+     */
+    public function afterExportOrders($ids)
     {
-        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent());
+        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent(['ids' => $ids]));
     }
 
     /**

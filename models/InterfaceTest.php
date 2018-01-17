@@ -30,11 +30,6 @@ class InterfaceTest extends Model
         }
     }
 
-    public static function instance()
-    {
-        return new self();
-    }
-
     public function getModel()
     {
         try {
