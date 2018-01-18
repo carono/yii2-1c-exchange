@@ -64,6 +64,7 @@ class ExchangeModule extends \yii\base\Module
      */
     public $validateModelOnSave = false;
     public $timeLimit = 1800;
+    public $memoryLimit = null;
     public $bootstrapUrlRule = true;
     public $auth;
 

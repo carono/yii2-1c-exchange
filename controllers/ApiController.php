@@ -49,6 +49,9 @@ class ApiController extends Controller
     public function init()
     {
         set_time_limit($this->module->timeLimit);
+        if ($this->module->memoryLimit) {
+            ini_set('memory_limit', $this->module->memoryLimit);
+        }
         parent::init();
     }
 
