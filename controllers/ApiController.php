@@ -223,10 +223,15 @@ class ApiController extends Controller
         }
         $this->beforeOfferSync();
         foreach ($commerce->offerPackage->getOffers() as $offer) {
-            $product = $this->findProductModelById($offer->getClearId());
-            $model = $product->getOffer1c($offer);
-            $this->parseProductOffer($model, $offer);
-            $this->_ids[] = $model->getPrimaryKey();
+            $product_id = $offer->getClearId();
+            if ($product = $this->findProductModelById($product_id)) {
+                $model = $product->getOffer1c($offer);
+                $this->parseProductOffer($model, $offer);
+                $this->_ids[] = $model->getPrimaryKey();
+            } else {
+                Yii::warning("Продукт $product_id не найден в базе", 'exchange1c');
+                continue;
+            }
             unset($model);
         }
         $this->afterOfferSync();
