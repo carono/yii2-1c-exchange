@@ -148,34 +148,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param $filePath
-     */
-    public function afterFinishUploadFile($filePath)
-    {
-        $this->module->trigger(self::EVENT_AFTER_FINISH_UPLOAD_FILE, new ExchangeEvent());
-    }
-
-    public function beforeProductSync()
-    {
-        $this->module->trigger(self::EVENT_BEFORE_PRODUCT_SYNC, new ExchangeEvent());
-    }
-
-    public function afterProductSync()
-    {
-        $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
-    }
-
-    public function beforeOfferSync()
-    {
-        $this->module->trigger(self::EVENT_BEFORE_OFFER_SYNC, new ExchangeEvent());
-    }
-
-    public function afterOfferSync()
-    {
-        $this->module->trigger(self::EVENT_AFTER_OFFER_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
-    }
-
-    /**
      * @param $file
      */
     public function parsingImport($file)
@@ -392,51 +364,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @param $model
-     */
-    public function afterUpdateProduct($model)
-    {
-        $this->module->trigger(self::EVENT_AFTER_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
-    }
-
-    /**
-     * @param $model
-     */
-    public function beforeUpdateProduct($model)
-    {
-        $this->module->trigger(self::EVENT_BEFORE_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
-    }
-
-    /**
-     * @param $model
-     * @param $offer
-     */
-    public function beforeUpdateOffer($model, $offer)
-    {
-        $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent([
-            'model' => $model,
-            'ml' => $offer,
-        ]));
-    }
-
-    /**
-     * @param $model
-     * @param $offer
-     */
-    public function afterUpdateOffer($model, $offer)
-    {
-        $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
-    }
-
-    /**
-     * @param $ids
-     */
-    public function afterExportOrders($ids)
-    {
-        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent(['ids' => $ids]));
-    }
-
-    /**
      * @param string $id
      *
      * @return ProductInterface|null
@@ -586,5 +513,78 @@ class ApiController extends Controller
     public function actionError()
     {
         return false;
+    }
+
+    /**
+     * @param $filePath
+     */
+    public function afterFinishUploadFile($filePath)
+    {
+        $this->module->trigger(self::EVENT_AFTER_FINISH_UPLOAD_FILE, new ExchangeEvent());
+    }
+
+    public function beforeProductSync()
+    {
+        $this->module->trigger(self::EVENT_BEFORE_PRODUCT_SYNC, new ExchangeEvent());
+    }
+
+    public function afterProductSync()
+    {
+        $this->module->trigger(self::EVENT_AFTER_PRODUCT_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
+    }
+
+    public function beforeOfferSync()
+    {
+        $this->module->trigger(self::EVENT_BEFORE_OFFER_SYNC, new ExchangeEvent());
+    }
+
+    public function afterOfferSync()
+    {
+        $this->module->trigger(self::EVENT_AFTER_OFFER_SYNC, new ExchangeEvent(['ids' => $this->_ids]));
+    }
+
+    /**
+     * @param $model
+     */
+    public function afterUpdateProduct($model)
+    {
+        $this->module->trigger(self::EVENT_AFTER_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
+    }
+
+    /**
+     * @param $model
+     */
+    public function beforeUpdateProduct($model)
+    {
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE_PRODUCT, new ExchangeEvent(['model' => $model]));
+    }
+
+    /**
+     * @param $model
+     * @param $offer
+     */
+    public function beforeUpdateOffer($model, $offer)
+    {
+        $this->module->trigger(self::EVENT_BEFORE_UPDATE_OFFER, new ExchangeEvent([
+            'model' => $model,
+            'ml' => $offer,
+        ]));
+    }
+
+    /**
+     * @param $model
+     * @param $offer
+     */
+    public function afterUpdateOffer($model, $offer)
+    {
+        $this->module->trigger(self::EVENT_AFTER_UPDATE_OFFER, new ExchangeEvent(['model' => $model, 'ml' => $offer]));
+    }
+
+    /**
+     * @param $ids
+     */
+    public function afterExportOrders($ids)
+    {
+        $this->module->trigger(self::EVENT_AFTER_EXPORT_ORDERS, new ExchangeEvent(['ids' => $ids]));
     }
 }
