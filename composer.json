@@ -23,5 +23,11 @@
   },
   "require-dev": {
     "yiidoc/yii2-redactor": "^2.0"
-  }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]  
 }
