@@ -51,7 +51,7 @@ class Breadcrumbs
             [
                 'label' => 'Добавить статью',
                 'url' => ['article/create'],
-                'options' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn btn-primary']
             ]
         ];
     }
@@ -66,17 +66,18 @@ class Breadcrumbs
             [
                 'label' => 'Редактировать',
                 'url' => ['article/update', 'id' => $article->id],
-                'options' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn btn-primary']
             ],
             [
                 'label' => 'Добавить подстатью',
                 'url' => ['article/create', 'parent' => $article->id],
-                'options' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn btn-primary']
             ],
             [
                 'label' => 'Удалить',
                 'url' => ['article/delete', 'id' => $article->id],
-                'options' => ['class' => 'btn btn-danger', 'data-confirm' => 'Удалить статью?']
+                'options' => ['data-confirm' => 'Удалить статью?'],
+                'linkOptions' => ['class' => 'btn btn-danger']
             ]
         ];
     }

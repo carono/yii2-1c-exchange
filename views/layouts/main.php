@@ -1,7 +1,7 @@
 <?php
 
 use carono\exchange1c\assets\AppAsset;
-use yii\widgets\Menu;
+use carono\exchange1c\widgets\Menu;
 use yii\widgets\Breadcrumbs;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -137,6 +137,8 @@ $this->beginPage();
             <?php
             echo Menu::widget([
                 'items' => ArrayHelper::getValue($this->params, 'buttons', []),
+                'linkTemplate' => '<a href="{url}"{options}>{label}</a>',
+                'itemOptions' => ['tag' => false],
                 'options' => [
                     'tag' => 'div',
                     'class' => ['btn-group pull-right'],
