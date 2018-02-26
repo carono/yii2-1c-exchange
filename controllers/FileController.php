@@ -34,7 +34,7 @@ class FileController extends Controller
      */
     protected function outAsFile($file)
     {
-        return $this->out($file);
+        $this->out($file);
     }
 
     /**

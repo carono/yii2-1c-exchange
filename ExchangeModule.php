@@ -105,14 +105,12 @@ class ExchangeModule extends \yii\base\Module
          * @var IdentityInterface $user
          */
         $class = \Yii::$app->user->identityClass;
-        if (!method_exists($class, 'findByUsername')) {
-            return null;
+        if (method_exists($class, 'findByUsername')) {
+            $user = $class::findByUsername($login);
+            if ($user && method_exists($user, 'validatePassword') && $user->validatePassword($password)) {
+                return $user;
+            }
         }
-        $user = $class::findByUsername($login);
-        if ($user && method_exists($user, 'validatePassword') && $user->validatePassword($password)) {
-            return $user;
-        } else {
-            return null;
-        }
+        return null;
     }
 }

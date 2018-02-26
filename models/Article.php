@@ -35,7 +35,7 @@ class Article extends BaseArticle
     }
 
     /**
-     * @return null|object|\yii\db\Connection
+     * @return null|object|\yii\db\Connection|mixed
      */
     public static function getDb()
     {
@@ -92,7 +92,7 @@ class Article extends BaseArticle
         $files = self::extractFilesFromString($this->content);
         foreach ($files as $file) {
             $uploadDir = (string)Yii::$app->getModule('redactor')->uploadDir . '/' . $file;
-            @unlink(Yii::getAlias($uploadDir));
+            unlink(Yii::getAlias($uploadDir));
         }
         foreach ($this->articles as $article) {
             $article->delete();
@@ -121,7 +121,7 @@ class Article extends BaseArticle
             $new = self::extractFilesFromString($this->content);
             foreach (array_diff($old, $new) as $file) {
                 $uploadDir = (string)Yii::$app->getModule('redactor')->uploadDir . '/' . $file;
-                @unlink(Yii::getAlias($uploadDir));
+                unlink(Yii::getAlias($uploadDir));
             }
         }
         parent::afterSave($insert, $changedAttributes);
