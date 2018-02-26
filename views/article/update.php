@@ -22,7 +22,7 @@ echo $form->field($article, 'parent_id')->dropDownList($articles, ['prompt' => '
 echo $form->field($article, 'content')->widget(Redactor::class, [
     'clientOptions' => [
         'lang' => 'ru',
-        'plugins' => ['clips', 'fontcolor', 'imagemanager']
+        'plugins' => ['clips', 'fontcolor', 'imagemanager', 'table']
     ],
 ]);
 echo \yii\helpers\Html::submitButton($article->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => 'btn btn-primary']);

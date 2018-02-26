@@ -57,10 +57,17 @@ class Article extends BaseArticle
         return $item;
     }
 
+    /**
+     * @param null $parent
+     * @return array
+     */
     public static function formMenuItems($parent = null)
     {
+        /**
+         * @var Article $group
+         */
         $items = [];
-        foreach (self::findAll(['parent_id' => $parent]) as $group) {
+        foreach (self::find()->andWhere(['parent_id' => $parent])->orderBy(['[[pos]]' => SORT_ASC])->each() as $group) {
             $items[] = $group->formForMenu();
         }
         return $items;

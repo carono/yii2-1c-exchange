@@ -19,7 +19,7 @@ if ($items) {
     Panel::end();
 }
 
-Panel::begin();
+Panel::begin(['id' => 'article-content']);
 echo $article->content;
 Panel::end();
 
@@ -46,3 +46,5 @@ if ($next) {
     echo Html::a('Читать далее: ' . $next->name, ['article/view', 'id' => $next->id], $options);
 }
 Panel::end();
+
+$this->registerJs("$('#article-content').find('table').addClass('table table-striped table-bordered');");
