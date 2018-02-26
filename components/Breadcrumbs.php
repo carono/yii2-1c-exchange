@@ -12,10 +12,10 @@ use yii\helpers\Url;
 class Breadcrumbs
 {
     /**
-     * @param Action $action
+     * @param $action
      * @param $params
      */
-    public static function formCrumbs($action, $params)
+    protected static function callCrumb($action, $params)
     {
         $name = 'crumb' . Inflector::camelize($action->controller->id . '-' . $action->id);
         $class = get_called_class();
@@ -27,7 +27,14 @@ class Breadcrumbs
             }
             $action->controller->getView()->params['breadcrumbs'] = call_user_func_array([$class, "$name"], $data);
         }
+    }
 
+    /**
+     * @param $action
+     * @param $params
+     */
+    protected static function callButton($action, $params)
+    {
         $name = 'button' . Inflector::camelize($action->controller->id . '-' . $action->id);
         $class = get_called_class();
         if (method_exists($class, $name)) {
@@ -44,6 +51,16 @@ class Breadcrumbs
             }
             $action->controller->getView()->params['buttons'] = $buttons;
         }
+    }
+
+    /**
+     * @param Action $action
+     * @param $params
+     */
+    public static function formCrumbs($action, $params)
+    {
+        self::callCrumb($action, $params);
+        self::callButton($action, $params);
     }
 
     public static function buttonArticleIndex()

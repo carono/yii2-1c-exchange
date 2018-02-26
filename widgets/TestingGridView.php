@@ -42,7 +42,7 @@ class TestingGridView extends GridView
                 }
             ],
             [
-                'class' => ActionColumn::className(),
+                'class' => ActionColumn::class,
                 'header' => 'Result',
                 'template' => '{view}',
                 'buttons' => [
