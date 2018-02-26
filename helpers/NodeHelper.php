@@ -18,7 +18,7 @@ class NodeHelper
     {
         $parentDom = dom_import_simplexml($parent);
         $childDom = dom_import_simplexml($child);
-        $childDom = $parentDom->ownerDocument->importNode($childDom, TRUE);
+        $childDom = $parentDom->ownerDocument->importNode($childDom, true);
         $parentDom->appendChild($childDom);
         return $child;
     }
@@ -46,8 +46,8 @@ class NodeHelper
                 return $item;
             } else {
                 $item = new \SimpleXMLElement("<{$field1c}>$content</{$field1c}>");
-                foreach ($attributes as $attribute => $value) {
-                    $item->addAttribute($attribute, $value);
+                foreach ($attributes as $name => $value) {
+                    $item->addAttribute($name, $value);
                 }
                 foreach ($array as $field => $value) {
                     self::addChild($item, $model, $field, $value);
