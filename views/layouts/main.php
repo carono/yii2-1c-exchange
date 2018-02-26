@@ -124,7 +124,7 @@ $this->beginPage();
         echo Breadcrumbs::widget([
             'links' => ArrayHelper::getValue($this->params, 'breadcrumbs', []),
             'options' => [
-                'class' => 'breadcrumb col-lg-8'
+                'class' => 'breadcrumb col-lg-7'
             ],
             'homeLink' => [
                 'label' => '<svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg>',
@@ -133,7 +133,7 @@ $this->beginPage();
             ]
         ]);
         ?>
-        <div class="col-lg-4 action-menu">
+        <div class="col-lg-5 action-menu">
             <?php
             echo Menu::widget([
                 'items' => ArrayHelper::getValue($this->params, 'buttons', []),

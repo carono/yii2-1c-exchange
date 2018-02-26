@@ -1007,7 +1007,7 @@ h1.page-header {
 }
 
 .redactor-editor {
-    height: 800px;
+    height: px;
 }
 
 .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
@@ -1024,5 +1024,7 @@ h1.page-header {
 
 .action-menu {
     background: #e9ecf2;
-    padding: 4px 15px;
+    padding: 3px 15px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
+

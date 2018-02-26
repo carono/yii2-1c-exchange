@@ -52,7 +52,7 @@ abstract class Controller extends \yii\web\Controller
             }
             $behaviors = [
                 'basicAuth' => [
-                    'class' => HttpBasicAuth::className(),
+                    'class' => HttpBasicAuth::class,
                     'auth' => $auth
                 ],
             ];
