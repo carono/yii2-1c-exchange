@@ -19,10 +19,10 @@ $form = ActiveForm::begin();
 echo $form->field($article, 'name');
 echo $form->field($article, 'pos')->textInput(['type' => 'number']);
 echo $form->field($article, 'parent_id')->dropDownList($articles, ['prompt' => '']);
-echo $form->field($article, 'content')->widget(Redactor::className(), [
+echo $form->field($article, 'content')->widget(Redactor::class, [
     'clientOptions' => [
         'lang' => 'ru',
-        'plugins' => ['clips', 'fontcolor', 'imagemanager'],
+        'plugins' => ['clips', 'fontcolor', 'imagemanager']
     ],
 ]);
 echo \yii\helpers\Html::submitButton($article->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => 'btn btn-primary']);

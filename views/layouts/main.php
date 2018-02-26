@@ -133,7 +133,7 @@ $this->beginPage();
             ]
         ]);
         ?>
-        <div class="col-lg-4" style="background: #e9ecf2; padding: 10px 15px;">
+        <div class="col-lg-4 action-menu">
             <?php
             echo Menu::widget([
                 'items' => ArrayHelper::getValue($this->params, 'buttons', []),

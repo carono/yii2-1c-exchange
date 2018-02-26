@@ -51,7 +51,7 @@ class Breadcrumbs
             [
                 'label' => 'Добавить статью',
                 'url' => ['article/create'],
-                'options' => ['class' => 'btn btn-primary', 'tag' => 'a']
+                'options' => ['class' => 'btn btn-primary']
             ]
         ];
     }

@@ -1007,13 +1007,22 @@ h1.page-header {
 }
 
 .redactor-editor {
-    height: 1000px;
+    height: 800px;
 }
 
-.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
     border-right: rgba(68, 68, 68, 0.13) solid 2px;
 }
 
-.btn-group>.btn:last-child:not(:first-child), .btn-group>.dropdown-toggle:not(:first-child) {
+.btn-group > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
     border-left: rgba(68, 68, 68, 0.13) solid 2px;
+}
+
+.btn-group a {
+    color: white;
+}
+
+.action-menu {
+    background: #e9ecf2;
+    padding: 4px 15px;
 }

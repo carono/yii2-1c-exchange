@@ -19,7 +19,7 @@ class ArticleController extends Controller
     public function actionCreate($parent = null)
     {
         $article = new Article();
-        $article->pos = 10;
+        $article->pos = Article::find()->andWhere(['[[parent_id]]' => $parent])->max('pos') + 10;
         $article->parent_id = $parent;
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {

@@ -73,9 +73,14 @@ class ExchangeModule extends \yii\base\Module
      */
     public function init()
     {
+        if (!isset(\Yii::$app->i18n->translations['models'])) {
+            \Yii::$app->i18n->translations['models'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'basePath' => '@app/messages',
+                'sourceLanguage' => 'en',
+            ];
+        }
         parent::init();
-
-        // custom initialization code goes here
     }
 
     public function getTmpDir($part = null)
