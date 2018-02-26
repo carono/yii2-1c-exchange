@@ -11,6 +11,11 @@ use yii\web\HttpException;
 
 class InterfaceController extends Controller
 {
+    /**
+     * @param string $variable
+     * @return string
+     * @throws HttpException
+     */
     public function actionCheck($variable)
     {
         $class = \Yii::$app->controller->module->{$variable};

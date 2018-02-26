@@ -7,33 +7,39 @@ namespace carono\exchange1c\helpers;
 use carono\exchange1c\interfaces\DocumentInterface;
 use carono\exchange1c\interfaces\OfferInterface;
 use carono\exchange1c\interfaces\PartnerInterface;
-use carono\exchange1c\interfaces\ProductInterface;
 
 class SerializeHelper
 {
+    /**
+     * @param PartnerInterface $partner
+     * @return \SimpleXMLElement
+     */
     public static function serializePartner(PartnerInterface $partner)
     {
         $xml = new \SimpleXMLElement('<Контрагент></Контрагент>');
         self::addFields($xml, $partner, $partner->getExportFields1c());
-        foreach ($partner::getFields1c() as $field1c => $attribute) {
-            if ($attribute) {
-                $xml->addChild($field1c, $partner->{$attribute});
-            }
-        }
         return $xml;
     }
 
+    /**
+     * @param OfferInterface $offer
+     * @param DocumentInterface $document
+     * @return \SimpleXMLElement
+     */
     public static function serializeOffer(OfferInterface $offer, DocumentInterface $document)
     {
         $productNode = new \SimpleXMLElement('<Товар></Товар>');
         self::addFields($productNode, $offer, $offer->getExportFields1c($document));
         if ($group = $offer->getGroup1c()) {
-            $productNode->addChild('ИдКаталога', $group->getId1c());
+            $productNode->addChild('ИдКаталога', $group->{$group->getIdFieldName1c()});
         }
         return $productNode;
     }
 
-
+    /**
+     * @param DocumentInterface $document
+     * @return \SimpleXMLElement
+     */
     public static function serializeDocument(DocumentInterface $document)
     {
         $documentNode = new \SimpleXMLElement('<Документ></Документ>');
@@ -50,6 +56,11 @@ class SerializeHelper
         return $documentNode;
     }
 
+    /**
+     * @param $node
+     * @param $object
+     * @param $fields
+     */
     public static function addFields($node, $object, $fields)
     {
         foreach ($fields as $field => $value) {

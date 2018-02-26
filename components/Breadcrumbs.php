@@ -36,7 +36,8 @@ class Breadcrumbs
             foreach ($reflectionMethod->getParameters() as $p) {
                 $data[] = isset($params[$p->getName()]) ? $params[$p->getName()] : null;
             }
-            foreach ($buttons = call_user_func_array([$class, "$name"], $data) as &$button) {
+            $buttons = call_user_func_array([$class, "$name"], $data);
+            foreach ($buttons as &$button) {
                 Html::addCssClass($button['options'], 'btn-xs');
                 $button['options']['href'] = Url::to(ArrayHelper::remove($button, 'url'));
                 $button['options']['tag'] = 'a';

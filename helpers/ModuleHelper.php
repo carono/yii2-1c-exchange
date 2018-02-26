@@ -8,7 +8,7 @@ class ModuleHelper
 {
     /**
      * @param string $class
-     * @param null $default
+     * @param string|null $default
      * @return int|null|string
      */
     public static function getModuleNameByClass($class = 'carono\exchange1c\ExchangeModule', $default = null)

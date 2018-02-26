@@ -3,6 +3,7 @@
 namespace carono\exchange1c;
 
 use yii\helpers\FileHelper;
+use yii\web\IdentityInterface;
 
 /**
  * exchange module definition class
@@ -92,14 +93,23 @@ class ExchangeModule extends \yii\base\Module
         return $dir . ($part ? DIRECTORY_SEPARATOR . trim($part, '/\\') : '');
     }
 
+    /**
+     * @param $login
+     * @param $password
+     * @return null|IdentityInterface
+     */
     public function auth($login, $password)
     {
         /**
          * @var $class \yii\web\IdentityInterface
+         * @var IdentityInterface $user
          */
         $class = \Yii::$app->user->identityClass;
+        if (!method_exists($class, 'findByUsername')) {
+            return null;
+        }
         $user = $class::findByUsername($login);
-        if ($user && $user->validatePassword($password)) {
+        if ($user && method_exists($user, 'validatePassword') && $user->validatePassword($password)) {
             return $user;
         } else {
             return null;

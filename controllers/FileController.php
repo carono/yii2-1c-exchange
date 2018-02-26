@@ -4,8 +4,8 @@
 namespace carono\exchange1c\controllers;
 
 
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use yii\helpers\FileHelper;
+use yii\web\NotFoundHttpException;
 
 class FileController extends Controller
 {
@@ -14,42 +14,62 @@ class FileController extends Controller
         return \Yii::getAlias("@vendor/carono/yii2-1c-exchange/" . ltrim($path, '/'));
     }
 
+    /**
+     * @param $file
+     * @param array $options
+     * @throws NotFoundHttpException
+     */
     protected function out($file, $options = [])
     {
         $filename = self::getAlias($file);
         if (!file_exists($filename)) {
-            throw new FileNotFoundException($filename);
+            throw new NotFoundHttpException("File $filename not found");
         }
         $content = file_get_contents($filename);
-        return \Yii::$app->response->sendContentAsFile($content, basename($filename), $options);
+        \Yii::$app->response->sendContentAsFile($content, basename($filename), $options);
     }
 
+    /**
+     * @param $file
+     */
     protected function outAsFile($file)
     {
         return $this->out($file);
     }
 
+    /**
+     * @param $file
+     */
     protected function outAsImage($file)
     {
         $options = [
             'inline' => true,
             'mimeType' => FileHelper::getMimeType(self::getAlias($file))
         ];
-        return $this->out($file, $options);
+        $this->out($file, $options);
     }
 
+    /**
+     * @param $file
+     */
     public function actionArticle($file)
     {
-        return $this->outAsImage("files/articles/$file");
+        $this->outAsImage("files/articles/$file");
     }
 
+    /**
+     * @param $file
+     */
     public function actionDoc($file)
     {
-        return $this->outAsImage("/files/doc/$file");
+        $this->outAsImage("/files/doc/$file");
     }
 
+    /**
+     * @param $file
+     */
     public function actionXml($file)
     {
-        return $this->outAsImage("/files/xml/$file");
+        $this->outAsImage("/files/xml/$file");
     }
 }
