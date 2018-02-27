@@ -61,7 +61,7 @@ class Article extends BaseArticle
     public function formForMenu()
     {
         $item = ['label' => $this->name, 'url' => ['article/view', 'id' => $this->id]];
-        foreach ($this->articles as $subGroup) {
+        foreach ($this->getArticles()->orderBy(['[[pos]]' => SORT_ASC])->each() as $subGroup) {
             $item['items'][] = $subGroup->formForMenu();
         }
         return $item;
