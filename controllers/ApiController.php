@@ -33,6 +33,7 @@ use Zenwalker\CommerceML\Model\RequisiteCollection;
 class ApiController extends Controller
 {
     public $enableCsrfValidation = false;
+
     const EVENT_BEFORE_UPDATE_PRODUCT = 'beforeUpdateProduct';
     const EVENT_AFTER_UPDATE_PRODUCT = 'afterUpdateProduct';
     const EVENT_BEFORE_UPDATE_OFFER = 'beforeUpdateOffer';
@@ -63,7 +64,7 @@ class ApiController extends Controller
     {
         return array_merge(parent::behaviors(), [
             'bom' => [
-                'class' => BomBehavior::className(),
+                'class' => BomBehavior::class,
                 'only' => ['query'],
             ],
         ]);
@@ -77,7 +78,6 @@ class ApiController extends Controller
     public function afterAction($action, $result)
     {
         Yii::$app->response->headers->set('uid', Yii::$app->user->getId());
-        parent::afterAction($action, $result);
         if (is_bool($result)) {
             return $result ? "success" : "failure";
         } elseif (is_array($result)) {
@@ -172,7 +172,8 @@ class ApiController extends Controller
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $productClass::createModel1c($product)) {
-                Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c", 'exchange1c');
+                Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c",
+                    'exchange1c');
                 continue;
             }
             $this->parseProduct($model, $product);
@@ -230,6 +231,17 @@ class ApiController extends Controller
         }
     }
 
+    private function extractArchive()
+    {
+        if (($archive = self::getData('archive')) && file_exists($archive)) {
+            $zip = new \ZipArchive();
+            $zip->open($archive);
+            $zip->extractTo(dirname($archive));
+            $zip->close();
+            unlink($archive);
+        }
+    }
+
     /**
      * @param $type
      * @param $filename
@@ -237,22 +249,21 @@ class ApiController extends Controller
      */
     public function actionImport($type, $filename)
     {
-        if (($archive = self::getData('archive')) && file_exists($archive)) {
-            $zip = new \ZipArchive();
-            $zip->open($archive);
-            $zip->extractTo(dirname($archive));
-            $zip->close();
-            @unlink($archive);
-        }
+        $this->extractArchive();
         $file = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
-        if ($type == 'catalog') {
-            if (strpos($file, 'offer') !== false) {
-                $this->parsingOffer($file);
-            } elseif (strpos($file, 'import') !== false) {
-                $this->parsingImport($file);
-            }
-        } elseif ($type == 'sale' && strpos($file, 'order') !== false) {
-            $this->parsingOrder($file);
+        switch ($type) {
+            case 'catalog':
+                if (strpos($file, 'offer') !== false) {
+                    $this->parsingOffer($file);
+                } elseif (strpos($file, 'import') !== false) {
+                    $this->parsingImport($file);
+                }
+                break;
+            case 'sale':
+                if (strpos($file, 'order') !== false) {
+                    $this->parsingOrder($file);
+                }
+                break;
         }
         if (!$this->module->debug) {
             $this->clearTmp();
