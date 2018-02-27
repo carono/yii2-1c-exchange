@@ -43,13 +43,7 @@ class Breadcrumbs
             foreach ($reflectionMethod->getParameters() as $p) {
                 $data[] = isset($params[$p->getName()]) ? $params[$p->getName()] : null;
             }
-            $buttons = call_user_func_array([$class, "$name"], $data);
-            foreach ($buttons as &$button) {
-                Html::addCssClass($button['options'], 'btn-xs');
-                $button['options']['href'] = Url::to(ArrayHelper::remove($button, 'url'));
-                $button['options']['tag'] = 'a';
-            }
-            $action->controller->getView()->params['buttons'] = $buttons;
+            $action->controller->getView()->params['buttons'] = call_user_func_array([$class, $name], $data);
         }
     }
 
@@ -69,7 +63,7 @@ class Breadcrumbs
             [
                 'label' => 'Добавить статью',
                 'url' => ['article/create'],
-                'linkOptions' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn-xs btn btn-primary']
             ]
         ];
     }
@@ -84,18 +78,18 @@ class Breadcrumbs
             [
                 'label' => 'Редактировать',
                 'url' => ['article/update', 'id' => $article->id],
-                'linkOptions' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn-xs btn btn-primary']
             ],
             [
                 'label' => 'Добавить подстатью',
                 'url' => ['article/create', 'parent' => $article->id],
-                'linkOptions' => ['class' => 'btn btn-primary']
+                'linkOptions' => ['class' => 'btn-xs  btn btn-primary']
             ],
             [
                 'label' => 'Удалить',
                 'url' => ['article/delete', 'id' => $article->id],
                 'options' => ['data-confirm' => 'Удалить статью?'],
-                'linkOptions' => ['class' => 'btn btn-danger']
+                'linkOptions' => ['class' => 'btn-xs btn btn-danger']
             ]
         ];
     }

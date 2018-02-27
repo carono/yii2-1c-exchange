@@ -2,9 +2,10 @@
 
 namespace carono\exchange1c;
 
+use carono\exchange1c\helpers\ModuleHelper;
 use yii\helpers\FileHelper;
 use yii\web\IdentityInterface;
-
+use Yii;
 /**
  * exchange module definition class
  */
@@ -69,6 +70,25 @@ class ExchangeModule extends \yii\base\Module
     public $bootstrapUrlRule = true;
     public $auth;
 
+    private function loadRedactorModule()
+    {
+        $redactorClass = 'yii\redactor\widgets\Redactor';
+        $moduleRedactorName = 'carono-exchange-redactor';
+        if (class_exists($redactorClass) && !Yii::$app->getModule($moduleRedactorName)) {
+            \Yii::$app->setModule($moduleRedactorName, [
+                'class' => 'yii\redactor\RedactorModule',
+                'uploadDir' => '@vendor/carono/yii2-1c-exchange/files/articles',
+                'imageAllowExtensions' => ['jpg', 'png', 'gif'],
+                'on beforeAction' => function () use ($moduleRedactorName) {
+                    $path = ModuleHelper::getModuleNameByClass('carono\exchange1c\ExchangeModule', 'exchange');
+                    $redactor = \Yii::$app->getModule($moduleRedactorName);
+                    $redactor->uploadUrl = "/$path/file/article?file=";
+                    \Yii::$app->setModule($moduleRedactorName, $redactor);
+                }
+            ]);
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -81,6 +101,7 @@ class ExchangeModule extends \yii\base\Module
                 'sourceLanguage' => 'en',
             ];
         }
+        $this->loadRedactorModule();
         parent::init();
     }
 
