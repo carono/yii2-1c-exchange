@@ -68,14 +68,14 @@ class ArticleController extends Controller
     public function actionDeleteUnusedImages()
     {
         $content = Article::find()->select(['content' => 'group_concat([[content]])'])->scalar();
-        $dir = Yii::getAlias(Yii::$app->getModule('redactor')->uploadDir);
+        $dir = Yii::getAlias((string)Yii::$app->getModule('redactor')->uploadDir);
         $files = Article::extractFilesFromString($content);
         $realFiles = FileHelper::findFiles($dir);
         array_walk($realFiles, function (&$item) use ($dir) {
             $item = str_replace('\\', '/', substr($item, strlen($dir)));
         });
         foreach (array_diff($realFiles, $files) as $file) {
-            @unlink($dir . '/' . $file);
+            unlink($dir . '/' . $file);
         };
         return $this->redirect(['article/index']);
     }

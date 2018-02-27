@@ -13,7 +13,7 @@ use yii\helpers\Html;
 $this->title = $article->name;
 
 $items = Article::formMenuItems($article->id);
-if ($items) {
+if (!empty($items)) {
     Panel::begin();
     echo Menu::widget(['items' => $items, 'options' => ['class' => 'article-menu']]);
     Panel::end();

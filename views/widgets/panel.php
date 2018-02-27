@@ -2,8 +2,10 @@
 /**
  * @var \yii\web\View $this
  * @var string $content
+ * @var \carono\exchange1c\widgets\Panel $context
  */
-$id = $this->context->id;
+$context = $this->context;
+$id = $context->id;
 ?>
 <div class="row" id="<?= $id ?>">
     <div class="col-lg-12">

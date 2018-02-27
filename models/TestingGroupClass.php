@@ -16,6 +16,9 @@ class TestingGroupClass extends TestingClass
     public $caption = 'Тестирование интерфейса группы';
     protected static $property = 'groupClass';
 
+    /**
+     * @return array
+     */
     public function getResultCreateTree1c()
     {
         /**

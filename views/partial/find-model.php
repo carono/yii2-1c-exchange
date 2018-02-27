@@ -1,6 +1,6 @@
 <?php
 use carono\exchange1c\models\InterfaceTest;
-use yii\bootstrap\ActiveForm;
+use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 /**
  * @var string $variable
@@ -16,7 +16,7 @@ use yii\helpers\Html;
         if ($interfaceTest->model) {
             $hint = "Модель найдена, $class::PK = " . $interfaceTest->model->primaryKey;
         }
-        $form = ActiveForm::begin(['layout' => 'horizontal']);
+        $form = ActiveForm::begin();
         echo $form->field($interfaceTest, 'class')->hiddenInput(['value' => $class])->label(false);
         echo $form->field($interfaceTest, 'id')->textInput(['placeholder' => "Найти модель $class через findOne()"])->hint($hint);
         echo Html::submitButton('Найти', ['class' => 'btn btn-primary pull-right']);

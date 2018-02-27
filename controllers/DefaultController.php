@@ -32,9 +32,6 @@ class DefaultController extends Controller
 
     public function actionImport()
     {
-        if (\Yii::$app->request->isPost) {
-
-        }
         return $this->render('import');
     }
 

@@ -26,7 +26,7 @@ class InterfaceTest extends Model
             $this->addError('id', 'Model not found');
             return false;
         } else {
-            return \Yii::$app->cache->set([self::className(), $this->class], $this, 300);
+            return \Yii::$app->cache->set([self::class, $this->class], $this, 300);
         }
     }
 
@@ -45,7 +45,7 @@ class InterfaceTest extends Model
      */
     public static function findByClass($class)
     {
-        if (!$model = \Yii::$app->cache->get([self::className(), $class])) {
+        if (!$model = \Yii::$app->cache->get([self::class, $class])) {
             return new self(['class' => $class]);
         } else {
             return $model;

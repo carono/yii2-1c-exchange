@@ -26,4 +26,8 @@ class Bootstrap implements BootstrapInterface
             }
         }
     }
+
+    public function __construct()
+    {
+    }
 }

@@ -9,7 +9,7 @@ class Panel extends Widget
     public function init()
     {
         ob_start();
-        ob_implicit_flush(false);
+        ob_implicit_flush(0);
     }
 
     public function run()

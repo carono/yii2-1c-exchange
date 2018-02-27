@@ -31,7 +31,7 @@ echo GridView::widget([
             }
         ],
         [
-            'class' => ActionColumn::className(),
+            'class' => ActionColumn::class,
             'template' => '{testing}',
             'buttons' => [
                 'testing' => function ($url, $data) use ($module) {

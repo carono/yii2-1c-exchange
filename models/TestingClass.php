@@ -84,7 +84,7 @@ abstract class TestingClass extends Testing
     }
 
     /**
-     * @return ActiveRecord
+     * @return ActiveRecord|mixed
      */
     protected static function getPropertyClass()
     {
@@ -166,7 +166,7 @@ abstract class TestingClass extends Testing
 
     public function getResult($force = false)
     {
-        if (!$force && ($cache = self::getSavedResult())) {
+        if (!$force && ($cache = $this->getSavedResult())) {
             return $cache;
         }
         try {
@@ -197,11 +197,12 @@ abstract class TestingClass extends Testing
         $property = static::$property;
         $test = new static();
         $test->name = "Реализация интерфейсов $property (" . self::module()->{$property} . ")";
-        $implements = ClassHelper::getImplementedMethods(self::module()->{$property}, ModuleHelper::getPhpDocInterfaceProperty($property));
+        $implements = ClassHelper::getImplementedMethods(self::module()->{$property},
+            ModuleHelper::getPhpDocInterfaceProperty($property));
         $implements = array_filter($implements, function ($data) {
             return !$data;
         });
-        if ($implements) {
+        if (!empty($implements)) {
             $comment = [];
             foreach ($implements as $class => $value) {
                 $comment[] = $class;
@@ -224,74 +225,12 @@ abstract class TestingClass extends Testing
 
     public function validateMethod()
     {
-//        $class = self::getPropertyClass();
-//        if (method_exists($class, $method)) {
-//            $reflectionMethod = new \ReflectionMethod($class, $method);
-//            if ($params = ArrayHelper::getValue($rule, 'params', [])) {
-//                $params = self::getParams($params);
-//            }
-//            try {
-//                if ($reflectionMethod->isStatic()) {
-//                    $methodResult = call_user_func_array("$class::$method", $params);
-//                } elseif (!$context = static::getContext()) {
-//                    $test->result = false;
-//                    $test->comment = 'Не найдена модель для проверки';
-//                    return;
-//                } else {
-//                    $methodResult = call_user_func_array([$context, $method], $params);
-//                }
-//            } catch (\Exception $e) {
-//                $test->result = false;
-//                $test->comment = $e->getMessage();
-//                return;
-//            }
-//            switch (ArrayHelper::getValue($rule, 'return')) {
-//                case "array":
-//                    if (!is_array($methodResult)) {
-//                        $test->result = false;
-//                        $test->comment = 'Значение должно быть массивом';
-//                    }
-//                    break;
-//                case "string":
-//                    if (!is_string($methodResult)) {
-//                        $test->result = false;
-//                        $test->comment = 'Значение должно быть строкой';
-//                    }
-//                    break;
-//                case "interface":
-//                    if ($methodResult) {
-//                        if (is_object($methodResult)) {
-//                            $reflection = new \ReflectionClass(get_class($methodResult));
-//                            if (!$reflection->implementsInterface(ltrim($rule['value'], '\\'))) {
-//                                $test->result = false;
-//                                $test->comment = "Результат должен имплементировать {$rule['value']}";
-//                            }
-//                        } else {
-//                            $test->result = false;
-//                            $test->comment = "Результат должен быль объектом и имплементировать {$rule['value']}";
-//                        }
-//                    } else {
-//                        $test->result = null;
-//                        $test->comment = 'Нет результата';
-//                    }
-//                    break;
-//                case false:
-//                    $test->result = null;
-//                    $test->comment = 'VOID';
-//                    break;
-//                default:
-//                    $test->comment = 'FAIL';
-//                    $test->result = false;
-//            }
-//        } else {
-//            $test->result = false;
-//            $test->comment = 'Метод не реализован';
-//        }
+        return false;
     }
 
     public function testing()
     {
-        if (!$rule = self::getMethodRule($this->method)) {
+        if (!self::getMethodRule($this->method)) {
             return parent::testing();
         }
         if ($this->isAutoTest()) {

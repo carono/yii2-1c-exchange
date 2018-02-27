@@ -20,7 +20,7 @@ class InterfaceController extends Controller
     {
         $class = \Yii::$app->controller->module->{$variable};
         if (!$class) {
-            throw new HttpException("Значение '$variable' не установлено");
+            throw new HttpException(401, "Значение '$variable' не установлено");
         }
         $interfaceTest = InterfaceTest::findByClass($class);
         $interfaceClass = ModuleHelper::getPhpDocInterfaceProperty($variable);

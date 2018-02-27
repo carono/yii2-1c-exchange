@@ -25,7 +25,7 @@ echo GridView::widget([
         'filename',
         'size:shortSize',
         [
-            'class' => ActionColumn::className(),
+            'class' => ActionColumn::class,
             'template' => '{download}',
             'buttons' => [
                 'download' => function ($url, $data) {

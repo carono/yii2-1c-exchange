@@ -4,7 +4,6 @@ use yii\grid\GridView;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use carono\exchange1c\widgets\Panel;
-use carono\xmldoc\Json;
 
 /**
  * @var \yii\data\ArrayDataProvider $dataProvider
@@ -19,7 +18,7 @@ echo GridView::widget([
         'filename',
         'size:shortSize',
         [
-            'class' => ActionColumn::className(),
+            'class' => ActionColumn::class,
             'template' => '{view}',
             'buttons' => [
                 'view' => function ($url, $data) {
