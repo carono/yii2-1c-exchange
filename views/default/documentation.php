@@ -9,7 +9,9 @@ use carono\exchange1c\widgets\Panel;
  * @var \yii\data\ArrayDataProvider $dataProvider
  * @var \yii\web\View $this
  */
-
+?>
+    <div class="alert alert-info">Файлы формата .XSD необходимо отрывать в Visual Studio</div>
+<?php
 $this->title = 'Спецификация по стандарту CommerceML';
 Panel::begin();
 echo GridView::widget([

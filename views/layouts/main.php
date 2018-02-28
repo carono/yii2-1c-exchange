@@ -81,7 +81,7 @@ $this->beginPage();
             ],
             ['options' => ['class' => 'divider']],
             [
-                'label' => '<i class="glyph glyphicon glyphicon-book"></i>CommerceML (PDF)',
+                'label' => '<i class="glyph glyphicon glyphicon-book"></i>CommerceML',
                 'url' => ['default/documentation'],
                 'encode' => false
             ],

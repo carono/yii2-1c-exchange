@@ -62,7 +62,12 @@ class FileController extends Controller
      */
     public function actionDoc($file)
     {
-        $this->outAsImage("/files/doc/$file");
+        $path = "/files/doc/$file";
+        if (pathinfo($file, PATHINFO_EXTENSION) == 'xsd') {
+            $this->outAsFile($path);
+        } else {
+            $this->outAsImage($path);
+        }
     }
 
     /**
