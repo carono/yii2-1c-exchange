@@ -46,6 +46,7 @@ class ArticleController extends Controller
 
     public function actionView($id)
     {
+        Yii::$app->getView()->registerJs("$('pre').each(function(i, block) { hljs.highlightBlock(block); });");
         $article = Article::findOne($id, true);
         return $this->render('view', ['article' => $article]);
     }

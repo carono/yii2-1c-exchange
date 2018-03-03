@@ -13,11 +13,13 @@ class LuminoAsset extends AssetBundle
         'css/bootstrap.min.css',
         'css/datepicker3.css',
         'css/styles.css',
+        'css/default.css'
     ];
     public $js = [
         'js/lumino.glyphs.js',
         'js/html5shiv.min',
-        'js/respond.min.js'
+        'js/respond.min.js',
+        'js/highlight.pack.js'
     ];
     public $publishOptions = [
         'forceCopy' => true

@@ -10,22 +10,8 @@ use yii\helpers\Html;
 
 class TestingGridView extends GridView
 {
-    public function init()
+    public function initColumns()
     {
-        $this->rowOptions = function ($data) {
-            /**
-             * @var TestingClass $data
-             */
-            $result = $data->testing();
-            if (($result === true || $data->hasResult()) && !$data->hasErrors()) {
-                return ['class' => 'success'];
-            } elseif ($result === false || $data->hasErrors()) {
-                return ['class' => 'danger'];
-            } else {
-                return ['class' => 'warning'];
-            }
-        };
-
         $this->columns = [
             'name',
             'expect',
@@ -67,6 +53,26 @@ class TestingGridView extends GridView
                 ]
             ]
         ];
+        parent::initColumns();
+    }
+
+    public function init()
+    {
+        $this->rowOptions = function ($data) {
+            /**
+             * @var TestingClass $data
+             */
+            $result = $data->testing();
+            if (($result === true || $data->hasResult()) && !$data->hasErrors()) {
+                return ['class' => 'success'];
+            } elseif ($result === false || $data->hasErrors()) {
+                return ['class' => 'danger'];
+            } else {
+                return ['class' => 'warning'];
+            }
+        };
+
+
         parent::init();
     }
 }

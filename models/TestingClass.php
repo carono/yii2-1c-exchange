@@ -230,12 +230,14 @@ abstract class TestingClass extends Testing
 
     public function testing()
     {
-        if (!self::getMethodRule($this->method)) {
+        if (!$rule = self::getMethodRule($this->method)) {
             return parent::testing();
         }
         if ($this->isAutoTest()) {
             if ($this->validateMethod()) {
                 return $this->result ?: true;
+            } elseif ($rule['return'] === 'string' && is_string($this->result)) {
+                return true;
             } else {
                 return false;
             }
