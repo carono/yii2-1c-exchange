@@ -1029,3 +1029,6 @@ h1.page-header {
     min-height: 40px;
 }
 
+li.active {
+    font-weight: bold;
+}

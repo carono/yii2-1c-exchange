@@ -24,6 +24,9 @@ abstract class TestingClass extends Testing
     protected static $required = false;
     public $expect;
 
+    const RETURN_STRING = 'string';
+    const RETURN_INTERFACE = 'interface';
+
     /**
      * [['name'], 'return' => 'array|string|interface']
      * [['name'], 'return' => 'interface', 'value'=>'']
@@ -184,8 +187,8 @@ abstract class TestingClass extends Testing
                 $result = call_user_func([$this, $methodName]);
                 return $this->_result = $result;
             } else {
-                $params = ArrayHelper::getValue(self::methodRules(), $methodName . '.params', []);
-                return $this->_result = self::getMethodResult($method, $params);
+                $params = ArrayHelper::getValue(static::methodRules(), $method . '.params', []);
+                return $this->_result = static::getMethodResult($method, $params);
             }
         } else {
             return null;
@@ -197,8 +200,9 @@ abstract class TestingClass extends Testing
         $property = static::$property;
         $test = new static();
         $test->name = "Реализация интерфейсов $property (" . self::module()->{$property} . ")";
-        $implements = ClassHelper::getImplementedMethods(self::module()->{$property},
-            ModuleHelper::getPhpDocInterfaceProperty($property));
+        $propertyValue = self::module()->{$property};
+        $propertyDoc = ModuleHelper::getPhpDocInterfaceProperty($property);
+        $implements = ClassHelper::getImplementedMethods($propertyValue, $propertyDoc);
         $implements = array_filter($implements, function ($data) {
             return !$data;
         });
@@ -233,16 +237,20 @@ abstract class TestingClass extends Testing
         if (!$rule = self::getMethodRule($this->method)) {
             return parent::testing();
         }
-        if ($this->isAutoTest()) {
-            if ($this->validateMethod()) {
-                return $this->result ?: true;
-            } elseif ($rule['return'] === 'string' && is_string($this->result)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return null;
+        $result = $this->isAutoTest() ? $this->getResult() : $this->getSavedResult();
+        $validateMethod = 'validateMethod' . ucfirst($this->method);
+        if (method_exists($this, $validateMethod)) {
+            $params = self::getParams($rule['params']);
+            $params[] = $result;
+            return call_user_func_array([$this, $validateMethod], $params);
+        }
+        switch ($rule['return']) {
+            case 'string':
+                return is_string($result);
+                break;
+            case 'interface';
+                return $result instanceof $rule['value'];
+                break;
         }
     }
 }

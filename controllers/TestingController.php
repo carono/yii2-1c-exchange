@@ -8,6 +8,12 @@ use carono\exchange1c\models\TestingClass;
 
 class TestingController extends Controller
 {
+    /**
+     * @param null $class
+     * @param null $result
+     * @return string
+     * @throws \Exception
+     */
     public function actionIndex($class = null, $result = null)
     {
         /**
@@ -23,6 +29,11 @@ class TestingController extends Controller
             } else {
                 throw new \Exception("Class $className not found");
             }
+
+            if ($testingClass::testImplementsClass()->hasErrors()) {
+                throw new \Exception('Ошибки реализации интерфейсов');
+            }
+
             if ($result) {
                 $resultClass = new $className(['method' => $result]);
             }

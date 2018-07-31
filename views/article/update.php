@@ -7,6 +7,7 @@ use carono\exchange1c\models\Article;
 use carono\exchange1c\widgets\Panel;
 use carono\exchange1c\helpers\ModuleHelper;
 use yii\redactor\RedactorModule;
+use yii\helpers\Html;
 
 /**
  * @var Article $article
@@ -16,7 +17,6 @@ $module = ModuleHelper::getModuleNameByClass(RedactorModule::class);
 if (!$module) {
     echo '<div class="alert alert-warning">Для редактирования, необходимо установить редактор <b>composer require yiidoc/yii2-redactor</b></div>';
 }
-
 
 $this->title = $article->isNewRecord ? 'Добавить статью' : 'Редактирование ' . $article->name;
 $articles = ArrayHelper::map(Article::find()->select(['id', 'name'])->asArray()->all(), 'id', 'name');
@@ -36,6 +36,11 @@ if ($module) {
 } else {
     echo $form->field($article, 'content')->textarea();
 }
-echo \yii\helpers\Html::submitButton($article->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => 'btn btn-primary']);
+
+echo '<div class="btn-group pull-right">';
+echo Html::submitButton($article->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => 'btn btn-primary']);
+echo Html::a('Отмена', ['view', 'id' => $article->id], ['class' => 'btn btn-warning']);
+echo '</div>';
+
 ActiveForm::end();
 Panel::end();

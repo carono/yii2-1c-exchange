@@ -38,20 +38,21 @@ if (!$testingClass) {
     return;
 }
 
-
 $transaction = Yii::$app->db->beginTransaction();
 
 Panel::begin();
 $testingProductClass = $testingClass::testImplementsClass();
-if (!$testingProductClass->hasErrors()) {
-    echo TestingGridView::widget([
-        'caption' => $testingClass->caption,
-        'dataProvider' => new ArrayDataProvider(['allModels' => $testingClass::findAll()]),
-    ]);
-} else {
-    $a = Html::a('productClass', ['interface/check', 'variable' => 'groupClass']);
-    echo Html::tag('div', 'Ошибки реализации интерфейсов ' . $a, ['class' => 'alert alert-danger']);
-}
+
+
+echo TestingGridView::widget([
+    'formatter' => [
+        'class' => \yii\i18n\Formatter::class,
+        'nullDisplay' => ''
+    ],
+    'caption' => $testingClass->caption,
+    'dataProvider' => new ArrayDataProvider(['allModels' => $testingClass::findAll()]),
+]);
+
 Panel::end();
 
 if ($resultClass) {

@@ -3,6 +3,7 @@
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
+echo Html::tag('div', 'В разработке', ['class' => 'alert alert-danger']);
 
 echo Html::a('Импорт товаров', [
     '/1c_exchange.php',
