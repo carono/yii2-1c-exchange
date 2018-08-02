@@ -13,7 +13,7 @@ use yii\helpers\Html;
  * @var Article $article
  * @var \yii\web\View $this
  */
-$module = ModuleHelper::getModuleNameByClass(RedactorModule::class);
+$module = Yii::$app->controller->module->redactor;
 if (!$module) {
     echo '<div class="alert alert-warning">Для редактирования, необходимо установить редактор <b>composer require yiidoc/yii2-redactor</b></div>';
 }
@@ -27,7 +27,7 @@ echo $form->field($article, 'pos')->textInput(['type' => 'number']);
 echo $form->field($article, 'parent_id')->dropDownList($articles, ['prompt' => '']);
 if ($module) {
     echo $form->field($article, 'content')->widget(Redactor::class, [
-        'moduleId' => $module,
+        'moduleId' => $module->id,
         'clientOptions' => [
             'lang' => 'ru',
             'plugins' => ['clips', 'fontcolor', 'imagemanager', 'table']

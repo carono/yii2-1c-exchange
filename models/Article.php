@@ -9,6 +9,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "article".
@@ -60,6 +61,9 @@ class Article extends BaseArticle
      */
     public function formForMenu()
     {
+        /**
+         * @var Article $subGroup
+         */
         $item = ['label' => $this->name, 'url' => ['article/view', 'id' => $this->id]];
         foreach ($this->getArticles()->orderBy(['[[pos]]' => SORT_ASC])->each() as $subGroup) {
             $item['items'][] = $subGroup->formForMenu();
@@ -91,8 +95,8 @@ class Article extends BaseArticle
     {
         $files = self::extractFilesFromString($this->content);
         foreach ($files as $file) {
-            $uploadDir = (string)Yii::$app->getModule('redactor')->uploadDir . '/' . $file;
-            unlink(Yii::getAlias($uploadDir));
+            $uploadFile = Yii::$app->controller->module->redactor->uploadDir . '/' . $file;
+            FileHelper::unlink($uploadFile);
         }
         foreach ($this->articles as $article) {
             $article->delete();
@@ -106,7 +110,7 @@ class Article extends BaseArticle
      */
     public static function extractFilesFromString($content)
     {
-        preg_match_all('#/file/article\?file=([\w\d\-\/\.]+)"#ui', $content, $m);
+        preg_match_all('#/file/article\?file=([\w\-\/\.]+)"#ui', $content, $m);
         return $m[1];
     }
 
@@ -120,8 +124,8 @@ class Article extends BaseArticle
             $old = self::extractFilesFromString($content);
             $new = self::extractFilesFromString($this->content);
             foreach (array_diff($old, $new) as $file) {
-                $uploadDir = (string)Yii::$app->getModule('redactor')->uploadDir . '/' . $file;
-                unlink(Yii::getAlias($uploadDir));
+                $uploadFile = Yii::$app->controller->module->redactor->uploadDir . '/' . $file;
+                FileHelper::unlink($uploadFile);
             }
         }
         parent::afterSave($insert, $changedAttributes);
