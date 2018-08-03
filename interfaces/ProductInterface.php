@@ -60,7 +60,7 @@ interface ProductInterface extends ActiveRecordInterface, IdentifierInterface
     /**
      * @param string $path
      * @param string $caption
-     * @return mixed
+     * @return void
      */
     public function addImage1c($path, $caption);
 
@@ -89,7 +89,7 @@ interface ProductInterface extends ActiveRecordInterface, IdentifierInterface
 
     /**
      * @param \Zenwalker\CommerceML\Model\Product $product
-     * @return mixed
+     * @return self
      */
     public static function createModel1c($product);
 }

@@ -27,7 +27,7 @@ interface OfferInterface extends ActiveRecordInterface, ExportFieldsInterface, I
 
     /**
      * @param $types
-     * @return mixed
+     * @return void
      */
     public static function createPriceTypes1c($types);
 

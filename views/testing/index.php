@@ -12,10 +12,27 @@ use carono\exchange1c\widgets\Panel;
  * @var \carono\exchange1c\models\TestingClass $resultClass
  */
 $this->title = 'Тестирование модуля';
+echo Html::tag('div', 'В разработке', ['class' => 'alert alert-danger']);
+if (YII_ENV_PROD) {
+    ?>
+    <div class="alert alert-danger">
+        Проводить тестирование в окружении YII_ENV_PROD невозможно.
+    </div>
+    <?php
+    return;
+}
+
+?>
+    <div class="alert alert-warning">
+        Внимание! Будет происходить тестирование вашей реализации методов.
+    </div>
+<?php
 
 $links = [
     'groupClass' => ['testing/index', 'class' => 'TestingGroupClass'],
     'productClass' => ['testing/index', 'class' => 'TestingProductClass'],
+    'documentClass' => ['testing/index', 'class' => 'TestingDocumentClass'],
+    'partnerClass' => ['testing/index', 'class' => 'TestingPartnerClass'],
 ];
 ?>
     <div class="panel">
@@ -28,10 +45,6 @@ $links = [
         </div>
     </div>
 
-    <div class="alert alert-danger">
-        Внимание! Будет происходить тестирование вашей реализации методов.<br>
-        Настоятельно не рекомеднуется производить тестирование для боевой базе.
-    </div>
 
 <?php
 if (!$testingClass) {

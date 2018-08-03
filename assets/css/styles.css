@@ -1015,7 +1015,7 @@ h1.page-header {
 }
 
 .btn-group > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
-    border-left: rgba(68, 68, 68, 0.13) solid 2px;
+    border-left: rgba(68, 68, 68, 0.13) solid 1px;
 }
 
 .btn-group a {
@@ -1029,6 +1029,10 @@ h1.page-header {
     min-height: 40px;
 }
 
-li.active {
+li.active > a {
     font-weight: bold;
+}
+
+.nav.menu > li {
+    /*margin-top: 20px;*/
 }

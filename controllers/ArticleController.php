@@ -24,9 +24,9 @@ class ArticleController extends Controller
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {
                 return $this->redirect(['article/index']);
-            } else {
-                \Yii::$app->session->setFlash('error', Html::errorSummary($article));
             }
+
+            \Yii::$app->session->setFlash('error', Html::errorSummary($article));
         }
         return $this->render('update', ['article' => $article]);
     }
@@ -37,9 +37,9 @@ class ArticleController extends Controller
         if ($article->load(\Yii::$app->request->post())) {
             if ($article->save()) {
                 return $this->redirect(['article/view', 'id' => $article->id]);
-            } else {
-                \Yii::$app->session->setFlash('error', Html::errorSummary($article));
             }
+
+            \Yii::$app->session->setFlash('error', Html::errorSummary($article));
         }
         return $this->render('update', ['article' => $article]);
     }
@@ -69,7 +69,7 @@ class ArticleController extends Controller
     public function actionDeleteUnusedImages()
     {
         $content = Article::find()->select(['content' => 'group_concat([[content]])'])->scalar();
-        $dir = Yii::getAlias((string)Yii::$app->getModule(Yii::$app->controller->module->redactorModuleName)->uploadDir);
+        $dir = Yii::getAlias(Yii::$app->controller->module->redactor->uploadDir);
         $files = Article::extractFilesFromString($content);
         $realFiles = FileHelper::findFiles($dir);
         array_walk($realFiles, function (&$item) use ($dir) {

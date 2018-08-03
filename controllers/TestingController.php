@@ -31,7 +31,7 @@ class TestingController extends Controller
             }
 
             if ($testingClass::testImplementsClass()->hasErrors()) {
-                throw new \Exception('Ошибки реализации интерфейсов');
+                throw new \Exception('Ошибки реализации интерфейсов.');
             }
 
             if ($result) {

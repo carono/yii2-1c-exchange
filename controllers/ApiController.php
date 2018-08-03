@@ -33,6 +33,7 @@ use Zenwalker\CommerceML\Model\RequisiteCollection;
 class ApiController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $commerceMLVersion = '2.10';
 
     const EVENT_BEFORE_UPDATE_PRODUCT = 'beforeUpdateProduct';
     const EVENT_AFTER_UPDATE_PRODUCT = 'afterUpdateProduct';
@@ -79,16 +80,18 @@ class ApiController extends Controller
     {
         Yii::$app->response->headers->set('uid', Yii::$app->user->getId());
         if (is_bool($result)) {
-            return $result ? "success" : "failure";
-        } elseif (is_array($result)) {
+            return $result ? 'success' : 'failure';
+        }
+
+        if (is_array($result)) {
             $r = [];
             foreach ($result as $key => $value) {
                 $r[] = is_int($key) ? $value : $key . '=' . $value;
             }
-            return join("\n", $r);
-        } else {
-            return parent::afterAction($action, $result);
+            return implode("\n", $r);
         }
+
+        return parent::afterAction($action, $result);
     }
 
     /**
@@ -99,17 +102,17 @@ class ApiController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             return false;
-        } else {
-            return [
-                "success",
-                "PHPSESSID",
-                Yii::$app->session->getId(),
-            ];
         }
+
+        return [
+            'success',
+            'PHPSESSID',
+            Yii::$app->session->getId(),
+        ];
     }
 
     /**
-     * @return float|int
+     * @return float|int|false
      */
     protected function getFileLimit()
     {
@@ -126,8 +129,8 @@ class ApiController extends Controller
     public function actionInit()
     {
         return [
-            "zip" => class_exists('ZipArchive') && $this->module->useZip ? "yes" : "no",
-            "file_limit" => $this->getFileLimit(),
+            'zip' => class_exists('ZipArchive') && $this->module->useZip ? 'yes' : 'no',
+            'file_limit' => $this->getFileLimit(),
         ];
     }
 
@@ -140,7 +143,7 @@ class ApiController extends Controller
     {
         $body = Yii::$app->request->getRawBody();
         $filePath = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
-        if (!self::getData('archive') && pathinfo($filePath, PATHINFO_EXTENSION) == 'zip') {
+        if (!self::getData('archive') && strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'zip') {
             self::setData('archive', $filePath);
         }
         file_put_contents($filePath, $body, FILE_APPEND);
@@ -162,7 +165,7 @@ class ApiController extends Controller
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
         } else {
-            $commerce->classifier->xml = simplexml_load_file($classifierFile);
+            $commerce->classifier->xml = simplexml_load_string(file_get_contents($classifierFile));
         }
         $this->beforeProductSync();
         if ($groupClass = $this->getGroupClass()) {
@@ -179,8 +182,7 @@ class ApiController extends Controller
             $this->parseProduct($model, $product);
             $this->_ids[] = $model->getPrimaryKey();
             $model = null;
-            unset($model);
-            unset($product);
+            unset($model, $product);
             gc_collect_cycles();
         }
         $this->afterProductSync();
@@ -233,7 +235,7 @@ class ApiController extends Controller
 
     private function extractArchive()
     {
-        if (($archive = self::getData('archive')) && file_exists($archive)) {
+        if (($archive = self::getData('archive')) && file_exists($archive) && class_exists('ZipArchive')) {
             $zip = new \ZipArchive();
             $zip->open($archive);
             $zip->extractTo(dirname($archive));
@@ -290,7 +292,7 @@ class ApiController extends Controller
         $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
 
         $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
-        $root->addAttribute('ВерсияСхемы', '2.10');
+        $root->addAttribute('ВерсияСхемы', $this->commerceMLVersion);
         $root->addAttribute('ДатаФормирования', date('Y-m-d\TH:i:s'));
 
         $ids = [];
@@ -374,7 +376,6 @@ class ApiController extends Controller
         $model->{$model::getIdFieldName1c()} = $offer->id;
         $model->save();
         $this->afterUpdateOffer($model, $offer);
-        unset($model);
     }
 
     /**
@@ -413,9 +414,9 @@ class ApiController extends Controller
         $class = $this->getProductClass();
         if ($model = $class::createModel1c($data)) {
             return $model;
-        } else {
-            return Yii::createObject(['class' => $class]);
         }
+
+        return Yii::createObject(['class' => $class]);
     }
 
     /**
