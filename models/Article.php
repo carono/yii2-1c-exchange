@@ -89,6 +89,40 @@ class Article extends BaseArticle
     }
 
     /**
+     * @param int $deep
+     * @return array
+     */
+    public function formForTitle($deep = 0)
+    {
+        /**
+         * @var Article $subGroup
+         */
+        $item = [];
+        $item[] = str_repeat("\t", $deep) . '* ' . "[{$this->name}](#{$this->id})";
+        foreach ($this->getArticles()->orderBy(['[[pos]]' => SORT_ASC])->each() as $subGroup) {
+            $item[] = $subGroup->formForTitle($deep + 1);
+        }
+        return implode("\n", $item);
+    }
+
+    /**
+     * @param int|null $parent
+     * @return array
+     */
+    public static function formTitleItems($parent = null)
+    {
+        /**
+         * @var Article $group
+         */
+        $items = [];
+        $query = self::find()->andWhere(['parent_id' => $parent])->orderBy(['[[pos]]' => SORT_ASC]);
+        foreach ($query->each() as $group) {
+            $items[] = $group->formForTitle();
+        }
+        return $items;
+    }
+
+    /**
      * @return false|int
      */
     public function delete()
