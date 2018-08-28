@@ -125,9 +125,8 @@ class ExchangeModule extends \yii\base\Module
                 'fileManagerJsonRoute' => ["/$routeName/upload/file-json"],
                 'imageAllowExtensions' => ['jpg', 'png', 'gif'],
                 'on beforeAction' => function () use ($moduleRedactorName) {
-                    $path = ModuleHelper::getModuleNameByClass(self::class, 'exchange');
                     $redactor = \Yii::$app->getModule($moduleRedactorName);
-                    $redactor->uploadUrl = "/$path/file/article?file=";
+                    $redactor->uploadUrl = '../file/article?file=';
                     \Yii::$app->setModule($moduleRedactorName, $redactor);
                 }
             ]);

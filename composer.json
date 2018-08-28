@@ -2,6 +2,7 @@
   "name": "carono/yii2-1c-exchange",
   "description": "Yii2 module for the exchange of goods and documents from 1C",
   "type": "yii2-extension",
+  "license": "MIT",
   "authors": [
     {
       "name": "Aleksandr Kasyanov",
