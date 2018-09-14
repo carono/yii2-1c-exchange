@@ -143,11 +143,12 @@ class ApiController extends Controller
     {
         $body = Yii::$app->request->getRawBody();
         $filePath = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
-        if (!self::getData('archive') && strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'zip') {
-            self::setData('archive', $filePath);
-        }
+        $isArchive = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'zip';
         file_put_contents($filePath, $body, FILE_APPEND);
         if ((int)Yii::$app->request->headers->get('Content-Length') != $this->getFileLimit()) {
+            if ($isArchive) {
+                $this->extractArchive($filePath);
+            }
             $this->afterFinishUploadFile($filePath);
         }
         return true;
@@ -233,14 +234,17 @@ class ApiController extends Controller
         }
     }
 
-    private function extractArchive()
+    /**
+     * @param $filePath
+     */
+    private function extractArchive($filePath)
     {
-        if (($archive = self::getData('archive')) && file_exists($archive) && class_exists('ZipArchive')) {
-            $zip = new \ZipArchive();
-            $zip->open($archive);
-            $zip->extractTo(dirname($archive));
-            $zip->close();
-            unlink($archive);
+        $zip = new \ZipArchive();
+        $zip->open($filePath);
+        $zip->extractTo(dirname($filePath));
+        $zip->close();
+        if (!$this->module->debug) {
+            FileHelper::unlink($filePath);
         }
     }
 
@@ -251,7 +255,6 @@ class ApiController extends Controller
      */
     public function actionImport($type, $filename)
     {
-        $this->extractArchive();
         $file = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
         switch ($type) {
             case 'catalog':
@@ -268,7 +271,7 @@ class ApiController extends Controller
                 break;
         }
         if (!$this->module->debug) {
-            $this->clearTmp();
+            FileHelper::unlink($file);
         }
         return true;
     }
@@ -535,7 +538,7 @@ class ApiController extends Controller
      */
     public function afterFinishUploadFile($filePath)
     {
-        $this->module->trigger(self::EVENT_AFTER_FINISH_UPLOAD_FILE, new ExchangeEvent());
+        $this->module->trigger(self::EVENT_AFTER_FINISH_UPLOAD_FILE, new ExchangeEvent(['filePath' => $filePath]));
     }
 
     public function beforeProductSync()

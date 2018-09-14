@@ -11,4 +11,5 @@ class ExchangeEvent extends Event
     public $model;
     public $ml;
     public $ids = [];
+    public $filePath;
 }
