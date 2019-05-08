@@ -101,6 +101,12 @@ class ExchangeModule extends \yii\base\Module
      * @var bool
      */
     public $bootstrapUrlRule = true;
+
+    /**
+     * @var bool Добавлять правило в конец
+     */
+    public $appendRule = false;
+
     public $redactorModuleName = 'carono-exchange-redactor';
     /**
      * Функция авторизации пользователя

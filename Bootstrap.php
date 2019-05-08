@@ -19,10 +19,14 @@ class Bootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
+        /**
+         * @var ExchangeModule $module
+         */
         if ($id = ModuleHelper::getModuleNameByClass()) {
-            if (Yii::$app->getModule($id)->bootstrapUrlRule) {
+            $module = Yii::$app->getModule($id);
+            if ($module && $module->bootstrapUrlRule) {
                 Yii::$app->urlManager->enablePrettyUrl = true;
-                Yii::$app->urlManager->addRules([new UrlRule]);
+                Yii::$app->urlManager->addRules([new UrlRule], $module->appendRule);
             }
         }
     }
