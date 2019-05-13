@@ -5,9 +5,9 @@ namespace carono\exchange1c\controllers;
 
 
 use carono\exchange1c\models\Article;
+use Yii;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
-use Yii;
 
 /**
  * Class ArticleController
@@ -85,20 +85,19 @@ class ArticleController extends Controller
     {
         $badges = [];
         $lines = [];
-        $titles =  Article::formTitleItems();
+        $titles = Article::formTitleItems();
 
         $badges[] = '[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/carono/yii2-1c-exchange/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/carono/yii2-1c-exchange/?branch=master)';
         $badges[] = '[![Latest Stable Version](https://poser.pugx.org/carono/yii2-1c-exchange/v/stable)](https://packagist.org/packages/carono/yii2-1c-exchange)';
         $badges[] = '[![Total Downloads](https://poser.pugx.org/carono/yii2-1c-exchange/downloads)](https://packagist.org/packages/carono/yii2-1c-exchange)';
         $badges[] = '[![License](https://poser.pugx.org/carono/yii2-1c-exchange/license)](https://packagist.org/packages/carono/yii2-1c-exchange)';
         $badges[] = "\n";
-        foreach (Article::find()->andWhere(['not', ['content' => '']])->all() as $article) {
-            $lines[] = Html::a($article->name, false, ['name' => $article->id]) . "\n=\n";
-            $lines[] = str_replace('../file/article?file=', 'https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles', $article->content);
-            $lines[] = "\n";
+        $titles[] = "\n";
+        foreach (Article::formContentItems() as $item) {
+            $titles[] = $item;
         }
         $titles[] = "\n";
         $content = implode("\n", array_merge($badges, $titles, $lines));
-        file_put_contents('README.md', $content);
+        file_put_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'README.md', trim($content));
     }
 }

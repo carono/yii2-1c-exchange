@@ -62,30 +62,6 @@
 </pre><p>3. Если используете apache как веб сервер, не забудьте создать и настроить <strong>.htaccess</strong> в <strong>web </strong>директории</p>
 
 
-<a name="3">Настройка 1С</a>
-=
-
-<p>1. Устанавливаем 1С:Предприятие 8 Управление торговлей, Управление торговлей", редакция 11.3, версия 11.3.2 (<a href="magnet:?xt=urn:btih:AA1729FE7AE39FF43D5EB63CB8D5AFF19C891892&amp;tr=http%3A%2F%2Fbt3.t-ru.org%2Fann%3Fmagnet&amp;dn=1%D0%A1%20%D0%A3%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%82%D0%BE%D1%80%D0%B3%D0%BE%D0%B2%D0%BB%D0%B5%D0%B9%2011.3%20%D0%9F%D1%80%D0%BE%D1%84.%20%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%2B%20%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20v.%2011.3.2.157%20x86%20%5B29.12.2016%2C%20RUS%5D" target="_blank">магнитная ссылка</a>), платформа 8.3.9.2033 (и выше)</p><p>Настройки будут производиться на демо версии.</p><p>2. Переходим в настройки синхронизации данных, через пункт НСИ и администрирование, или через поиск</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/c2818da962-slide1.png"></p><p>3. Переходим в узлы обмена с сайтами</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/30de0bdc18-slide2.png"><br></p><p>4. Создаём новый узел, и заполняем данные</p><ul><li>Наименование</li><li>Выгрузка товаров</li><li>Адрес сайта, указываем ваш <strong>сайт/</strong><strong>1c_exchange.php</strong></li><li>Логин и пароль от пользователя, от чьего имени будем выгружать товары (<a href="view?id=4">настройка авторизации</a>)</li></ul><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/dcf36639b2-2018-02-2619-55-41.png"><br></p>
-
-
-<a name="4">Настройка авторизации</a>
-=
-
-<p>Авторизация в модуле реализована через поведение \yii\filters\auth\HttpBasicAuth</p><pre>'modules' =&gt; [
-    'exchange' =&gt; [
-        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
-        'auth' =&gt; function ($username, $password) {
-            if ($user = \app\models\User::findByUsername($username)) {
-                if ($user-&gt;validatePassword($password)) {
-                    return $user;
-                }
-            }
-            return false;
-        }
-     ]
-],</pre><p><br></p>
-
-
 <a name="5">Свойства модуля обмена</a>
 =
 
@@ -221,33 +197,28 @@
 </table>
 
 
-<a name="7">productClass Модель продукта</a>
+<a name="3">Настройка 1С</a>
 =
 
-<p>Продукт - моделью продукта является сам товар, картинки, его свойства и реквизиты, но не остаток или цена.
-</p><p><em>Для тех разработчиков, которые не очень хорошо знакомы с концепцией хранения данных в 1С, нужно дополнительно пояснение. В 1С существуют продукты и предложения. Продукт эта сама сущность товара, предложение, это то что можно продать, т.е. предложения и учавствуют в продажах.</em>
-</p><p><em>Пример:
-	</em>
-</p><p><em><strong>Туфли лабутены Модель X</strong> - это продукт, у него есть картинки, различные реквизиты (производитель, цвет, материал и т.д.), которые присущи данному продукту.
-	</em>
-</p><p><em><strong>Туфли лабутены Модель X, размер 32, за 20000р</strong>  - это предложение, от одного продукта может быть несколько предложений, с разными характеристиками, такими как размер, и разными ценами, на каждое предложение может быть свой остаток.</em>
-</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для продукта <strong>'productClass' =&gt; \app\models\Product::class</strong>
-</p><h2>
-<pre style="font-size: 12.6px;">[
+<p>1. Устанавливаем 1С:Предприятие 8 Управление торговлей, Управление торговлей", редакция 11.3, версия 11.3.2 (<a href="magnet:?xt=urn:btih:AA1729FE7AE39FF43D5EB63CB8D5AFF19C891892&amp;tr=http%3A%2F%2Fbt3.t-ru.org%2Fann%3Fmagnet&amp;dn=1%D0%A1%20%D0%A3%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%82%D0%BE%D1%80%D0%B3%D0%BE%D0%B2%D0%BB%D0%B5%D0%B9%2011.3%20%D0%9F%D1%80%D0%BE%D1%84.%20%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%2B%20%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20v.%2011.3.2.157%20x86%20%5B29.12.2016%2C%20RUS%5D" target="_blank">магнитная ссылка</a>), платформа 8.3.9.2033 (и выше)</p><p>Настройки будут производиться на демо версии.</p><p>2. Переходим в настройки синхронизации данных, через пункт НСИ и администрирование, или через поиск</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/c2818da962-slide1.png"></p><p>3. Переходим в узлы обмена с сайтами</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/30de0bdc18-slide2.png"><br></p><p>4. Создаём новый узел, и заполняем данные</p><ul><li>Наименование</li><li>Выгрузка товаров</li><li>Адрес сайта, указываем ваш <strong>сайт/</strong><strong>1c_exchange.php</strong></li><li>Логин и пароль от пользователя, от чьего имени будем выгружать товары (<a href="view?id=4">настройка авторизации</a>)</li></ul><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/dcf36639b2-2018-02-2619-55-41.png"><br></p>
+
+
+<a name="4">Настройка авторизации</a>
+=
+
+<p>Авторизация в модуле реализована через поведение \yii\filters\auth\HttpBasicAuth</p><pre>'modules' =&gt; [
     'exchange' =&gt; [
         'class' =&gt; \carono\exchange1c\ExchangeModule::class,
-        'groupClass' =&gt; \app\models\Group::class,
-        'productClass' =&gt; \app\models\Product::class,
-    ]
-]
-</pre>
-<table style="width: 1466px;">
-<tbody>
-<tr>
-</tr>
-</tbody>
-</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\ProductInterface</strong><strong></strong>
-</p>
+        'auth' =&gt; function ($username, $password) {
+            if ($user = \app\models\User::findByUsername($username)) {
+                if ($user-&gt;validatePassword($password)) {
+                    return $user;
+                }
+            }
+            return false;
+        }
+     ]
+],</pre><p><br></p>
 
 
 <a name="8">groupClass Группа продуктов</a>
@@ -269,192 +240,6 @@
 ]);
 </pre><p>Список интерфейсов, которые необходимо реализовать <a href="../interface/check?variable=groupClass" target="_blank">здесь</a>
 </p>
-
-
-<a name="9">setRequisite1c</a>
-=
-
-<h2>public function setRequisite1c($name, $value)<br></h2><p>Установка реквизитов для продукта. Список резвизитов находится в <strong>import.xml &gt; Каталог &gt; Товары &gt; Товар &gt; ЗначенияРеквизитов &gt; ЗначениеРеквизита</strong></p><p>Для хранения реквизитов, потребуется таблица реквизитов, а также сводная таблица продут+реквизит+значение
-</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/0489d0ae5b-requisite.png" width="653" height="310" style="width: 653px; height: 310px;"></p><pre>public function setRequisite1c($name, $value)
-{
-    if (!$requisite = Requisite::findOne(['name' =&gt; $name])) {
-        $requisite = new Requisite();
-        $requisite-&gt;name = $name;
-        $requisite-&gt;save();
-    }
-    $this-&gt;addPivot($requisite, PvProductRequisite::class, ['value' =&gt; $value]);
-}
-</pre>
-
-
-<a name="11">setGroup1c</a>
-=
-
-<h2>public function setGroup1c($group)</h2><p>Установка группы, где находится продукт. Все группы у вас уже должны быть сохранены в базе, т.к. ранее вызывался метод <strong>\carono\exchange1c\interfaces\GroupInterface::createTree1c</strong>, и все дерево групп уже создано Вами, а значит можно не проверять на существование группы.</p><pre>    public function setGroup1c($group)
-    {
-        $id = Group::find()-&gt;select(['id'])-&gt;andWhere(['accounting_id' =&gt; $group-&gt;id])-&gt;scalar();
-        $this-&gt;updateAttributes(['group_id' =&gt; $id]);
-    }
-</pre>
-
-
-<a name="12">setProperty1c</a>
-=
-
-<h2>public function setProperty1c($property)</h2><p>Свойство продукта и значение свойства являются отдельными сущностями, поэтому их нужно хранить в отдельных таблицах, а значения и продукт хранить в сводной таблице.
-</p><p>Все свойства уже должны быть заполнены, т.к. ранее выполнялся <strong>createProperties1c($properties)</strong>, поэтому можем искать свойства и значения по id.</p><p>Значение свойства могут быть как отдельной сущностью, так и простым значением, поэтому есть в xml есть поле <strong>ИдЗначения</strong> значит нужно искать в таблице со значениями, иначе должно быть просто строка или число.</p><p><em>* в этой фукнции используется трейт из пакета carono/yii2-migrate</em><br>
-</p><pre>    
-    /**
-     * $property - Свойство товара (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство)
-     * $property-&gt;value - Разыменованное значение (string) (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство &gt; Значение)
-     * $property-&gt;getValueModel() - Данные по значению, Ид значения, и т.д (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство &gt; ВариантыЗначений &gt; Справочник)
-     *
-     * @param MlProperty $property
-     * @return void
-     */
-    public function setProperty1c($property)
-    {
-        $propertyModel = Property::findOne(['accounting_id' =&gt; $property-&gt;id]);
-        $propertyValue = $property-&gt;getValueModel();
-        if ($propertyAccountingId = (string)$propertyValue-&gt;ИдЗначения) {
-            $value = PropertyValue::findOne(['accounting_id' =&gt; $propertyAccountingId]);
-            $attributes = ['property_value_id' =&gt; $value-&gt;id];
-        } else {
-            $attributes = ['value' =&gt; $propertyValue-&gt;value];
-        }
-        $this-&gt;addPivot($propertyModel, PvProductProperty::class, $attributes);
-    }
-</pre><p><br>
-</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/adc45161dd-properties.png" style="color: rgb(95, 100, 104);">
-</p>
-
-
-<a name="13">addImage1c</a>
-=
-
-<h2>public function addImage1c($path, $caption)</h2><p>В этой фукнции мы получаем абсолютный путь до картинки и название изрбражения (для alt аттрибута)</p><p><em>* в этой фукнции используются трейт из пакета carono/yii2-migrate и управление файлами из carono/yii2-file-upload</em></p><pre>    /**
-     * @param string $path
-     * @param string $caption
-     * @return mixed
-     */
-    public function addImage1c($path, $caption)
-    {
-        if (!$this-&gt;getImages()-&gt;andWhere(['md5' =&gt; md5_file($path)])-&gt;exists()) {
-            $this-&gt;addPivot(FileUpload::startUpload($path)-&gt;process(), PvProductImage::class, ['caption' =&gt; $caption]);
-        }
-    }
-</pre>
-
-
-<a name="14"> getGroup1c</a>
-=
-
-<h2>public function getGroup1c()</h2><p>Получаем группу, где находится текущий продукт, группа должна наследовать интерфейс <strong>\carono\exchange1c\interfaces\GroupInterface</strong><strong></strong><span></span></p><pre>    /**
-     * @return GroupInterface
-     */
-    public function getGroup1c()
-    {
-        return $this-&gt;group;
-    }
-</pre>
-
-
-<a name="15">createProperties1c</a>
-=
-
-<h2>public static function createProperties1c($properties)</h2>
-<p>Функция вызывается один раз при импорте, в ней необходимо создать все свойста и значения свойств.
-</p>
-<pre>    /**
-     * @param PropertyCollection $properties
-     * @return mixed
-     */
-    public static function createProperties1c($properties)
-    {
-        /**
-         * @var \Zenwalker\CommerceML\Model\Property $property
-         */
-        foreach ($properties as $property) {
-            $propertyModel = Property::createByMl($property);
-            foreach ($property->getAvailableValues() as $value) {
-                if (!$propertyValue = PropertyValue::findOne(['accounting_id' => $value->id])) {
-                    $propertyValue = new PropertyValue();
-                    $propertyValue->name = (string)$value->Значение;
-                    $propertyValue->property_id = $propertyModel->id;
-                    $propertyValue->accounting_id = (string)$value->ИдЗначения;
-                    $propertyValue->save();
-                    unset($propertyValue);
-                }
-            }
-        }
-    }
-</pre>
-<p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/30d7d0869c-property.png" style="color: rgb(95, 100, 104);">
-</p>
-
-
-<a name="16">getOffer1c</a>
-=
-
-<h2>public function getOffer1c($offer)</h2>
-<p>В эту фукнцию отправляется xml данные предложения из файла, необходимо создать или найти вашу модель предложения (интерфейс <strong>\carono\exchange1c\interfaces\OfferInterface</strong><strong></strong>) и вернуть в результате.
-</p>
-<pre>    /**
-     * @param \Zenwalker\CommerceML\Model\Offer $offer
-     * @return OfferInterface
-     */
-    public function getOffer1c($offer)
-    {
-        $offerModel = Offer::createByMl($offer);
-        $offerModel-&gt;product_id = $this-&gt;id;
-        if ($offerModel-&gt;getDirtyAttributes()) {
-            $offerModel-&gt;save();
-        }
-        return $offerModel;
-    }
-</pre>
-
-Пример парсинга предложения
-<pre>    
-class Offer extends BaseOffer implements OfferInterface {   
-    /**
-     * @param MlOffer $offer
-     * @return Offer
-     */
-    public static function createByMl($offer)
-    {
-        if (!$offerModel = self::findOne(['accounting_id' =&gt; $offer-&gt;id])) {
-            $offerModel = new self;
-            $offerModel-&gt;name = (string)$offer-&gt;name;
-            $offerModel-&gt;accounting_id = (string)$offer-&gt;id;
-        }
-        $offerModel-&gt;remnant = (string)$offer-&gt;Количество;
-        return $offerModel;
-    }
-}
-</pre>
-
-
-<a name="17">createModel1c</a>
-=
-
-<h2>public static function createModel1c($product)</h2><p>В этой фукнции мы должны найти или создать новый продукт и вернуть вашу модель.</p><pre>    /**
-     * @param \Zenwalker\CommerceML\Model\Product $product
-     * @return self
-     */
-    public static function createModel1c($product)
-    {
-        if (!$model = Product::findOne(['accounting_id' =&gt; $product-&gt;id])) {
-            $model = new Product();
-            $model-&gt;accounting_id = $product-&gt;id;
-        }
-        $model-&gt;name = $product-&gt;name;
-        $model-&gt;description = (string)$product-&gt;Описание;
-        $model-&gt;article = (string)$product-&gt;Артикул;
-        $model-&gt;save();
-        return $model;
-    }
-</pre>
 
 
 <a name="18">createTree1c</a>
@@ -531,6 +316,221 @@ class Group extends base\Group implements GroupInterface
 </p>
 
 
+<a name="7">productClass Модель продукта</a>
+=
+
+<p>Продукт - моделью продукта является сам товар, картинки, его свойства и реквизиты, но не остаток или цена.
+</p><p><em>Для тех разработчиков, которые не очень хорошо знакомы с концепцией хранения данных в 1С, нужно дополнительно пояснение. В 1С существуют продукты и предложения. Продукт эта сама сущность товара, предложение, это то что можно продать, т.е. предложения и учавствуют в продажах.</em>
+</p><p><em>Пример:
+	</em>
+</p><p><em><strong>Туфли лабутены Модель X</strong> - это продукт, у него есть картинки, различные реквизиты (производитель, цвет, материал и т.д.), которые присущи данному продукту.
+	</em>
+</p><p><em><strong>Туфли лабутены Модель X, размер 32, за 20000р</strong>  - это предложение, от одного продукта может быть несколько предложений, с разными характеристиками, такими как размер, и разными ценами, на каждое предложение может быть свой остаток.</em>
+</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для продукта <strong>'productClass' =&gt; \app\models\Product::class</strong>
+</p><h2>
+<pre style="font-size: 12.6px;">[
+    'exchange' =&gt; [
+        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
+        'groupClass' =&gt; \app\models\Group::class,
+        'productClass' =&gt; \app\models\Product::class,
+    ]
+]
+</pre>
+<table style="width: 1466px;">
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\ProductInterface</strong><strong></strong>
+</p>
+
+
+<a name="9">setRequisite1c</a>
+=
+
+<h2>public function setRequisite1c($name, $value)<br></h2><p>Установка реквизитов для продукта. Список резвизитов находится в <strong>import.xml &gt; Каталог &gt; Товары &gt; Товар &gt; ЗначенияРеквизитов &gt; ЗначениеРеквизита</strong></p><p>Для хранения реквизитов, потребуется таблица реквизитов, а также сводная таблица продут+реквизит+значение
+</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/0489d0ae5b-requisite.png" width="653" height="310" style="width: 653px; height: 310px;"></p><pre>public function setRequisite1c($name, $value)
+{
+    if (!$requisite = Requisite::findOne(['name' =&gt; $name])) {
+        $requisite = new Requisite();
+        $requisite-&gt;name = $name;
+        $requisite-&gt;save();
+    }
+    $this-&gt;addPivot($requisite, PvProductRequisite::class, ['value' =&gt; $value]);
+}
+</pre>
+
+
+<a name="11">setGroup1c</a>
+=
+
+<h2>public function setGroup1c($group)</h2><p>Установка группы, где находится продукт. Все группы у вас уже должны быть сохранены в базе, т.к. ранее вызывался метод <strong>\carono\exchange1c\interfaces\GroupInterface::createTree1c</strong>, и все дерево групп уже создано Вами, а значит можно не проверять на существование группы.</p><pre>    public function setGroup1c($group)
+    {
+        $id = Group::find()-&gt;select(['id'])-&gt;andWhere(['accounting_id' =&gt; $group-&gt;id])-&gt;scalar();
+        $this-&gt;updateAttributes(['group_id' =&gt; $id]);
+    }
+</pre>
+
+
+<a name="15">createProperties1c</a>
+=
+
+<h2>public static function createProperties1c($properties)</h2>
+<p>Функция вызывается один раз при импорте, в ней необходимо создать все свойста и значения свойств.
+</p>
+<pre>    /**
+     * @param PropertyCollection $properties
+     * @return mixed
+     */
+    public static function createProperties1c($properties)
+    {
+        /**
+         * @var \Zenwalker\CommerceML\Model\Property $property
+         */
+        foreach ($properties as $property) {
+            $propertyModel = Property::createByMl($property);
+            foreach ($property->getAvailableValues() as $value) {
+                if (!$propertyValue = PropertyValue::findOne(['accounting_id' => $value->id])) {
+                    $propertyValue = new PropertyValue();
+                    $propertyValue->name = (string)$value->Значение;
+                    $propertyValue->property_id = $propertyModel->id;
+                    $propertyValue->accounting_id = (string)$value->ИдЗначения;
+                    $propertyValue->save();
+                    unset($propertyValue);
+                }
+            }
+        }
+    }
+</pre>
+<p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/30d7d0869c-property.png" style="color: rgb(95, 100, 104);">
+</p>
+
+
+<a name="12">setProperty1c</a>
+=
+
+<h2>public function setProperty1c($property)</h2><p>Свойство продукта и значение свойства являются отдельными сущностями, поэтому их нужно хранить в отдельных таблицах, а значения и продукт хранить в сводной таблице.
+</p><p>Все свойства уже должны быть заполнены, т.к. ранее выполнялся <strong>createProperties1c($properties)</strong>, поэтому можем искать свойства и значения по id.</p><p>Значение свойства могут быть как отдельной сущностью, так и простым значением, поэтому есть в xml есть поле <strong>ИдЗначения</strong> значит нужно искать в таблице со значениями, иначе должно быть просто строка или число.</p><p><em>* в этой фукнции используется трейт из пакета carono/yii2-migrate</em><br>
+</p><pre>    
+    /**
+     * $property - Свойство товара (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство)
+     * $property-&gt;value - Разыменованное значение (string) (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство &gt; Значение)
+     * $property-&gt;getValueModel() - Данные по значению, Ид значения, и т.д (import.xml &gt; Классификатор &gt; Свойства &gt; Свойство &gt; ВариантыЗначений &gt; Справочник)
+     *
+     * @param MlProperty $property
+     * @return void
+     */
+    public function setProperty1c($property)
+    {
+        $propertyModel = Property::findOne(['accounting_id' =&gt; $property-&gt;id]);
+        $propertyValue = $property-&gt;getValueModel();
+        if ($propertyAccountingId = (string)$propertyValue-&gt;ИдЗначения) {
+            $value = PropertyValue::findOne(['accounting_id' =&gt; $propertyAccountingId]);
+            $attributes = ['property_value_id' =&gt; $value-&gt;id];
+        } else {
+            $attributes = ['value' =&gt; $propertyValue-&gt;value];
+        }
+        $this-&gt;addPivot($propertyModel, PvProductProperty::class, $attributes);
+    }
+</pre><p><br>
+</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/adc45161dd-properties.png" style="color: rgb(95, 100, 104);">
+</p>
+
+
+<a name="13">addImage1c</a>
+=
+
+<h2>public function addImage1c($path, $caption)</h2><p>В этой фукнции мы получаем абсолютный путь до картинки и название изрбражения (для alt аттрибута)</p><p><em>* в этой фукнции используются трейт из пакета carono/yii2-migrate и управление файлами из carono/yii2-file-upload</em></p><pre>    /**
+     * @param string $path
+     * @param string $caption
+     * @return mixed
+     */
+    public function addImage1c($path, $caption)
+    {
+        if (!$this-&gt;getImages()-&gt;andWhere(['md5' =&gt; md5_file($path)])-&gt;exists()) {
+            $this-&gt;addPivot(FileUpload::startUpload($path)-&gt;process(), PvProductImage::class, ['caption' =&gt; $caption]);
+        }
+    }
+</pre>
+
+
+<a name="14"> getGroup1c</a>
+=
+
+<h2>public function getGroup1c()</h2><p>Получаем группу, где находится текущий продукт, группа должна наследовать интерфейс <strong>\carono\exchange1c\interfaces\GroupInterface</strong><strong></strong><span></span></p><pre>    /**
+     * @return GroupInterface
+     */
+    public function getGroup1c()
+    {
+        return $this-&gt;group;
+    }
+</pre>
+
+
+<a name="16">getOffer1c</a>
+=
+
+<h2>public function getOffer1c($offer)</h2>
+<p>В эту фукнцию отправляется xml данные предложения из файла, необходимо создать или найти вашу модель предложения (интерфейс <strong>\carono\exchange1c\interfaces\OfferInterface</strong><strong></strong>) и вернуть в результате.
+</p>
+<pre>    /**
+     * @param \Zenwalker\CommerceML\Model\Offer $offer
+     * @return OfferInterface
+     */
+    public function getOffer1c($offer)
+    {
+        $offerModel = Offer::createByMl($offer);
+        $offerModel-&gt;product_id = $this-&gt;id;
+        if ($offerModel-&gt;getDirtyAttributes()) {
+            $offerModel-&gt;save();
+        }
+        return $offerModel;
+    }
+</pre>
+
+Пример парсинга предложения
+<pre>    
+class Offer extends BaseOffer implements OfferInterface {   
+    /**
+     * @param MlOffer $offer
+     * @return Offer
+     */
+    public static function createByMl($offer)
+    {
+        if (!$offerModel = self::findOne(['accounting_id' =&gt; $offer-&gt;id])) {
+            $offerModel = new self;
+            $offerModel-&gt;name = (string)$offer-&gt;name;
+            $offerModel-&gt;accounting_id = (string)$offer-&gt;id;
+        }
+        $offerModel-&gt;remnant = (string)$offer-&gt;Количество;
+        return $offerModel;
+    }
+}
+</pre>
+
+
+<a name="17">createModel1c</a>
+=
+
+<h2>public static function createModel1c($product)</h2><p>В этой фукнции мы должны найти или создать новый продукт и вернуть вашу модель.</p><pre>    /**
+     * @param \Zenwalker\CommerceML\Model\Product $product
+     * @return self
+     */
+    public static function createModel1c($product)
+    {
+        if (!$model = Product::findOne(['accounting_id' =&gt; $product-&gt;id])) {
+            $model = new Product();
+            $model-&gt;accounting_id = $product-&gt;id;
+        }
+        $model-&gt;name = $product-&gt;name;
+        $model-&gt;description = (string)$product-&gt;Описание;
+        $model-&gt;article = (string)$product-&gt;Артикул;
+        $model-&gt;save();
+        return $model;
+    }
+</pre>
+
+
 <a name="19">offerClass Модель предложения</a>
 =
 
@@ -554,71 +554,6 @@ class Group extends base\Group implements GroupInterface
 </p>
 
 
-<a name="20">partnerClass Модель пользователя</a>
-=
-
-<p>Данный интерфейс на данный момент требуется только для работы обмена документов. Единственное что нужно реализовать, это общий метод public function getExportFields1c, который описывает поля для сериализации <span class="redactor-invisible-space">в xml при обмене. Необходимо возвращать массив, где ключ, это тег в xml, а значение - ваши данные. Все поддерживаемые стандартом данные можно найти в <a href="http://exchange.site/exchange/default/documentation" target="_blank">спецификации</a>, исчерпывающую информацию лучше смотреть в xsd файлах, для этого потребуется visual studio, т.к. в официальных pdf файлах присутствуют неточности. Чуть подробнее о методе можно почитать <a href="http://exchange.site/exchange/article/view?id=33" target="_blank">здесь</a></span>
-</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для предложения <strong>'partnerClass' =&gt; \app\models\Partner::class</strong>
-</p><h2>
-<pre style="font-size: 12.6px;">[
-    'exchange' =&gt; [
-        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
-        'groupClass' =&gt; \app\models\Group::class,
-        'productClass' =&gt; \app\models\Product::class,
-        'offerClass' =&gt; \app\models\Offer::class,
-        'partnerClass' =&gt; \app\models\Partner::class, 
-    ]
-]
-</pre>
-<table style="width: 1466px;">
-<tbody>
-<tr>
-</tr>
-</tbody>
-</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\PartnerInterface</strong></p><pre>    public function getExportFields1c($context = null)
-    {
-        return [
-            'Ид' =&gt; 'id',
-            'Наименование' =&gt; 'username',
-            'ПолноеНаименование' =&gt; 'full_name',
-            'Фамилия' =&gt; 'surname',
-            'Имя' =&gt; 'name',
-        ];
-    }
-</pre>
-
-
-<a name="21">warehouseClass Модель склада</a>
-=
-
-<p><span style="color: rgb(247, 150, 70);">На данный момент не используется</span></p>
-
-
-<a name="22">documentClass Модель документа</a>
-=
-
-<p>Документ в 1С, он же заказ на сайте. У документа дожны быть связи на <strong>предложения </strong>через сводную таблицу. Суммы желательно указывать и в сводной таблице и в самом заказе, чтобы не расчитывать её в динамике т.к. цена на предложение может поменятся и клиенту в итоге поступит счет на другую сумму.</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для предложения <strong>'documentClass' =&gt; \app\models\Document::class</strong>
-</p><h2>
-<pre style="font-size: 12.6px;">[
-    'exchange' =&gt; [
-        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
-        'groupClass' =&gt; \app\models\Group::class,
-        'productClass' =&gt; \app\models\Product::class,
-        'offerClass' =&gt; \app\models\Offer::class,
-        'partnerClass' =&gt; \app\models\Partner::class, 
-        'documentClass' =&gt; \app\models\Document::class, 
-    ]
-]
-</pre>
-<table style="width: 1466px;">
-<tbody>
-<tr>
-</tr>
-</tbody>
-</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\DocumentInterface</strong>
-</p><p><strong><br></strong></p><p><strong><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/79d570a828-order.png" style="color: rgb(95, 100, 104);"><br></strong></p>
-
-
 <a name="23">getGroup1c</a>
 =
 
@@ -629,6 +564,44 @@ class Group extends base\Group implements GroupInterface
     {
         return $this-&gt;product-&gt;group;
     }
+</pre>
+
+
+<a name="25">createPriceTypes1c</a>
+=
+
+<h2>public static function createPriceTypes1c($types)</h2><p>В этом методе необходимо создать все типы цен, фукнция вызывается один раз. Тип цены содержит название (розничная, оптовая и др.), а так же название валюты.
+</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/47e17f3950-pricetype.png">
+</p><pre>    /**
+     * @param $types
+     * @return void
+     */
+    public static function createPriceTypes1c($types)
+    {
+        foreach ($types as $type) {
+            PriceType::createByMl($type);
+        }
+    }
+</pre><p>Пример реализации создания типа</p><pre>class PriceType extends BasePriceType
+{
+    /**
+     * @param Simple $type
+     * @return PriceType
+     */
+    public static function createByMl($type)
+    {
+        if (!$priceType = self::findOne(['accounting_id' =&gt; $type-&gt;id])) {
+            $priceType = new self;
+            $priceType-&gt;accounting_id = $type-&gt;id;
+        }
+        $priceType-&gt;name = $type-&gt;name;
+        $priceType-&gt;currency = (string)$type-&gt;Валюта;
+        if ($priceType-&gt;getDirtyAttributes()) {
+            $priceType-&gt;save();
+        }
+        return $priceType;
+    }
+}
 </pre>
 
 
@@ -679,44 +652,6 @@ class Group extends base\Group implements GroupInterface
 </pre>
 
 
-<a name="25">createPriceTypes1c</a>
-=
-
-<h2>public static function createPriceTypes1c($types)</h2><p>В этом методе необходимо создать все типы цен, фукнция вызывается один раз. Тип цены содержит название (розничная, оптовая и др.), а так же название валюты.
-</p><p><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/47e17f3950-pricetype.png">
-</p><pre>    /**
-     * @param $types
-     * @return void
-     */
-    public static function createPriceTypes1c($types)
-    {
-        foreach ($types as $type) {
-            PriceType::createByMl($type);
-        }
-    }
-</pre><p>Пример реализации создания типа</p><pre>class PriceType extends BasePriceType
-{
-    /**
-     * @param Simple $type
-     * @return PriceType
-     */
-    public static function createByMl($type)
-    {
-        if (!$priceType = self::findOne(['accounting_id' =&gt; $type-&gt;id])) {
-            $priceType = new self;
-            $priceType-&gt;accounting_id = $type-&gt;id;
-        }
-        $priceType-&gt;name = $type-&gt;name;
-        $priceType-&gt;currency = (string)$type-&gt;Валюта;
-        if ($priceType-&gt;getDirtyAttributes()) {
-            $priceType-&gt;save();
-        }
-        return $priceType;
-    }
-}
-</pre>
-
-
 <a name="26">setSpecification1c</a>
 =
 
@@ -749,6 +684,65 @@ class Group extends base\Group implements GroupInterface
     }
 }
 </pre>
+
+
+<a name="20">partnerClass Модель пользователя</a>
+=
+
+<p>Данный интерфейс на данный момент требуется только для работы обмена документов. Единственное что нужно реализовать, это общий метод public function getExportFields1c, который описывает поля для сериализации <span class="redactor-invisible-space">в xml при обмене. Необходимо возвращать массив, где ключ, это тег в xml, а значение - ваши данные. Все поддерживаемые стандартом данные можно найти в <a href="http://exchange.site/exchange/default/documentation" target="_blank">спецификации</a>, исчерпывающую информацию лучше смотреть в xsd файлах, для этого потребуется visual studio, т.к. в официальных pdf файлах присутствуют неточности. Чуть подробнее о методе можно почитать <a href="http://exchange.site/exchange/article/view?id=33" target="_blank">здесь</a></span>
+</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для предложения <strong>'partnerClass' =&gt; \app\models\Partner::class</strong>
+</p><h2>
+<pre style="font-size: 12.6px;">[
+    'exchange' =&gt; [
+        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
+        'groupClass' =&gt; \app\models\Group::class,
+        'productClass' =&gt; \app\models\Product::class,
+        'offerClass' =&gt; \app\models\Offer::class,
+        'partnerClass' =&gt; \app\models\Partner::class, 
+    ]
+]
+</pre>
+<table style="width: 1466px;">
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\PartnerInterface</strong></p><pre>    public function getExportFields1c($context = null)
+    {
+        return [
+            'Ид' =&gt; 'id',
+            'Наименование' =&gt; 'username',
+            'ПолноеНаименование' =&gt; 'full_name',
+            'Фамилия' =&gt; 'surname',
+            'Имя' =&gt; 'name',
+        ];
+    }
+</pre>
+
+
+<a name="22">documentClass Модель документа</a>
+=
+
+<p>Документ в 1С, он же заказ на сайте. У документа дожны быть связи на <strong>предложения </strong>через сводную таблицу. Суммы желательно указывать и в сводной таблице и в самом заказе, чтобы не расчитывать её в динамике т.к. цена на предложение может поменятся и клиенту в итоге поступит счет на другую сумму.</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для предложения <strong>'documentClass' =&gt; \app\models\Document::class</strong>
+</p><h2>
+<pre style="font-size: 12.6px;">[
+    'exchange' =&gt; [
+        'class' =&gt; \carono\exchange1c\ExchangeModule::class,
+        'groupClass' =&gt; \app\models\Group::class,
+        'productClass' =&gt; \app\models\Product::class,
+        'offerClass' =&gt; \app\models\Offer::class,
+        'partnerClass' =&gt; \app\models\Partner::class, 
+        'documentClass' =&gt; \app\models\Document::class, 
+    ]
+]
+</pre>
+<table style="width: 1466px;">
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\DocumentInterface</strong>
+</p><p><strong><br></strong></p><p><strong><img src="https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles/100/79d570a828-order.png" style="color: rgb(95, 100, 104);"><br></strong></p>
 
 
 <a name="27">findDocuments1c</a>
@@ -797,6 +791,12 @@ class Group extends base\Group implements GroupInterface
         return $this-&gt;user;
     }
 </pre>
+
+
+<a name="21">warehouseClass Модель склада</a>
+=
+
+<p><span style="color: rgb(247, 150, 70);">На данный момент не используется</span></p>
 
 
 <a name="33">getExportFields1c</a>
@@ -898,4 +898,3 @@ class Group extends base\Group implements GroupInterface
 =
 
 <p><strong>beforeUpdateProduct</strong></p><p>Событие перед началом парсинга продукта</p><p><strong>afterUpdateProduct</strong></p><p>Событие после парсинга продукта</p><p><strong>beforeUpdateOffer</strong></p><p>Событие перед началом парсинга предложения<span class="redactor-invisible-space"></span></p><p><strong>afterUpdateOffer</strong></p><p>Событие после парсинга предложения<br></p><p><strong>beforeProductSync</strong></p><p>Событие перед началом парсинга всех продуктов<span class="redactor-invisible-space"></span></p><p><strong>afterProductSync</strong></p><p>Событие после парсинга всех продуктов<br></p><p><strong>beforeOfferSync</strong></p><p>Событие перед началом парсинга всех предложений<br></p><p><strong>afterOfferSync</strong></p><p>Событие после парсинга всех предложений<br></p><p><strong>afterFinishUploadFile</strong></p><p>Событие, которое вызывается после загрузки архива или xml файла от 1С на ваш сайт</p><p><strong>afterExportOrders</strong></p><p>Событие после формирования заказов из вашего сайта для 1С, в этом методе предлагается вам реализовать смену статусов или указания флага, чтобы исключить повторную выгрузку документов, т.к. они заменят те, что были загружены ранее.</p>
-

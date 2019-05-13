@@ -2,14 +2,15 @@
 
 namespace carono\exchange1c\models;
 
+use carono\exchange1c\models\base\Article as BaseArticle;
 use carono\exchange1c\models\query\ArticleQuery;
 use Yii;
-use \carono\exchange1c\models\base\Article as BaseArticle;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "article".
@@ -118,6 +119,29 @@ class Article extends BaseArticle
         $query = self::find()->andWhere(['parent_id' => $parent])->orderBy(['[[pos]]' => SORT_ASC]);
         foreach ($query->each() as $group) {
             $items[] = $group->formForTitle();
+        }
+        return $items;
+    }
+
+    /**
+     * @param null $parent
+     * @return array
+     */
+    public static function formContentItems($parent = null)
+    {
+        /**
+         * @var Article $article
+         */
+        $items = [];
+        $query = self::find()->andWhere(['parent_id' => $parent])->orderBy(['[[pos]]' => SORT_ASC]);
+        foreach ($query->each() as $article) {
+            if ($article->content) {
+                $link = 'https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles';
+                $items[] = Html::a($article->name, false, ['name' => $article->id]) . "\n=\n";
+                $items[] = str_replace('../file/article?file=', $link, $article->content);
+                $items[] = "\n";
+            }
+            $items = array_merge($items, static::formContentItems($article->id));
         }
         return $items;
     }
