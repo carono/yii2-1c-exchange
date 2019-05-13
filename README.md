@@ -188,10 +188,20 @@
 	</td>
 </tr>
 <tr>
+	<td>appendRule
+	</td>
+	<td>false
+	</td>
+	<td>Добавлять правило роутинга в конец
+	</td>
+</tr>
+<tr>
 	<td>auth
 	</td>
-	<td>null</td>
-	<td>Фукнция для авторизации</td>
+	<td>null
+	</td>
+	<td>Фукнция для авторизации
+	</td>
 </tr>
 </tbody>
 </table>
@@ -233,10 +243,10 @@
 ]
 </pre><p>Миграция, создаём группу, для хранения продукции, должна быть древовидная структура с неограниченной вложенностью, рекомендуется использовать <a href="https://packagist.org/packages/creocoder/yii2-nested-sets" target="_blank">nested sets</a> , но для примера используем более простой пример
 </p><pre>$this-&gt;createTable('{{%group}}', [
-    'id' =&gt; self::primaryKey(),
-    'name' =&gt; self::string()-&gt;comment('Наименование группы'),
-    'parent_id' =&gt; self::integer()-&gt;comment('Родительская группа'),
-    'accounting_id' =&gt; self::string()-&gt;comment('Код в 1С')-&gt;unique(),
+    'id' =&gt; $this-&gt;primaryKey(),
+    'name' =&gt; $this-&gt;string()-&gt;comment('Наименование группы'),
+    'parent_id' =&gt; $this-&gt;integer()-&gt;comment('Родительская группа'),
+    'accounting_id' =&gt; $this-&gt;string()-&gt;comment('Код в 1С')-&gt;unique(),
 ]);
 </pre><p>Список интерфейсов, которые необходимо реализовать <a href="../interface/check?variable=groupClass" target="_blank">здесь</a>
 </p>
@@ -534,9 +544,13 @@ class Offer extends BaseOffer implements OfferInterface {
 <a name="19">offerClass Модель предложения</a>
 =
 
-<p>Предложение - модель товара, которая учавствует в продажах, у нее есть остаток и набор цен</p><h2>Настройка</h2><p>Добавляем в настройки модуля вашу модель для предложения <strong>'offerClass' =&gt; \app\models\Offer::class</strong>
-</p><h2>
-<pre style="font-size: 12.6px;">[
+<p>Предложение - модель товара, которая учавствует в продажах, у нее есть остаток и набор цен
+</p>
+<h2>Настройка</h2>
+<p>Добавляем в настройки модуля вашу модель для предложения <strong>'offerClass' =&gt; \app\models\Offer::class</strong>
+</p>
+
+<pre>[
     'exchange' =&gt; [
         'class' =&gt; \carono\exchange1c\ExchangeModule::class,
         'groupClass' =&gt; \app\models\Group::class,
@@ -545,12 +559,9 @@ class Offer extends BaseOffer implements OfferInterface {
     ]
 ]
 </pre>
-<table style="width: 1466px;">
-<tbody>
-<tr>
-</tr>
-</tbody>
-</table></h2><h2>Интерфейсы</h2><p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\OfferInterface</strong><strong></strong>
+
+<h2>Интерфейсы</h2>
+<p>В вашей модели имплементируем интерфейс <strong>carono\exchange1c\interfaces\OfferInterface</strong><strong></strong>
 </p>
 
 
