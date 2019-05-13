@@ -137,8 +137,9 @@ class Article extends BaseArticle
         foreach ($query->each() as $article) {
             if ($article->content) {
                 $link = 'https://raw.github.com/carono/yii2-1c-exchange/HEAD/files/articles';
+                $content = str_replace(['../file/article?file=', 'view?id='], [$link, '#'], $article->content);
                 $items[] = Html::a($article->name, false, ['name' => $article->id]) . "\n=\n";
-                $items[] = str_replace('../file/article?file=', $link, $article->content);
+                $items[] = $content;
                 $items[] = "\n";
             }
             $items = array_merge($items, static::formContentItems($article->id));
