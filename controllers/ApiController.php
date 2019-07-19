@@ -46,7 +46,7 @@ class ApiController extends Controller
     const EVENT_AFTER_FINISH_UPLOAD_FILE = 'afterFinishUploadFile';
     const EVENT_AFTER_EXPORT_ORDERS = 'afterExportOrders';
 
-    private $_ids;
+    protected $_ids;
 
     public function init()
     {
