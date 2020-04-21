@@ -126,8 +126,21 @@ class ApiController extends Controller
     /**
      * @return array
      */
-    public function actionInit()
+    public function actionInit($type)
     {
+        switch ($type) {
+            case 'catalog':
+                $pattern = '*.xml';
+                $dir = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $pattern;
+                foreach (glob($dir) as $file) {
+                    if ($this->module->debug) {
+                        rename($file, str_replace('.xml', date("_Y-m-d H.i.s", filemtime($file)) . '.xml.bak', $file));
+                    } else {
+                        FileHelper::unlink($file);
+                    }
+                }
+                break;
+        }
         return [
             'zip' => class_exists('ZipArchive') && $this->module->useZip ? 'yes' : 'no',
             'file_limit' => $this->getFileLimit(),
@@ -143,6 +156,9 @@ class ApiController extends Controller
     {
         $body = Yii::$app->request->getRawBody();
         $filePath = $this->module->getTmpDir() . DIRECTORY_SEPARATOR . $filename;
+        if (!is_dir(dirname($filePath))) {
+            FileHelper::createDirectory(dirname($filePath));
+        }
         $isArchive = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'zip';
         file_put_contents($filePath, $body, FILE_APPEND);
         if ((int)Yii::$app->request->headers->get('Content-Length') != $this->getFileLimit()) {
