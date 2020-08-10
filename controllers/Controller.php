@@ -20,6 +20,7 @@ abstract class Controller extends \yii\web\Controller
 
     public function init()
     {
+        parent::init();
         if ($dbPath = realpath(__DIR__ . '/../exchange.db')) {
             $config = [
                 'class' => 'yii\db\Connection',
