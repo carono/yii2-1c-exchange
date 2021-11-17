@@ -57,20 +57,6 @@ class ApiController extends Controller
         parent::init();
     }
 
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            'bom' => [
-                'class' => BomBehavior::class,
-                'only' => ['query'],
-            ],
-        ]);
-    }
-
     /**
      * @param \yii\base\Action $action
      * @param mixed $result
