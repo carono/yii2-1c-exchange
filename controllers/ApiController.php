@@ -63,12 +63,18 @@ class ApiController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(parent::behaviors(), [
-            'bom' => [
-                'class' => BomBehavior::class,
-                'only' => ['query'],
-            ],
-        ]);
+        $behaviors = parent::behaviors();
+
+        if ($this->module->encodeQueryResponse) {
+            $behaviors = array_merge($behaviors, [
+                BomBehavior::class => [
+                    'class' => BomBehavior::class,
+                    'only' => ['query'],
+                ],
+            ]);
+        }
+
+        return $behaviors;
     }
 
     /**
@@ -308,7 +314,11 @@ class ApiController extends Controller
          */
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
-        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
+
+        if ($this->module->encodeQueryResponse) {
+            $response->getHeaders()
+                ->set('Content-Type', 'application/xml; charset=windows-1251');
+        }
 
         $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
         $root->addAttribute('ВерсияСхемы', $this->commerceMLVersion);
@@ -323,7 +333,11 @@ class ApiController extends Controller
             }
             if ($this->module->debug) {
                 $xml = $root->asXML();
-                $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
+
+                if ($this->module->encodeQueryResponse) {
+                    $xml = html_entity_decode($xml, ENT_NOQUOTES, 'UTF-8');
+                }
+
                 file_put_contents($this->module->getTmpDir() . '/query.xml', $xml);
             }
         }

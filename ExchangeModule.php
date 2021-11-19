@@ -116,6 +116,11 @@ class ExchangeModule extends \yii\base\Module
      */
     public $auth;
 
+    /**
+     * @var bool
+     */
+    public $encodeQueryResponse = true;
+
     private function loadRedactorModule()
     {
         $redactorClass = 'yii\redactor\widgets\Redactor';
