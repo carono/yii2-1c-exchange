@@ -16,14 +16,8 @@ use yii\db\ActiveRecord;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
-use Zenwalker\CommerceML\Model\Classifier;
-use Zenwalker\CommerceML\Model\Group;
-use Zenwalker\CommerceML\Model\Image;
 use Zenwalker\CommerceML\Model\Offer;
 use Zenwalker\CommerceML\Model\Product;
-use Zenwalker\CommerceML\Model\PropertyCollection;
-use Zenwalker\CommerceML\Model\Simple;
-use Zenwalker\CommerceML\Model\RequisiteCollection;
 
 /**
  * Default controller for the `api` module
@@ -308,7 +302,7 @@ class ApiController extends Controller
          */
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_RAW;
-        $response->getHeaders()->set('Content-Type', 'application/xml; charset=windows-1251');
+        $response->getHeaders()->set('Content-Type', 'application/xml; charset=' . $this->module->exchangeDocumentEncode);
 
         $root = new \SimpleXMLElement('<КоммерческаяИнформация></КоммерческаяИнформация>');
         $root->addAttribute('ВерсияСхемы', $this->commerceMLVersion);

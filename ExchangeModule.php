@@ -2,11 +2,10 @@
 
 namespace carono\exchange1c;
 
-use carono\exchange1c\helpers\ModuleHelper;
+use Yii;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 use yii\web\IdentityInterface;
-use Yii;
 
 /**
  * exchange module definition class
@@ -115,6 +114,13 @@ class ExchangeModule extends \yii\base\Module
      * @var \Closure
      */
     public $auth;
+
+    /**
+     * @var string
+     * Кодировка XML для обмена документами, старые 1С работают с windows-1251, новые конфигурации могут работать с UTF-8
+     * Если проблема с кодировкой, то при обмене, 1С может писать ошибку "Не удалось получить файл обмена"
+     */
+    public $exchangeDocumentEncode = 'windows-1251';
 
     private function loadRedactorModule()
     {

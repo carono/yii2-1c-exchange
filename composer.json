@@ -13,7 +13,9 @@
   "require": {
     "php": ">=5.6",
     "yiisoft/yii2": "^2.0",
-    "carono/commerceml": "^0.2.3"
+    "carono/commerceml": "^0.2.3",
+    "ext-simplexml": "*",
+    "ext-zip": "*"
   },
   "autoload": {
     "psr-4": {
