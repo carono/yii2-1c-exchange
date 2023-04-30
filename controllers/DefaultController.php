@@ -4,6 +4,8 @@
 namespace carono\exchange1c\controllers;
 
 
+use carono\exchange1c\models\Monitor;
+use Yii;
 use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
 
@@ -57,7 +59,9 @@ class DefaultController extends Controller
      */
     public function actionMonitor()
     {
-        return $this->render('monitor');
+        $dataProvider = Monitor::find()->search();
+        $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
+        return $this->render('monitor', ['dataProvider' => $dataProvider]);
     }
 
     /**
@@ -107,6 +111,15 @@ class DefaultController extends Controller
         foreach (FileHelper::findFiles($this->module->getTmpDir()) as $file) {
             unlink($file);
         }
+        return $this->redirect(\Yii::$app->request->referrer);
+    }
+
+    /**
+     * @return \yii\web\Response
+     */
+    public function actionClearMonitor()
+    {
+        Yii::$app->exchangeDb->createCommand()->truncateTable('{{%monitor}}')->execute();
         return $this->redirect(\Yii::$app->request->referrer);
     }
 }

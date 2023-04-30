@@ -11,16 +11,16 @@ use yii\data\Sort;
 use yii\db\ActiveQuery;
 
 /**
- * This is the ActiveQuery class for \carono\exchange1c\models\Article
- * @see \carono\exchange1c\models\Article
- * @method \yii\db\BatchQueryResult|\carono\exchange1c\models\Article[] each($batchSize = 100, $db = null)
- * @method \yii\db\BatchQueryResult|\carono\exchange1c\models\Article[] batch($batchSize = 100, $db = null)
+ * This is the ActiveQuery class for \carono\exchange1c\models\Monitor
+ * @see \carono\exchange1c\models\Monitor
+ * @method \yii\db\BatchQueryResult|\carono\exchange1c\models\Monitor[] each($batchSize = 100, $db = null)
+ * @method \yii\db\BatchQueryResult|\carono\exchange1c\models\Monitor[] batch($batchSize = 100, $db = null)
  */
-class ArticleQuery extends ActiveQuery
+class MonitorQuery extends ActiveQuery
 {
 	/**
 	 * @inheritdoc
-	 * @return \carono\exchange1c\models\Article[]
+	 * @return \carono\exchange1c\models\Monitor[]
 	 */
 	public function all($db = null)
 	{
@@ -30,7 +30,7 @@ class ArticleQuery extends ActiveQuery
 
 	/**
 	 * @inheritdoc
-	 * @return \carono\exchange1c\models\Article
+	 * @return \carono\exchange1c\models\Monitor
 	 */
 	public function one($db = null)
 	{

@@ -11,7 +11,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the base-model class for table "article".
+ * This is the base-model class for table "{{%article}}".
  *
  * @property integer $id
  * @property string $name
@@ -23,6 +23,18 @@ use yii\helpers\ArrayHelper;
  */
 class Article extends ActiveRecord
 {
+	protected $_relationClasses = [];
+
+
+	/**
+	 * @return \yii\db\Connection the database connection used by this AR class.
+	 */
+	public static function getDb()
+	{
+		return Yii::$app->get('exchangeDb');
+	}
+
+
 	/**
 	 * @inheritdoc
 	 */
