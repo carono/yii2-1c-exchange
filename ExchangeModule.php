@@ -107,6 +107,8 @@ class ExchangeModule extends \yii\base\Module
      */
     public $appendRule = false;
 
+    public $exchangeDocumentEncode = 'windows-1251';
+    
     public $redactorModuleName = 'carono-exchange-redactor';
     /**
      * Функция авторизации пользователя
