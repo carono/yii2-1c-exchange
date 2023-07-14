@@ -4,10 +4,12 @@
 namespace carono\exchange1c\controllers;
 
 
+use carono\exchange1c\models\forms\ImportForm;
 use carono\exchange1c\models\Monitor;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
+use yii\helpers\Html;
 
 /**
  * Class DefaultController
@@ -43,7 +45,15 @@ class DefaultController extends Controller
      */
     public function actionImport()
     {
-        return $this->render('import');
+        $model = new ImportForm();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->import()) {
+                Yii::$app->session->setFlash('success', 'Импорт завершен');
+            } else {
+                Yii::$app->session->setFlash('error', Html::errorSummary($model));
+            }
+        }
+        return $this->render('import', ['model' => $model]);
     }
 
     /**

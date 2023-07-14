@@ -3,6 +3,9 @@
 namespace carono\exchange1c;
 
 use carono\exchange1c\helpers\ModuleHelper;
+use carono\exchange1c\queue\OfferParseQueue;
+use carono\exchange1c\queue\ProductParseQueue;
+use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 use yii\web\IdentityInterface;
@@ -108,7 +111,7 @@ class ExchangeModule extends \yii\base\Module
     public $appendRule = false;
 
     public $exchangeDocumentEncode = 'windows-1251';
-    
+
     public $redactorModuleName = 'carono-exchange-redactor';
     /**
      * Функция авторизации пользователя
@@ -117,6 +120,24 @@ class ExchangeModule extends \yii\base\Module
      * @var \Closure
      */
     public $auth;
+
+    public $offerParsing;
+
+    public $productParsing;
+
+    public $offerChunk;
+
+    public $productChunk;
+
+    public $parseChunk = 100;
+
+    public $useQueue = false;
+
+    public $offerParseClass = OfferParseQueue::class;
+
+    public $productParseClass = ProductParseQueue::class;
+
+    public $queue;
 
     private function loadRedactorModule()
     {
@@ -154,6 +175,10 @@ class ExchangeModule extends \yii\base\Module
      */
     public function init()
     {
+        if ($this->useQueue && !$this->queue) {
+            throw new InvalidArgumentException('queue param is not set in exchange-1c module');
+        }
+
         if (!isset(\Yii::$app->i18n->translations['models'])) {
             \Yii::$app->i18n->translations['models'] = [
                 'class' => 'yii\i18n\PhpMessageSource',
@@ -162,6 +187,7 @@ class ExchangeModule extends \yii\base\Module
             ];
         }
         $this->loadRedactorModule();
+
         parent::init();
     }
 

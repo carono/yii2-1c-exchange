@@ -14,19 +14,14 @@ use carono\exchange1c\interfaces\ProductInterface;
 use carono\exchange1c\models\Monitor;
 use Exception;
 use Yii;
+use yii\console\Application;
 use yii\db\ActiveRecord;
-use yii\db\Expression;
+use yii\helpers\Console;
 use yii\helpers\FileHelper;
 use yii\web\Response;
 use Zenwalker\CommerceML\CommerceML;
-use Zenwalker\CommerceML\Model\Classifier;
-use Zenwalker\CommerceML\Model\Group;
-use Zenwalker\CommerceML\Model\Image;
 use Zenwalker\CommerceML\Model\Offer;
 use Zenwalker\CommerceML\Model\Product;
-use Zenwalker\CommerceML\Model\PropertyCollection;
-use Zenwalker\CommerceML\Model\Simple;
-use Zenwalker\CommerceML\Model\RequisiteCollection;
 
 /**
  * Default controller for the `api` module
@@ -52,11 +47,78 @@ class ApiController extends Controller
     protected $_ids;
     protected $_monitorModel;
 
+
     public function init()
     {
         set_time_limit($this->module->timeLimit);
         if ($this->module->memoryLimit) {
             ini_set('memory_limit', $this->module->memoryLimit);
+        }
+
+        if (!$this->module->productParsing) {
+            if ($this->module->useQueue) {
+                $this->module->productParsing = function (array $models) {
+                    $owner = null;
+                    $job = new $this->module->productParseClass;
+                    foreach ($models as $model) {
+                        $job->xml[] = $model->xml->asXML();
+                        if (!$owner) {
+                            $owner = $model->owner;
+                            $job->importXml = $model->owner->importXml ? $model->owner->importXml->asXML() : '';
+                            $job->offerXml = $model->owner->offersXml ? $model->owner->offersXml->asXML() : '';
+                            $job->ordersXml = $model->owner->ordersXml ? $model->owner->ordersXml->asXML() : '';
+                        }
+                    }
+                    Yii::$app->get($this->module->queue)->push($job);
+                };
+            } else {
+                $this->module->productParsing = function ($products) {
+                    $productClass = $this->getProductClass();
+                    foreach ($products as $product) {
+                        if (!$model = $productClass::createModel1c($product)) {
+                            Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c",
+                                'exchange1c');
+                            continue;
+                        }
+                        $this->parseProduct($model, $product);
+                        $this->_ids[] = $model->getPrimaryKey();
+                        $model = null;
+                        unset($model, $product);
+                        gc_collect_cycles();
+                    }
+                };
+            }
+        }
+
+        if (!$this->module->offerParsing) {
+            if ($this->module->useQueue) {
+                $this->module->offerParsing = function (array $models) {
+                    $owner = null;
+                    $job = new $this->module->offerParseClass;
+                    foreach ($models as $model) {
+                        $job->xml[] = $model->xml->asXML();
+                        if (!$owner) {
+                            $owner = $model->owner;
+                            $job->importXml = $model->owner->importXml ? $model->owner->importXml->asXML() : '';
+                            $job->offerXml = $model->owner->offersXml ? $model->owner->offersXml->asXML() : '';
+                            $job->ordersXml = $model->owner->ordersXml ? $model->owner->ordersXml->asXML() : '';
+                        }
+                    }
+                    Yii::$app->get($this->module->queue)->push($job);
+                };
+            } else {
+                $this->module->offerParsing = function ($offers) {
+                    foreach ($offers as $offer) {
+                        $product_id = $offer->getClearId();
+                        if ($product = $this->findProductModelById($product_id)) {
+                            $model = $product->getOffer1c($offer);
+                            $this->parseProductOffer($model, $offer);
+                        } else {
+                            Yii::warning("Продукт $product_id не найден в базе", 'exchange1c');
+                        }
+                    }
+                };
+            }
         }
         parent::init();
     }
@@ -209,15 +271,8 @@ class ApiController extends Controller
         return true;
     }
 
-    /**
-     * @param $file
-     */
-    public function parsingImport($file)
+    protected function reloadClassifier($commerce)
     {
-        $this->_ids = [];
-        $commerce = new CommerceML();
-        $commerce->loadImportXml($file);
-
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($this->module->getTmpDir() . DIRECTORY_SEPARATOR . "classifier-{$commerce->classifier->id}.xml");
         } else {
@@ -229,22 +284,36 @@ class ApiController extends Controller
             }
             $commerce->classifier->xml = simplexml_load_string(file_get_contents($classifierFile));
         }
+    }
+
+    /**
+     * @param $file
+     */
+    public function parsingImport($file)
+    {
+        $this->_ids = [];
+        $commerce = new CommerceML();
+        $commerce->loadImportXml($file);
+        $this->reloadClassifier($commerce);
+
         $this->beforeProductSync();
         if ($groupClass = $this->getGroupClass()) {
             $groupClass::createTree1c($commerce->classifier->getGroups());
         }
         $productClass = $this->getProductClass();
         $productClass::createProperties1c($commerce->classifier->getProperties());
-        foreach ($commerce->catalog->getProducts() as $product) {
-            if (!$model = $productClass::createModel1c($product)) {
-                Yii::error("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c",
-                    'exchange1c');
-                continue;
+        $total = count($commerce->catalog->getProducts());
+        $showProgress = $this->module->debug && Yii::$app instanceof Application;
+        if ($showProgress) {
+            Console::startProgress($done = 0, $total);
+        }
+        $chunk = $this->module->productChunk ?: $this->module->parseChunk;
+        foreach (array_chunk($commerce->catalog->getProducts(), $chunk) as $products) {
+            if ($showProgress) {
+                Console::startProgress($done += count($products), $total);
             }
-            $this->parseProduct($model, $product);
-            $this->_ids[] = $model->getPrimaryKey();
-            $model = null;
-            unset($model, $product);
+            call_user_func($this->module->productParsing, $products);
+            unset($products);
             gc_collect_cycles();
         }
         $this->afterProductSync();
@@ -272,17 +341,17 @@ class ApiController extends Controller
             $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
         }
         $this->beforeOfferSync();
-        foreach ($commerce->offerPackage->getOffers() as $offer) {
-            $product_id = $offer->getClearId();
-            if ($product = $this->findProductModelById($product_id)) {
-                $model = $product->getOffer1c($offer);
-                $this->parseProductOffer($model, $offer);
-                $this->_ids[] = $model->getPrimaryKey();
-            } else {
-                Yii::warning("Продукт $product_id не найден в базе", 'exchange1c');
-                continue;
+        $showProgress = $this->module->debug && Yii::$app instanceof Application;
+        $total = count($commerce->offerPackage->getOffers());
+        if ($showProgress) {
+            Console::startProgress($done = 0, $total);
+        }
+        $chunk = $this->module->offerChunk ?: $this->module->parseChunk;
+        foreach (array_chunk($commerce->offerPackage->getOffers(), $chunk) as $offers) {
+            if ($showProgress) {
+                Console::updateProgress($done += count($offers), $total);
             }
-            unset($model);
+            call_user_func($this->module->offerParsing, $offers);
         }
         $this->afterOfferSync();
     }
@@ -426,7 +495,7 @@ class ApiController extends Controller
      * @param ProductInterface $model
      * @param \Zenwalker\CommerceML\Model\Product $product
      */
-    protected function parseProduct($model, $product)
+    public function parseProduct($model, $product)
     {
         $this->beforeUpdateProduct($model);
         $model->setRaw1cData($product->owner, $product);
@@ -442,13 +511,16 @@ class ApiController extends Controller
      * @param OfferInterface $model
      * @param Offer $offer
      */
-    protected function parseProductOffer($model, $offer)
+    public function parseProductOffer($model, $offer)
     {
         $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
         $this->parsePrice($model, $offer);
         $model->{$model::getIdFieldName1c()} = $offer->id;
-        $model->save();
+        if (!$model->save()) {
+            $error = $model instanceof ActiveRecord ? current($model->getFirstErrors()) : '';
+            Yii::warning("Не удалось сохранить предложение: $error", 'exchange1c');
+        }
         $this->afterUpdateOffer($model, $offer);
     }
 
@@ -457,7 +529,7 @@ class ApiController extends Controller
      *
      * @return ProductInterface|null
      */
-    protected function findProductModelById($id)
+    public function findProductModelById($id)
     {
         /**
          * @var $class ProductInterface

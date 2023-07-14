@@ -4,8 +4,15 @@
 namespace carono\exchange1c\helpers;
 
 
+use Yii;
+
 class ModuleHelper
 {
+    public static function getModuleByClass($class = 'carono\exchange1c\ExchangeModule')
+    {
+        return Yii::$app->getModule(static::getModuleNameByClass($class));
+    }
+
     /**
      * @param string $class
      * @param string|null $default

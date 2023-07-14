@@ -115,7 +115,8 @@ abstract class TestingClass extends Testing
                     $methodResult = call_user_func_array([$context, $method], $params);
                 }
             } catch (\Exception $e) {
-                return null;
+                var_dump($e->getMessage());
+                return $e->getMessage();
             }
         }
         return $methodResult;
@@ -173,7 +174,13 @@ abstract class TestingClass extends Testing
             return $cache;
         }
         try {
-            return $this->saveResult($this->prepareResult());
+            $result = $this->prepareResult();
+//            try {
+//                return $this->saveResult($result);
+//            } catch (Exception $e) {
+//
+//            }
+            return $result;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
