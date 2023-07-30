@@ -58,15 +58,18 @@ class ApiController extends Controller
         if (!$this->module->productParsing) {
             if ($this->module->useQueue) {
                 $this->module->productParsing = function (array $models) {
+                    /**
+                     * @var Product $model
+                     */
                     $owner = null;
                     $job = new $this->module->productParseClass;
                     foreach ($models as $model) {
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $model->owner->importXml ? $model->owner->importXml->asXML() : '';
-                            $job->offerXml = $model->owner->offersXml ? $model->owner->offersXml->asXML() : '';
-                            $job->ordersXml = $model->owner->ordersXml ? $model->owner->ordersXml->asXML() : '';
+                            $job->importXml = $model->owner->importXmlFilePath;
+                            $job->offerXml = $model->owner->offersXmlFilePath;
+                            $job->ordersXml = $model->owner->ordersXmlFilePath;
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
@@ -99,9 +102,9 @@ class ApiController extends Controller
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $model->owner->importXml ? $model->owner->importXml->asXML() : '';
-                            $job->offerXml = $model->owner->offersXml ? $model->owner->offersXml->asXML() : '';
-                            $job->ordersXml = $model->owner->ordersXml ? $model->owner->ordersXml->asXML() : '';
+                            $job->importXml = $model->owner->importXmlFilePath;
+                            $job->offerXml = $model->owner->offersXmlFilePath;
+                            $job->ordersXml = $model->owner->ordersXmlFilePath;
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
