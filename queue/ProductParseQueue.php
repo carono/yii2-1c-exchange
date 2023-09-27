@@ -14,7 +14,6 @@ use Zenwalker\CommerceML\Model\Product;
 
 class ProductParseQueue extends ParseQueue
 {
-
     public function execute($queue)
     {
         /**
@@ -27,7 +26,7 @@ class ProductParseQueue extends ParseQueue
         $productClass = $module->productClass;
 
         foreach ($this->xml as $xml) {
-            $product = new Product($commerceMl, new SimpleXMLElement($xml));;
+            $product = new Product($commerceMl, new SimpleXMLElement($xml));
             if (!$model = $productClass::createModel1c($product)) {
                 $message = "Модель продукта не найдена, проверьте реализацию $productClass::createModel1c";
                 Yii::warning($message, 'exchange1c');

@@ -5,6 +5,7 @@ namespace carono\exchange1c;
 use carono\exchange1c\helpers\ModuleHelper;
 use carono\exchange1c\queue\OfferParseQueue;
 use carono\exchange1c\queue\ProductParseQueue;
+use Exception;
 use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
@@ -194,10 +195,30 @@ class ExchangeModule extends \yii\base\Module
     public function getTmpDir($part = null)
     {
         $dir = \Yii::getAlias($this->tmpDir);
-        if (!is_dir($dir)) {
-            FileHelper::createDirectory($dir, 0777, true);
+        $path = $dir . ($part ? DIRECTORY_SEPARATOR . trim($part, '/\\') : '');
+        if (!is_dir($path)) {
+            FileHelper::createDirectory($path, 0777, true);
         }
-        return $dir . ($part ? DIRECTORY_SEPARATOR . trim($part, '/\\') : '');
+        return $path;
+    }
+
+    public function saveFileToTmp($file)
+    {
+        if (!$file || !file_exists($file)) {
+            return null;
+        }
+        $dir = $this->getTmpDir('queue_tmp');
+        $md5 = md5_file($file);
+        $tmpFile = $dir . DIRECTORY_SEPARATOR . $md5 . '_' . basename($file);
+
+        if (file_exists($tmpFile) && md5_file($tmpFile) == $md5) {
+            return $tmpFile;
+        }
+
+        if (!copy($file, $tmpFile)) {
+            throw new Exception("Fail copy '$file' to '$tmpFile'");
+        }
+        return $tmpFile;
     }
 
     /**

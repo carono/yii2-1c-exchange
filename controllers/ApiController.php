@@ -47,7 +47,6 @@ class ApiController extends Controller
     protected $_ids;
     protected $_monitorModel;
 
-
     public function init()
     {
         set_time_limit($this->module->timeLimit);
@@ -63,13 +62,14 @@ class ApiController extends Controller
                      */
                     $owner = null;
                     $job = new $this->module->productParseClass;
+
                     foreach ($models as $model) {
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $model->owner->importXmlFilePath;
-                            $job->offerXml = $model->owner->offersXmlFilePath;
-                            $job->ordersXml = $model->owner->ordersXmlFilePath;
+                            $job->importXml = $this->module->saveFileToTmp($model->owner->importXmlFilePath);
+                            $job->offerXml = $this->module->saveFileToTmp($model->owner->offersXmlFilePath);
+                            $job->ordersXml = $this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
@@ -102,9 +102,9 @@ class ApiController extends Controller
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $model->owner->importXmlFilePath;
-                            $job->offerXml = $model->owner->offersXmlFilePath;
-                            $job->ordersXml = $model->owner->ordersXmlFilePath;
+                            $job->importXml = $this->module->saveFileToTmp($model->owner->importXmlFilePath);
+                            $job->offerXml = $this->module->saveFileToTmp($model->owner->offersXmlFilePath);
+                            $job->ordersXml = $this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
@@ -149,7 +149,7 @@ class ApiController extends Controller
             $monitor->headers = json_encode(Yii::$app->request->headers->toArray());
             $monitor->post = json_encode(Yii::$app->request->post());
             $monitor->get = json_encode(Yii::$app->request->get());
-            $monitor->user_id = Yii::$app->user->getId();
+            $monitor->user_id = (string)Yii::$app->user->getId();
             $monitor->ip = Yii::$app->request->userIP;
             $monitor->created_at = date('Y-m-d H:i:s');
             if ($monitor->save()) {
@@ -648,7 +648,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @return ProductInterface
+     * @return ProductInterface|string
      */
     protected function getProductClass()
     {
