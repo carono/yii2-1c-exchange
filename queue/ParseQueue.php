@@ -8,9 +8,9 @@ abstract class ParseQueue implements \yii\queue\JobInterface, RetryableJobInterf
 {
     public $timeout = 3600;
     public $xml = [];
-    public $importXml;
-    public $offerXml;
-    public $ordersXml;
+    public $importXml = '';
+    public $offerXml = '';
+    public $ordersXml = '';
 
 
     public function getTtr()
