@@ -25,6 +25,7 @@ class ProductParseQueue extends ParseQueue
         $commerceMl->addXmls($this->importXml, $this->offerXml, $this->ordersXml);
         $productClass = $module->productClass;
 
+        $controller->reloadClassifier($commerceMl);
         foreach ($this->xml as $xml) {
             $product = new Product($commerceMl, new SimpleXMLElement($xml));
             if (!$model = $productClass::createModel1c($product)) {

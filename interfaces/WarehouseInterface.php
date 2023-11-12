@@ -8,5 +8,5 @@ use yii\db\ActiveRecordInterface;
 
 interface WarehouseInterface extends ActiveRecordInterface, IdentifierInterface
 {
-
+    public static function createWarehouses($stockrooms);
 }

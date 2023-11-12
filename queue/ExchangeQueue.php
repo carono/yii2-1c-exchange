@@ -11,6 +11,7 @@ use yii\queue\RetryableJobInterface;
 class ExchangeQueue implements \yii\queue\JobInterface, RetryableJobInterface
 {
     public $timeout = 3600;
+    public $file;
 
     public function execute($queue)
     {
@@ -21,8 +22,9 @@ class ExchangeQueue implements \yii\queue\JobInterface, RetryableJobInterface
         $ctrl = new ApiController('api', $module);
 //        Yii::$app->request->setRawBody($content);
 //        $ctrl->actionFile(null, 'import.zip');
+        $path = $this->file ?: realpath($module->getTmpDir()) . '/*.xml';
 
-        foreach (glob(realpath($module->getTmpDir()) . '/*.xml') as $file) {
+        foreach (glob($path) as $file) {
             Console::output($file);
             $ctrl->actionImport('catalog', basename($file));
         }
