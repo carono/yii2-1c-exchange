@@ -68,9 +68,9 @@ class ApiController extends Controller
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $this->module->saveFileToTmp($model->owner->importXmlFilePath);
-                            $job->offerXml = $this->module->saveFileToTmp($model->owner->offersXmlFilePath);
-                            $job->ordersXml = $this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
+                            $job->importXml = (string)$this->module->saveFileToTmp($model->owner->importXmlFilePath);
+                            $job->offerXml = (string)$this->module->saveFileToTmp($model->owner->offersXmlFilePath);
+                            $job->ordersXml = (string)$this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
@@ -103,9 +103,9 @@ class ApiController extends Controller
                         $job->xml[] = $model->xml->asXML();
                         if (!$owner) {
                             $owner = $model->owner;
-                            $job->importXml = $this->module->saveFileToTmp($model->owner->importXmlFilePath);
-                            $job->offerXml = $this->module->saveFileToTmp($model->owner->offersXmlFilePath);
-                            $job->ordersXml = $this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
+                            $job->importXml = (string)$this->module->saveFileToTmp($model->owner->importXmlFilePath);
+                            $job->offerXml = (string)$this->module->saveFileToTmp($model->owner->offersXmlFilePath);
+                            $job->ordersXml = (string)$this->module->saveFileToTmp($model->owner->ordersXmlFilePath);
                         }
                     }
                     Yii::$app->get($this->module->queue)->push($job);
