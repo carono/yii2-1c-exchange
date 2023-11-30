@@ -3,7 +3,7 @@
 namespace carono\exchange1c\interfaces;
 
 use yii\db\ActiveRecordInterface;
-use Zenwalker\CommerceML\Model\PropertyCollection;
+use Zenwalker\CommerceML\Collections\PropertyCollection;
 
 /**
  * Interface ProductInterface
